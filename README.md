@@ -34,16 +34,16 @@ In this cloud workspace, use `npm --cache /workspace/.npm-cache ci` if the defau
 
 Visual sonification interprets displayed pixels, not calibrated physical measurements. Climate recordings use separate observational data. Places suggest tracks and rotate the globe; they do not manufacture local measurements. NASA/NOAA/NSIDC observations are pinned snapshots, not a live feed.
 
-## Verify and build
+## Production workflow
 
 ```sh
-npm test                 # audio, live pixel mapping, WAV, and source-data checks
-npm run build            # strict TypeScript and production bundle
-npm run test:e2e         # browser interactions, media, mobile, and axe audit
-npm run preview          # serve the production bundle
+git switch main
+git add <changed-files>
+git commit -m "Describe the change"
+git push origin main
 ```
 
-Playwright uses `/usr/bin/chromium` when available. Otherwise run `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to a compatible browser. The browser suite starts Vite automatically if needed. `npm run check` runs the complete validation chain.
+All work stays on `main`. Vercel builds each push and publishes directly to [Earth FM](https://earth-fm.vercel.app/). Preview deployments and testing workflows are not used. For an explicit terminal deployment, run `vercel deploy --prod --yes --scope chia-0u0-s-projects` from this linked checkout.
 
 `npm run data:refresh` verifies the checked-in source hashes and deterministically rebuilds the observation data. `node scripts/refresh-data.mjs --download` restores the same pinned versions using verified HTTPS and recorded hashes; it does not silently refresh to a moving upstream branch.
 

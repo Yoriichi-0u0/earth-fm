@@ -1,39 +1,33 @@
-# Deploy Earth FM to Vercel
+# Earth FM production deployment
 
-The live site is [Earth FM](https://earth-fm.vercel.app/). The connected GitHub build reached **Ready**, and its HTTPS homepage, visual readiness, climate player readiness, and browser console were verified on October 14, 2026.
+Live website: [earth-fm.vercel.app](https://earth-fm.vercel.app/).
 
-The production site is static. `vercel.json` selects Vite, runs `npm run build`, and serves `dist`. No Supabase project, API key, or runtime environment variable is needed.
+Earth FM uses a single branch and deployment workflow: **`main` → Vercel production**. All code and setup remain on `main`. Preview deployments are disabled, and `vercel.json` permits automatic Git deployments only from `main`. Test suites and testing pipelines are not part of this workflow.
 
-The checkout is linked to [Vercel project `earth-fm`](https://vercel.com/chia-0u0-s-projects/earth-fm). GitHub is connected as `Yoriichi-0u0/earth-fm`, with `codex/earth-fm-bobomimi` selected as the production branch. Build settings are Node.js 24, install command `npm ci`, build command `npm run build`, and output directory `dist`. See [CONNECTIONS.md](CONNECTIONS.md) for the Supabase project and credential configuration.
+The connected [Vercel project `earth-fm`](https://vercel.com/chia-0u0-s-projects/earth-fm) uses GitHub repository `Yoriichi-0u0/earth-fm`, production branch `main`, and the repository root. Build settings are Node.js 24, install command `npm ci`, build command `npm run build`, and output directory `dist`.
 
-## GitHub import
+## Publish through GitHub
 
-1. Push or merge the tested project branch into the GitHub repository.
-2. For a new checkout or hosting project, import `Yoriichi-0u0/earth-fm`, select `codex/earth-fm-bobomimi`, and use the repository root as the root directory. The current Vercel project is already connected.
-3. Select Node.js 24 or a supported Node.js version of at least 22.12. The framework is Vite, build command is `npm run build`, and output directory is `dist`.
-4. Deploy. Open the returned HTTPS URL and validate **Hear this visual**, the immersive video, a climate track, and WAV download. Browser audio begins only after a user gesture.
-5. Put the verified HTTPS URL into the Space Apps submission and `docs/SUBMISSION.md`.
-
-The Vercel GitHub integration automatically creates previews for subsequent commits on an imported project. Account sign-in in another interface does not by itself inject CLI credentials into the cloud workspace.
-
-## CLI alternative
-
-If a Vercel CLI connection is available on your machine:
+Commit changes directly to `main`, then push:
 
 ```sh
-npm ci
-npm run check
-npx vercel
+git switch main
+git add <changed-files>
+git commit -m "Describe the change"
+git push origin main
 ```
 
-This creates a reviewable preview. Inspect its behavior before promoting it with `npx vercel --prod`. Use Vercel’s normal secure sign-in or environment settings for authentication; never commit tokens or put them in chat.
+The connected Vercel build publishes the production website automatically. There is no separate preview, staging, or testing step.
 
-## Self-host or local production check
+## Explicit terminal deployment
+
+From this linked checkout on `main`:
 
 ```sh
-npm ci
-npm run build
-npm run preview
+vercel project inspect --non-interactive
+vercel deploy --prod --yes --scope chia-0u0-s-projects
 ```
 
-Any HTTPS static host can serve `dist` unchanged. Bundled source snapshots are deliberately available under `/data/` for provenance and reuse. WAV synthesis and file processing occur in the browser, so the host does not need an audio backend or upload endpoint.
+Production builds run `npm run build`. The static sonification application processes data, audio, and uploads in the browser. Supabase is connected for future backend work, with public configuration scoped to Vercel production; see [CONNECTIONS.md](CONNECTIONS.md).
+
+Keep the production website URL in `docs/SUBMISSION.md` for the Space Apps submission.
