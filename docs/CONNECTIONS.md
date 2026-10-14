@@ -6,6 +6,7 @@ Use **Earth FM** for display names and `earth-fm` for package and service slugs.
 | --- | --- |
 | GitHub | [Yoriichi-0u0/earth-fm](https://github.com/Yoriichi-0u0/earth-fm) |
 | App branch | [`codex/earth-fm-bobomimi`](https://github.com/Yoriichi-0u0/earth-fm/tree/codex/earth-fm-bobomimi) |
+| Live website | [earth-fm.vercel.app](https://earth-fm.vercel.app/) |
 | Vercel | [earth-fm](https://vercel.com/chia-0u0-s-projects/earth-fm), team `chia-0u0-s-projects` |
 | Supabase | [Earth FM](https://supabase.com/dashboard/project/jycymoxtfbuxzmpeaykj), organization **Chia's Project**, Singapore |
 

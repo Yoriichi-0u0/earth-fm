@@ -1,5 +1,7 @@
 # Deploy Earth FM to Vercel
 
+The live site is [Earth FM](https://earth-fm.vercel.app/). The connected GitHub build reached **Ready**, and its HTTPS homepage, visual readiness, climate player readiness, and browser console were verified on October 14, 2026.
+
 The production site is static. `vercel.json` selects Vite, runs `npm run build`, and serves `dist`. No Supabase project, API key, or runtime environment variable is needed.
 
 The checkout is linked to [Vercel project `earth-fm`](https://vercel.com/chia-0u0-s-projects/earth-fm). GitHub is connected as `Yoriichi-0u0/earth-fm`, with `codex/earth-fm-bobomimi` selected as the production branch. Build settings are Node.js 24, install command `npm ci`, build command `npm run build`, and output directory `dist`. See [CONNECTIONS.md](CONNECTIONS.md) for the Supabase project and credential configuration.

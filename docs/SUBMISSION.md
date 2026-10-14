@@ -42,7 +42,7 @@ This mapping covers the summary supplied by the team. It does not claim validati
 
 - Source repository: https://github.com/Yoriichi-0u0/earth-fm/tree/codex/earth-fm-bobomimi
 - Challenge: https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/
-- Project website: add the verified deployment URL after publishing. No deployment URL is asserted in this draft.
+- Project website: https://earth-fm.vercel.app/ (production deployment and homepage verified October 14, 2026).
 - [Observation sources and transformations](DATA.md)
 - [Visual assets, mirror evidence, missing dates, and credits](FRAMES.md)
 - [Sonification method and implementation](SONIFICATION.md)
