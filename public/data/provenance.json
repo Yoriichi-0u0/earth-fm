@@ -1,0 +1,60 @@
+{
+  "checkedOn": "2026-10-14",
+  "note": "Checked-on date is the date these mirrors were retrieved for this project, not an upstream update timestamp. Bundled snapshots are not live data.",
+  "lastCompleteCalendarYearAllowed": 2025,
+  "observationsSha256": "6229325d880774494139391a670f0ccee063bb66e12a74d4b018aac6e83e13eb",
+  "sources": [
+    {
+      "id": "temperature",
+      "file": "global-temperature.csv",
+      "repository": "datasets/global-temp",
+      "commit": "44571fe8c15e228c156bb19308e5ccc1e31cf9f7",
+      "path": "data/annual.csv",
+      "sha256": "c9f98d4dfb6a985d9dbbb7a99e9208378d8d693ce951cd69f7983a628c296e20",
+      "downloadUrl": "https://raw.githubusercontent.com/datasets/global-temp/44571fe8c15e228c156bb19308e5ccc1e31cf9f7/data/annual.csv",
+      "bundledUrl": "/data/sources/global-temperature.csv",
+      "observations": 146,
+      "firstYear": 1880,
+      "lastYear": 2025
+    },
+    {
+      "id": "co2",
+      "file": "mauna-loa-co2.csv",
+      "repository": "datasets/co2-ppm",
+      "commit": "8c4097238570147adf6fa97ad357315528dac4c5",
+      "path": "data/co2-annmean-mlo.csv",
+      "sha256": "b1548ededea6f9b7eecac370753de8d8da6e0afafe1041f749a11db78c2e33c4",
+      "downloadUrl": "https://raw.githubusercontent.com/datasets/co2-ppm/8c4097238570147adf6fa97ad357315528dac4c5/data/co2-annmean-mlo.csv",
+      "bundledUrl": "/data/sources/mauna-loa-co2.csv",
+      "observations": 67,
+      "firstYear": 1959,
+      "lastYear": 2025
+    },
+    {
+      "id": "sea-level",
+      "file": "sea-level.csv",
+      "repository": "datasets/sea-level-rise",
+      "commit": "e75c7af397e8ef9cd93348fb608530eb764cc1ba",
+      "path": "data/epa-sea-level.csv",
+      "sha256": "f65bea986aca6a7444190e6384356c8d81284603ce391a9f44e3fe679ce96b4a",
+      "downloadUrl": "https://raw.githubusercontent.com/datasets/sea-level-rise/e75c7af397e8ef9cd93348fb608530eb764cc1ba/data/epa-sea-level.csv",
+      "bundledUrl": "/data/sources/sea-level.csv",
+      "observations": 31,
+      "firstYear": 1993,
+      "lastYear": 2023
+    },
+    {
+      "id": "sea-ice",
+      "file": "arctic-daily-extent.csv",
+      "repository": "s4f-dortmund/open_data_notebooks",
+      "commit": "17a7f4af6c5c895663e62ccda6e76e9228e95ce3",
+      "path": "data/2023-07-25/N_seaice_extent_daily_v3.0.csv",
+      "sha256": "b76a73a8b1c659476741b65336f9f522b3a836ad5b971a2236cce1ef0c5296b9",
+      "downloadUrl": "https://raw.githubusercontent.com/s4f-dortmund/open_data_notebooks/17a7f4af6c5c895663e62ccda6e76e9228e95ce3/data/2023-07-25/N_seaice_extent_daily_v3.0.csv",
+      "bundledUrl": "/data/sources/arctic-daily-extent.csv",
+      "observations": 36,
+      "firstYear": 1987,
+      "lastYear": 2022
+    }
+  ]
+}

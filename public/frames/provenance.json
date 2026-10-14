@@ -1,0 +1,57 @@
+{
+  "checkedOn": "2026-10-14",
+  "repository": "CarsonDavis/compression-comparison",
+  "commit": "2895d06f1a6abc144a5bc74f10daac805e8b0022",
+  "verification": "Mirror README and original-path naming identify these as earth.gov assets. NOAA/NASA credit is embedded in night-lights.png. Direct official NASA/EIC endpoints were blocked in this environment, so exact official bytes and dates could not be independently checked.",
+  "assets": [
+    {
+      "file": "night-lights.png",
+      "bytes": 1430244,
+      "sha256": "3de7c8fb5e560e178a8b83795aeaf9f9fa00196cd6ae40929528a5873e08eb11",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/originals/themes--energy--card.png",
+      "bundledUrl": "/frames/night-lights.png"
+    },
+    {
+      "file": "night-lights.webp",
+      "bytes": 396858,
+      "sha256": "7cf4a3ecbfb0a59a2c2fef519235f702a81ed364de9e874d05f702c8e1db16a6",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/webp-q80/themes--energy--card.webp",
+      "bundledUrl": "/frames/night-lights.webp"
+    },
+    {
+      "file": "eic-immersive.png",
+      "bytes": 1337368,
+      "sha256": "043543f1aaa8b1035a0f85ba32cc57acd7a56081b59aa869a00e641202f56d82",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/originals/portals--earth-information-center.png",
+      "bundledUrl": "/frames/eic-immersive.png"
+    },
+    {
+      "file": "eic-immersive.webp",
+      "bytes": 401982,
+      "sha256": "56f4215bc1ec25f5d10e9ab8a74c6231447efa7a2c03fd2af48811fa4dd26dd2",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/webp-q80/portals--earth-information-center.webp",
+      "bundledUrl": "/frames/eic-immersive.webp"
+    },
+    {
+      "file": "untethered-earth.gif",
+      "bytes": 5460499,
+      "sha256": "45329ca71deda4d7b2df92190d6f788b4bf914e1af3563735463b81a236d55e3",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/originals/visit--immersive-experience--untethered-4.gif",
+      "bundledUrl": "/frames/untethered-earth.gif"
+    },
+    {
+      "file": "untethered-earth.webm",
+      "bytes": 856852,
+      "sha256": "c006fb8ff3e6938e63c475eaffd9bd2a9528c042cd21c88587c0086982dd4ae9",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/webm/visit--immersive-experience--untethered-4.webm",
+      "bundledUrl": "/frames/untethered-earth.webm"
+    },
+    {
+      "file": "MIRROR-README.md",
+      "bytes": 3266,
+      "sha256": "28af743c57a3deff427bd1b87a4acf70c61a06861b457344bdba77fa914e9d64",
+      "retrievalUrl": "https://raw.githubusercontent.com/CarsonDavis/compression-comparison/2895d06f1a6abc144a5bc74f10daac805e8b0022/README.md",
+      "bundledUrl": "/frames/MIRROR-README.md"
+    }
+  ]
+}

@@ -1,0 +1,1186 @@
+[
+  {
+    "id": "temperature",
+    "title": "Global temperature",
+    "subtitle": "The planet’s rising melody",
+    "unit": "°C",
+    "color": "#ff7959",
+    "source": "NASA GISS · GISTEMP v4",
+    "sourceUrl": "https://data.giss.nasa.gov/gistemp/",
+    "description": "Annual global land and ocean temperature anomalies from NASA GISTEMP. Each note represents one year of observations.",
+    "coverage": "Global land and ocean average",
+    "baseline": "Temperature anomaly relative to the 1951–1980 average.",
+    "mapping": "Higher temperature anomalies produce higher notes. The sound is a musical representation of data, not a recording of Earth.",
+    "observations": [
+      {
+        "year": 1880,
+        "value": -0.1792
+      },
+      {
+        "year": 1881,
+        "value": -0.0917
+      },
+      {
+        "year": 1882,
+        "value": -0.115
+      },
+      {
+        "year": 1883,
+        "value": -0.18
+      },
+      {
+        "year": 1884,
+        "value": -0.285
+      },
+      {
+        "year": 1885,
+        "value": -0.3392
+      },
+      {
+        "year": 1886,
+        "value": -0.32
+      },
+      {
+        "year": 1887,
+        "value": -0.3667
+      },
+      {
+        "year": 1888,
+        "value": -0.18
+      },
+      {
+        "year": 1889,
+        "value": -0.1133
+      },
+      {
+        "year": 1890,
+        "value": -0.3617
+      },
+      {
+        "year": 1891,
+        "value": -0.2292
+      },
+      {
+        "year": 1892,
+        "value": -0.2783
+      },
+      {
+        "year": 1893,
+        "value": -0.3158
+      },
+      {
+        "year": 1894,
+        "value": -0.3092
+      },
+      {
+        "year": 1895,
+        "value": -0.23
+      },
+      {
+        "year": 1896,
+        "value": -0.1192
+      },
+      {
+        "year": 1897,
+        "value": -0.1158
+      },
+      {
+        "year": 1898,
+        "value": -0.2817
+      },
+      {
+        "year": 1899,
+        "value": -0.1817
+      },
+      {
+        "year": 1900,
+        "value": -0.0875
+      },
+      {
+        "year": 1901,
+        "value": -0.1575
+      },
+      {
+        "year": 1902,
+        "value": -0.2867
+      },
+      {
+        "year": 1903,
+        "value": -0.3758
+      },
+      {
+        "year": 1904,
+        "value": -0.4817
+      },
+      {
+        "year": 1905,
+        "value": -0.27
+      },
+      {
+        "year": 1906,
+        "value": -0.2283
+      },
+      {
+        "year": 1907,
+        "value": -0.3892
+      },
+      {
+        "year": 1908,
+        "value": -0.4342
+      },
+      {
+        "year": 1909,
+        "value": -0.4933
+      },
+      {
+        "year": 1910,
+        "value": -0.4433
+      },
+      {
+        "year": 1911,
+        "value": -0.4508
+      },
+      {
+        "year": 1912,
+        "value": -0.375
+      },
+      {
+        "year": 1913,
+        "value": -0.3575
+      },
+      {
+        "year": 1914,
+        "value": -0.1667
+      },
+      {
+        "year": 1915,
+        "value": -0.1483
+      },
+      {
+        "year": 1916,
+        "value": -0.365
+      },
+      {
+        "year": 1917,
+        "value": -0.4642
+      },
+      {
+        "year": 1918,
+        "value": -0.3025
+      },
+      {
+        "year": 1919,
+        "value": -0.2783
+      },
+      {
+        "year": 1920,
+        "value": -0.2783
+      },
+      {
+        "year": 1921,
+        "value": -0.1917
+      },
+      {
+        "year": 1922,
+        "value": -0.2842
+      },
+      {
+        "year": 1923,
+        "value": -0.2658
+      },
+      {
+        "year": 1924,
+        "value": -0.2692
+      },
+      {
+        "year": 1925,
+        "value": -0.2217
+      },
+      {
+        "year": 1926,
+        "value": -0.1083
+      },
+      {
+        "year": 1927,
+        "value": -0.22
+      },
+      {
+        "year": 1928,
+        "value": -0.2017
+      },
+      {
+        "year": 1929,
+        "value": -0.3625
+      },
+      {
+        "year": 1930,
+        "value": -0.16
+      },
+      {
+        "year": 1931,
+        "value": -0.0942
+      },
+      {
+        "year": 1932,
+        "value": -0.1617
+      },
+      {
+        "year": 1933,
+        "value": -0.2883
+      },
+      {
+        "year": 1934,
+        "value": -0.1283
+      },
+      {
+        "year": 1935,
+        "value": -0.2017
+      },
+      {
+        "year": 1936,
+        "value": -0.1517
+      },
+      {
+        "year": 1937,
+        "value": -0.0333
+      },
+      {
+        "year": 1938,
+        "value": -0.0058
+      },
+      {
+        "year": 1939,
+        "value": -0.0242
+      },
+      {
+        "year": 1940,
+        "value": 0.1217
+      },
+      {
+        "year": 1941,
+        "value": 0.18
+      },
+      {
+        "year": 1942,
+        "value": 0.0617
+      },
+      {
+        "year": 1943,
+        "value": 0.0858
+      },
+      {
+        "year": 1944,
+        "value": 0.2017
+      },
+      {
+        "year": 1945,
+        "value": 0.095
+      },
+      {
+        "year": 1946,
+        "value": -0.0725
+      },
+      {
+        "year": 1947,
+        "value": -0.0283
+      },
+      {
+        "year": 1948,
+        "value": -0.1083
+      },
+      {
+        "year": 1949,
+        "value": -0.1108
+      },
+      {
+        "year": 1950,
+        "value": -0.175
+      },
+      {
+        "year": 1951,
+        "value": -0.07
+      },
+      {
+        "year": 1952,
+        "value": 0.01
+      },
+      {
+        "year": 1953,
+        "value": 0.08
+      },
+      {
+        "year": 1954,
+        "value": -0.1325
+      },
+      {
+        "year": 1955,
+        "value": -0.14
+      },
+      {
+        "year": 1956,
+        "value": -0.1892
+      },
+      {
+        "year": 1957,
+        "value": 0.0475
+      },
+      {
+        "year": 1958,
+        "value": 0.0592
+      },
+      {
+        "year": 1959,
+        "value": 0.0308
+      },
+      {
+        "year": 1960,
+        "value": -0.025
+      },
+      {
+        "year": 1961,
+        "value": 0.0567
+      },
+      {
+        "year": 1962,
+        "value": 0.0308
+      },
+      {
+        "year": 1963,
+        "value": 0.0542
+      },
+      {
+        "year": 1964,
+        "value": -0.1992
+      },
+      {
+        "year": 1965,
+        "value": -0.1067
+      },
+      {
+        "year": 1966,
+        "value": -0.0575
+      },
+      {
+        "year": 1967,
+        "value": -0.0242
+      },
+      {
+        "year": 1968,
+        "value": -0.0825
+      },
+      {
+        "year": 1969,
+        "value": 0.0525
+      },
+      {
+        "year": 1970,
+        "value": 0.0275
+      },
+      {
+        "year": 1971,
+        "value": -0.0792
+      },
+      {
+        "year": 1972,
+        "value": 0.0092
+      },
+      {
+        "year": 1973,
+        "value": 0.1608
+      },
+      {
+        "year": 1974,
+        "value": -0.0717
+      },
+      {
+        "year": 1975,
+        "value": -0.0133
+      },
+      {
+        "year": 1976,
+        "value": -0.0975
+      },
+      {
+        "year": 1977,
+        "value": 0.1783
+      },
+      {
+        "year": 1978,
+        "value": 0.0667
+      },
+      {
+        "year": 1979,
+        "value": 0.1642
+      },
+      {
+        "year": 1980,
+        "value": 0.2558
+      },
+      {
+        "year": 1981,
+        "value": 0.3233
+      },
+      {
+        "year": 1982,
+        "value": 0.1392
+      },
+      {
+        "year": 1983,
+        "value": 0.315
+      },
+      {
+        "year": 1984,
+        "value": 0.155
+      },
+      {
+        "year": 1985,
+        "value": 0.1183
+      },
+      {
+        "year": 1986,
+        "value": 0.18
+      },
+      {
+        "year": 1987,
+        "value": 0.3217
+      },
+      {
+        "year": 1988,
+        "value": 0.39
+      },
+      {
+        "year": 1989,
+        "value": 0.2742
+      },
+      {
+        "year": 1990,
+        "value": 0.4492
+      },
+      {
+        "year": 1991,
+        "value": 0.4075
+      },
+      {
+        "year": 1992,
+        "value": 0.2242
+      },
+      {
+        "year": 1993,
+        "value": 0.2333
+      },
+      {
+        "year": 1994,
+        "value": 0.3158
+      },
+      {
+        "year": 1995,
+        "value": 0.4475
+      },
+      {
+        "year": 1996,
+        "value": 0.3342
+      },
+      {
+        "year": 1997,
+        "value": 0.4675
+      },
+      {
+        "year": 1998,
+        "value": 0.6092
+      },
+      {
+        "year": 1999,
+        "value": 0.3825
+      },
+      {
+        "year": 2000,
+        "value": 0.3933
+      },
+      {
+        "year": 2001,
+        "value": 0.5333
+      },
+      {
+        "year": 2002,
+        "value": 0.6275
+      },
+      {
+        "year": 2003,
+        "value": 0.6167
+      },
+      {
+        "year": 2004,
+        "value": 0.5342
+      },
+      {
+        "year": 2005,
+        "value": 0.6792
+      },
+      {
+        "year": 2006,
+        "value": 0.6408
+      },
+      {
+        "year": 2007,
+        "value": 0.6642
+      },
+      {
+        "year": 2008,
+        "value": 0.5433
+      },
+      {
+        "year": 2009,
+        "value": 0.6558
+      },
+      {
+        "year": 2010,
+        "value": 0.7242
+      },
+      {
+        "year": 2011,
+        "value": 0.6075
+      },
+      {
+        "year": 2012,
+        "value": 0.6467
+      },
+      {
+        "year": 2013,
+        "value": 0.6767
+      },
+      {
+        "year": 2014,
+        "value": 0.7492
+      },
+      {
+        "year": 2015,
+        "value": 0.8983
+      },
+      {
+        "year": 2016,
+        "value": 1.0125
+      },
+      {
+        "year": 2017,
+        "value": 0.915
+      },
+      {
+        "year": 2018,
+        "value": 0.8508
+      },
+      {
+        "year": 2019,
+        "value": 0.98
+      },
+      {
+        "year": 2020,
+        "value": 1.0075
+      },
+      {
+        "year": 2021,
+        "value": 0.8492
+      },
+      {
+        "year": 2022,
+        "value": 0.8925
+      },
+      {
+        "year": 2023,
+        "value": 1.1725
+      },
+      {
+        "year": 2024,
+        "value": 1.2858
+      },
+      {
+        "year": 2025,
+        "value": 1.1933
+      }
+    ],
+    "precision": 2
+  },
+  {
+    "id": "co2",
+    "title": "Atmospheric CO₂",
+    "subtitle": "An atmosphere gathering tension",
+    "unit": "ppm",
+    "color": "#bb98ff",
+    "source": "NOAA Global Monitoring Laboratory",
+    "sourceUrl": "https://gml.noaa.gov/ccgg/trends/data.html",
+    "description": "Annual mean atmospheric carbon dioxide concentration from the Mauna Loa record. It is a long-running atmospheric reference, not a global spatial map.",
+    "coverage": "Mauna Loa atmospheric reference record, Hawaiʻi",
+    "baseline": "Absolute dry-air CO₂ mole fraction in parts per million.",
+    "mapping": "Higher CO₂ concentrations produce higher notes. This association makes the changing concentration audible; it does not measure a natural sound.",
+    "observations": [
+      {
+        "year": 1959,
+        "value": 315.98
+      },
+      {
+        "year": 1960,
+        "value": 316.91
+      },
+      {
+        "year": 1961,
+        "value": 317.64
+      },
+      {
+        "year": 1962,
+        "value": 318.45
+      },
+      {
+        "year": 1963,
+        "value": 318.99
+      },
+      {
+        "year": 1964,
+        "value": 319.62
+      },
+      {
+        "year": 1965,
+        "value": 320.04
+      },
+      {
+        "year": 1966,
+        "value": 321.37
+      },
+      {
+        "year": 1967,
+        "value": 322.18
+      },
+      {
+        "year": 1968,
+        "value": 323.05
+      },
+      {
+        "year": 1969,
+        "value": 324.62
+      },
+      {
+        "year": 1970,
+        "value": 325.68
+      },
+      {
+        "year": 1971,
+        "value": 326.32
+      },
+      {
+        "year": 1972,
+        "value": 327.46
+      },
+      {
+        "year": 1973,
+        "value": 329.68
+      },
+      {
+        "year": 1974,
+        "value": 330.19
+      },
+      {
+        "year": 1975,
+        "value": 331.13
+      },
+      {
+        "year": 1976,
+        "value": 332.03
+      },
+      {
+        "year": 1977,
+        "value": 333.84
+      },
+      {
+        "year": 1978,
+        "value": 335.41
+      },
+      {
+        "year": 1979,
+        "value": 336.84
+      },
+      {
+        "year": 1980,
+        "value": 338.76
+      },
+      {
+        "year": 1981,
+        "value": 340.12
+      },
+      {
+        "year": 1982,
+        "value": 341.48
+      },
+      {
+        "year": 1983,
+        "value": 343.15
+      },
+      {
+        "year": 1984,
+        "value": 344.87
+      },
+      {
+        "year": 1985,
+        "value": 346.35
+      },
+      {
+        "year": 1986,
+        "value": 347.61
+      },
+      {
+        "year": 1987,
+        "value": 349.31
+      },
+      {
+        "year": 1988,
+        "value": 351.69
+      },
+      {
+        "year": 1989,
+        "value": 353.2
+      },
+      {
+        "year": 1990,
+        "value": 354.45
+      },
+      {
+        "year": 1991,
+        "value": 355.7
+      },
+      {
+        "year": 1992,
+        "value": 356.54
+      },
+      {
+        "year": 1993,
+        "value": 357.21
+      },
+      {
+        "year": 1994,
+        "value": 358.96
+      },
+      {
+        "year": 1995,
+        "value": 360.97
+      },
+      {
+        "year": 1996,
+        "value": 362.74
+      },
+      {
+        "year": 1997,
+        "value": 363.88
+      },
+      {
+        "year": 1998,
+        "value": 366.84
+      },
+      {
+        "year": 1999,
+        "value": 368.54
+      },
+      {
+        "year": 2000,
+        "value": 369.71
+      },
+      {
+        "year": 2001,
+        "value": 371.32
+      },
+      {
+        "year": 2002,
+        "value": 373.45
+      },
+      {
+        "year": 2003,
+        "value": 375.98
+      },
+      {
+        "year": 2004,
+        "value": 377.7
+      },
+      {
+        "year": 2005,
+        "value": 379.98
+      },
+      {
+        "year": 2006,
+        "value": 382.09
+      },
+      {
+        "year": 2007,
+        "value": 384.02
+      },
+      {
+        "year": 2008,
+        "value": 385.83
+      },
+      {
+        "year": 2009,
+        "value": 387.64
+      },
+      {
+        "year": 2010,
+        "value": 390.1
+      },
+      {
+        "year": 2011,
+        "value": 391.85
+      },
+      {
+        "year": 2012,
+        "value": 394.06
+      },
+      {
+        "year": 2013,
+        "value": 396.74
+      },
+      {
+        "year": 2014,
+        "value": 398.81
+      },
+      {
+        "year": 2015,
+        "value": 401.01
+      },
+      {
+        "year": 2016,
+        "value": 404.41
+      },
+      {
+        "year": 2017,
+        "value": 406.76
+      },
+      {
+        "year": 2018,
+        "value": 408.72
+      },
+      {
+        "year": 2019,
+        "value": 411.65
+      },
+      {
+        "year": 2020,
+        "value": 414.21
+      },
+      {
+        "year": 2021,
+        "value": 416.41
+      },
+      {
+        "year": 2022,
+        "value": 418.53
+      },
+      {
+        "year": 2023,
+        "value": 421.08
+      },
+      {
+        "year": 2024,
+        "value": 424.61
+      },
+      {
+        "year": 2025,
+        "value": 427.35
+      }
+    ],
+    "precision": 2
+  },
+  {
+    "id": "sea-level",
+    "title": "Sea level rise",
+    "subtitle": "The ocean’s slow crescendo",
+    "unit": "mm",
+    "color": "#66cddd",
+    "source": "NOAA satellite record · EPA indicator",
+    "sourceUrl": "https://www.epa.gov/climate-indicators/climate-change-indicators-sea-level",
+    "description": "Annual global mean sea level from the NOAA satellite column of the EPA climate indicator. Values are rebased to 1993 and converted from inches to millimeters.",
+    "coverage": "Global mean sea level from satellite altimetry",
+    "baseline": "Change from the 1993 annual mean; 1993 is set to 0 mm.",
+    "mapping": "Higher sea level produces higher notes. The relative rise is preserved; different tracks have separate musical scales.",
+    "observations": [
+      {
+        "year": 1993,
+        "value": 0
+      },
+      {
+        "year": 1994,
+        "value": 4.49
+      },
+      {
+        "year": 1995,
+        "value": 10.1
+      },
+      {
+        "year": 1996,
+        "value": 13.63
+      },
+      {
+        "year": 1997,
+        "value": 17.52
+      },
+      {
+        "year": 1998,
+        "value": 16.6
+      },
+      {
+        "year": 1999,
+        "value": 15.86
+      },
+      {
+        "year": 2000,
+        "value": 19.93
+      },
+      {
+        "year": 2001,
+        "value": 25.23
+      },
+      {
+        "year": 2002,
+        "value": 27.08
+      },
+      {
+        "year": 2003,
+        "value": 30.29
+      },
+      {
+        "year": 2004,
+        "value": 32.11
+      },
+      {
+        "year": 2005,
+        "value": 35.75
+      },
+      {
+        "year": 2006,
+        "value": 37.98
+      },
+      {
+        "year": 2007,
+        "value": 37.97
+      },
+      {
+        "year": 2008,
+        "value": 41.96
+      },
+      {
+        "year": 2009,
+        "value": 45.6
+      },
+      {
+        "year": 2010,
+        "value": 47.13
+      },
+      {
+        "year": 2011,
+        "value": 45.42
+      },
+      {
+        "year": 2012,
+        "value": 55.47
+      },
+      {
+        "year": 2013,
+        "value": 57.85
+      },
+      {
+        "year": 2014,
+        "value": 61.18
+      },
+      {
+        "year": 2015,
+        "value": 69.91
+      },
+      {
+        "year": 2016,
+        "value": 73.27
+      },
+      {
+        "year": 2017,
+        "value": 74.52
+      },
+      {
+        "year": 2018,
+        "value": 76.99
+      },
+      {
+        "year": 2019,
+        "value": 83.45
+      },
+      {
+        "year": 2020,
+        "value": 86.13
+      },
+      {
+        "year": 2021,
+        "value": 90.88
+      },
+      {
+        "year": 2022,
+        "value": 93.11
+      },
+      {
+        "year": 2023,
+        "value": 98.94
+      }
+    ],
+    "precision": 1
+  },
+  {
+    "id": "sea-ice",
+    "title": "Arctic sea ice",
+    "subtitle": "A vanishing September refrain",
+    "unit": "million km²",
+    "color": "#b3deee",
+    "source": "NSIDC · Sea Ice Index v3",
+    "sourceUrl": "https://doi.org/10.7265/N5K072F8",
+    "description": "September mean Arctic sea ice extent, calculated from 30 daily NSIDC observations per year. Years with incomplete September coverage are excluded.",
+    "coverage": "Northern Hemisphere sea ice extent",
+    "baseline": "September mean of daily extent; not the official NSIDC monthly product.",
+    "mapping": "Greater ice extent produces higher notes, so declining ice moves down the scale. Each point averages a complete September of observations.",
+    "observations": [
+      {
+        "year": 1987,
+        "value": 7.2787
+      },
+      {
+        "year": 1988,
+        "value": 7.369
+      },
+      {
+        "year": 1989,
+        "value": 7.0083
+      },
+      {
+        "year": 1990,
+        "value": 6.1428
+      },
+      {
+        "year": 1991,
+        "value": 6.4729
+      },
+      {
+        "year": 1992,
+        "value": 7.4737
+      },
+      {
+        "year": 1993,
+        "value": 6.3967
+      },
+      {
+        "year": 1994,
+        "value": 7.1376
+      },
+      {
+        "year": 1995,
+        "value": 6.0801
+      },
+      {
+        "year": 1996,
+        "value": 7.5825
+      },
+      {
+        "year": 1997,
+        "value": 6.6863
+      },
+      {
+        "year": 1998,
+        "value": 6.536
+      },
+      {
+        "year": 1999,
+        "value": 6.1169
+      },
+      {
+        "year": 2000,
+        "value": 6.2461
+      },
+      {
+        "year": 2001,
+        "value": 6.7322
+      },
+      {
+        "year": 2002,
+        "value": 5.8271
+      },
+      {
+        "year": 2003,
+        "value": 6.1161
+      },
+      {
+        "year": 2004,
+        "value": 5.9845
+      },
+      {
+        "year": 2005,
+        "value": 5.5038
+      },
+      {
+        "year": 2006,
+        "value": 5.8624
+      },
+      {
+        "year": 2007,
+        "value": 4.2673
+      },
+      {
+        "year": 2008,
+        "value": 4.6874
+      },
+      {
+        "year": 2009,
+        "value": 5.2616
+      },
+      {
+        "year": 2010,
+        "value": 4.8651
+      },
+      {
+        "year": 2011,
+        "value": 4.5613
+      },
+      {
+        "year": 2012,
+        "value": 3.5656
+      },
+      {
+        "year": 2013,
+        "value": 5.2083
+      },
+      {
+        "year": 2014,
+        "value": 5.2199
+      },
+      {
+        "year": 2015,
+        "value": 4.6158
+      },
+      {
+        "year": 2016,
+        "value": 4.5285
+      },
+      {
+        "year": 2017,
+        "value": 4.8219
+      },
+      {
+        "year": 2018,
+        "value": 4.7852
+      },
+      {
+        "year": 2019,
+        "value": 4.3639
+      },
+      {
+        "year": 2020,
+        "value": 4.0005
+      },
+      {
+        "year": 2021,
+        "value": 4.9524
+      },
+      {
+        "year": 2022,
+        "value": 4.8969
+      }
+    ],
+    "precision": 2
+  }
+]
