@@ -4,5 +4,8 @@ dist/
 playwright-report/
 test-results/
 .DS_Store
+.vercel/
+supabase/.temp/
 .env
-.env.local
+.env.*
+!.env.example

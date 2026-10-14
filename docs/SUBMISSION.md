@@ -40,7 +40,7 @@ This mapping covers the summary supplied by the team. It does not claim validati
 
 ## Sources and project links
 
-- Source repository: https://github.com/Yoriichi-0u0/The-Earth-Information-Jukebox
+- Source repository: https://github.com/Yoriichi-0u0/earth-fm/tree/codex/earth-fm-bobomimi
 - Challenge: https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/
 - Project website: add the verified deployment URL after publishing. No deployment URL is asserted in this draft.
 - [Observation sources and transformations](DATA.md)

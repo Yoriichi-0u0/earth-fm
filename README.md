@@ -1,4 +1,4 @@
-# Earth FM — The Earth Information Jukebox
+# Earth FM
 
 **Our planet. A thousand stories. One soundtrack.**
 
@@ -10,6 +10,8 @@ Earth FM is BoboMimi’s working prototype for the [2026 NASA Space Apps Earth I
 | Jacy Chiong Yet Suu | Team member | jacychiongys |
 
 ## Run
+
+This checkout is connected to GitHub, Vercel, and Supabase. See [the connection map](docs/CONNECTIONS.md) for project links, installed terminal tools, and local configuration.
 
 Use Node.js 22.12+ or 24 LTS. From the repository root:
 
