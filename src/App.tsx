@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import { ArrowDown, ArrowDownToLine, ArrowRight, AudioLines, Check, ChevronDown, ChevronRight, CircleHelp, Globe2, Headphones, Heart, Info, Leaf, Link2, Menu, Music2, Pause, Play, Radio, RotateCcw, Settings2, SkipForward, Sparkles, Volume2, VolumeX, Waves, X } from 'lucide-react';
 import EarthGlobe from './components/EarthGlobe';
 import FrameJukebox from './components/FrameJukebox';
+import ClimateExplore from './components/ClimateExplore';
 import { tracks } from './data/earth';
 import type { EarthTrack, Observation } from './data/earth';
 import { EarthAudio, exportWav } from './lib/audio';
@@ -71,6 +72,7 @@ export default function App() {
   const [volume, setVolume] = useState(.55);
   const [playing, setPlaying] = useState(false);
   const [visualPlaying, setVisualPlaying] = useState(false);
+  const [activePlayer, setActivePlayer] = useState<'climate' | 'visual' | 'spiral' | null>(null);
   const [playIndex, setPlayIndex] = useState(0);
   const [modal, setModal] = useState<'about' | 'mix' | 'saved' | null>(null);
   const [saved, setSaved] = useState<string[]>(() => { try { const v = JSON.parse(localStorage.getItem('earth-fm-saved') ?? '[]'); return Array.isArray(v) ? v.filter(id => typeof id === 'string' && tracks.some(t => t.id === id)) : []; } catch { return []; } });
@@ -115,6 +117,7 @@ export default function App() {
   const chooseTrack = (id: string) => { stop(); setTrackId(id); setPlayIndex(0); const t = tracks.find(t => t.id === id)!; setYearStart(Math.max(1980, t.observations[0].year)); setYearEnd(t.observations.at(-1)!.year); };
   const chooseLocation = (id: string) => { setLocationId(id); if (id === 'arctic' && tracks.some(t => t.id === 'sea-ice')) chooseTrack('sea-ice'); if (id === 'pacific') chooseTrack('sea-level'); if (id === 'amazon') chooseTrack('co2'); };
   const begin = async (from = index) => {
+    setActivePlayer('climate');
     const activeSession = ++session.current;
     const offset = from >= points.length - 1 ? 0 : from;
     setPlayIndex(offset);
@@ -147,12 +150,13 @@ export default function App() {
     <a className="skip-link" href="#listen">Skip to the jukebox</a>
     <header className="site-header">
       <a className="brand" href="#" aria-label="Earth FM home"><span className="brand-mark"><Globe2 size={23}/></span><span>earth<span className="brand-fm">fm</span><sup>↗</sup></span></a>
-      <nav aria-label="Main navigation" className={menuOpen ? 'nav-open' : ''}><a href="#visual-radio" onClick={() => setMenuOpen(false)}>Visual radio</a><a href="#tracks" onClick={() => setMenuOpen(false)}>The collection</a><button onClick={() => { setModal('about'); setMenuOpen(false); }}>Behind the sound <span>↗</span></button></nav>
+      <nav aria-label="Main navigation" className={menuOpen ? 'nav-open' : ''}><a href="?studio=1">Symphony Studio 2.0 ↗</a><a href="#climate-spiral" onClick={() => setMenuOpen(false)}>Climate Spiral</a><a href="#visual-radio" onClick={() => setMenuOpen(false)}>Visual radio</a><a href="#tracks" onClick={() => setMenuOpen(false)}>The collection</a><button onClick={() => { setModal('about'); setMenuOpen(false); }}>Behind the sound <span>↗</span></button></nav>
       <button className="saved-button" onClick={() => setModal('saved')}><Headphones size={16}/><span>My collection</span>{saved.length > 0 && <span className="saved-count">{saved.length}</span>}</button>
       <button className="mobile-menu icon-button" aria-label="Toggle navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu size={22}/></button>
     </header>
 
     <main>
+      <ClimateExplore active={activePlayer === 'spiral'} onStart={() => { stop(); setActivePlayer('spiral'); }}/>
       <section id="explore" className="hero content-width">
         <div className="hero-copy"><div className="eyebrow"><span className="live-dot"/> THE EARTH INFORMATION JUKEBOX</div>
           <h1>Our planet.<br/>A thousand stories.<br/><span>One soundtrack.</span></h1>
@@ -165,7 +169,7 @@ export default function App() {
 
       <div className="signal-strip"><div className="content-width signal-inner"><span><AudioLines size={17}/> SMALL SIGNALS. BIG STORIES.</span><span>Temperature <i/> Atmosphere <i/> Oceans <i/> Ice</span><span>SCROLL TO TUNE IN <ArrowDown size={13}/></span></div></div>
 
-      <FrameJukebox climatePlaying={playing} onStart={stop} onPlayingChange={setVisualPlaying}/>
+      <FrameJukebox climatePlaying={playing || activePlayer === 'spiral'} onStart={() => { stop(); setActivePlayer('visual'); }} onPlayingChange={setVisualPlaying}/>
 
       <section id="tracks" className="content-width collection-section">
         <div className="section-heading"><div><div className="eyebrow muted">THE PLANET’S PLAYLIST</div><h2>Four signals. A world of change.</h2></div><span className="section-note">Science you can see.<br/>Stories you can hear.</span></div>

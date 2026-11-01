@@ -1,0 +1,25 @@
+{
+  "id": "gistemp-v4-global-monthly-2026-10-18",
+  "retrievedAt": "2026-10-18T09:59:29.067558+00:00",
+  "sourceUrl": "https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv",
+  "sourcePage": "https://data.giss.nasa.gov/gistemp/",
+  "localSource": "/data/sources/gistemp-global-monthly-2026-10-18.csv",
+  "sha256": "4c64eda288bce32b8d76926278f346ecea1e53506df8ee72a3d5accb0657c416",
+  "bytes": 12886,
+  "baseline": "1951\u20131980",
+  "unit": "\u00b0C",
+  "citation": "GISTEMP Team, 2026: GISS Surface Temperature Analysis (GISTEMP), version 4. NASA GISS. Accessed 2026-10-18. Lenssen et al. (2024), doi:10.1029/2023JD040179.",
+  "visual": {
+    "id": 5190,
+    "sourcePage": "https://svs.gsfc.nasa.gov/5190/",
+    "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005100/a005190/GISTEMP_Spiral_English_degC_2160p60.01402_print.jpg",
+    "localSource": "/frames/climate-spiral-svs5190-2026-10-18.jpg",
+    "sha256": "664a669b9f0b8b8093b7c680d50acc73db0da3996ea770f120041456965594a3",
+    "bytes": 100355,
+    "publishedUpdate": "2026-09-11",
+    "displayedYear": 2026,
+    "credit": "NASA\u2019s Scientific Visualization Studio; Mark SubbaRao and Ed Hawkins. See source for full credits.",
+    "eicEvidence": "https://svs.gsfc.nasa.gov/gallery/climate-vital-signs-dashboard/",
+    "relationship": "Related GISTEMP v4 visual; exact data revision of rendered curves is unverified. The month indicator marks a calendar label, not a measured curve point."
+  }
+}

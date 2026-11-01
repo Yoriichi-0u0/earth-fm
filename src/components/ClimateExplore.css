@@ -1,0 +1,64 @@
+.climate-explore{padding:54px 0 40px;scroll-margin-top:24px}
+.climate-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:30px}
+.climate-intro .eyebrow{color:var(--lime);font-size:9px;letter-spacing:1.8px}
+.climate-intro h2{font-family:'Space Grotesk',sans-serif;font-size:42px;line-height:1.13;letter-spacing:-1.6px;margin:17px 0 0;color:#f0f3e9;font-weight:500}
+.climate-intro h2 span{color:#f4ad81}
+.climate-intro>p{max-width:330px;color:#a9b9bd;font-size:13px;line-height:1.9;margin:0 0 2px}
+.climate-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);border:1px solid #36444a;border-radius:14px;background:#111d25;overflow:hidden}
+.climate-visual{margin:0;padding:24px 25px 19px;background:#0a1117;border-right:1px solid #303d44;min-width:0}
+.climate-visual-heading{display:flex;align-items:center;justify-content:space-between;color:#a8babd;font-size:8px;letter-spacing:1px;gap:12px}
+.climate-visual-heading>span:last-child{display:flex;align-items:center;gap:5px;color:#c3d49d}
+.climate-image-wrap{position:relative;aspect-ratio:1;margin:14px auto 8px;max-width:540px;background:#000;border-radius:8px;overflow:hidden}
+.climate-image-wrap>img{display:block;width:100%;height:100%;object-fit:contain}
+.climate-month-marker{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.climate-month-marker circle{fill:#d1ee8114;stroke:#d1ee81;stroke-width:4;filter:drop-shadow(0 0 5px #000)}
+.climate-visual figcaption{font-size:10px;color:#a7b6bc;line-height:1.7;max-width:510px}
+.climate-visual figcaption strong{color:#d7e8b0;font-weight:500}
+.climate-marker-key{display:inline-block;width:7px;height:7px;border:1px solid var(--lime);border-radius:50%;margin-right:5px}
+.climate-visual-credit{font-size:9px;line-height:1.7;color:#899da6;margin:9px 0 0}
+.climate-image-error{padding:30px;color:#becbd0;line-height:1.8;font-size:13px}
+.climate-controls{padding:25px 28px 23px;min-width:0}
+.climate-mode-row{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#9bb0b7;font-size:7px;letter-spacing:.7px}
+.climate-mode{display:flex;align-items:center;gap:7px;color:var(--lime);font-size:9px;letter-spacing:1.2px}
+.climate-year-row{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:25px}
+.climate-year-row label{font-size:12px;color:#d1dadb}
+.climate-year-row select{font:inherit;font-size:13px;color:#e8eee0;padding:10px 31px 10px 12px;border:1px solid #46575d;background:#19272f;border-radius:6px;min-width:106px}
+.climate-measurement{margin:23px 0 20px;min-height:122px}
+.climate-measurement>span{display:block;color:#d4e1e2;font-size:14px}
+.climate-measurement>strong{display:block;font-family:'Space Grotesk',sans-serif;color:#f4ad81;font-size:44px;font-weight:500;letter-spacing:-1.8px;line-height:1.2;margin:7px 0 8px}
+.climate-measurement>p{font-size:11px;color:#c5d2d5;margin:0 0 7px}
+.climate-measurement>small{display:block;font-size:10px;color:#9fb3ba;line-height:1.6}
+.climate-months{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.climate-months button{border:1px solid #3d4f57;border-radius:5px;padding:10px 0;background:#192730;color:#c4d2d7;font:inherit;font-size:10px;cursor:pointer}
+.climate-months button[aria-pressed=true]{background:#d2ed85;color:#14251c;border-color:#d2ed85;font-weight:600}
+.climate-months button:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.climate-month-slider{display:block;width:100%;accent-color:#d2ed85;margin:17px 0 0}
+.climate-partial{font-size:10px;color:#c9d5b6;line-height:1.7;margin:11px 0 0}
+.climate-transport{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:22px 0 17px}
+.climate-transport .primary-button{font-size:11px;padding:12px 15px;min-height:42px}
+.climate-transport .primary-button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.climate-volume{display:flex;align-items:center;gap:8px;color:#a1b3ba}
+.climate-volume input{width:64px;accent-color:#d2ed85}
+.climate-style{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding-top:16px;border-top:1px solid #35434b}
+.climate-style-active{display:flex;align-items:center;gap:7px;font-size:12px;color:#dbe9ba}
+.climate-style-pending{color:#99adb5;font-size:10px}
+.climate-band-readout{display:flex;flex-direction:column;gap:5px;margin-top:17px;color:#9db0b7}
+.climate-band-readout>span{font-size:8px;letter-spacing:.8px;line-height:1.6}
+.climate-band-readout>strong{font-size:12px;font-weight:400;color:#c4d2d5}
+.climate-error{color:#ffd1b8;font-size:11px;line-height:1.7;margin:15px 0 0}
+.climate-explanation{display:flex;align-items:flex-start;gap:12px;margin-top:20px;color:#9eb5bc}
+.climate-explanation>svg{flex-shrink:0;color:#c5d697;margin-top:2px}
+.climate-explanation p{margin:0;font-size:12px;line-height:1.8;max-width:960px}
+.climate-explanation strong{color:#d3dedd;font-weight:500;margin-right:5px}
+.climate-sources{margin-top:20px;border-top:1px solid #32414a;padding-top:16px;color:#a3b6bd}
+.climate-sources summary{cursor:pointer;font-size:12px;color:#c9d5d5;width:fit-content}
+.climate-sources summary svg{vertical-align:middle;margin-left:5px}
+.climate-sources>div{font-size:11px;line-height:1.9;max-width:950px;padding:5px 0 0}
+.climate-sources p{margin:12px 0}.climate-sources strong{color:#d1dcd8;font-weight:500}
+.climate-source-links{display:flex;flex-wrap:wrap;gap:10px 20px;margin:15px 0 0}
+.climate-source-links a{color:#d3e5a7;display:inline-flex;align-items:center;gap:4px}
+.climate-explore :is(button,select,input,summary,a):focus-visible{outline:2px solid #f4ad81;outline-offset:4px}
+@media(min-width:1500px){.climate-intro h2{font-size:48px}.climate-controls{padding:28px 34px}}
+@media(max-width:1000px){.climate-layout{grid-template-columns:minmax(0,1fr) minmax(320px,1fr)}.climate-visual{padding:22px 16px}.climate-controls{padding:24px 22px}.climate-visual-heading{font-size:7px;letter-spacing:.5px}.climate-intro h2{font-size:37px}.climate-intro>p{max-width:280px;font-size:12px}}
+@media(max-width:760px){.climate-explore{padding-top:32px}.climate-intro{align-items:flex-start;flex-direction:column;gap:18px;margin-bottom:24px}.climate-intro h2{font-size:37px}.climate-intro>p{max-width:480px}.climate-layout{grid-template-columns:1fr}.climate-visual{border-right:0;border-bottom:1px solid #303d44;padding:20px}.climate-image-wrap{max-width:470px}.climate-controls{padding:23px}.climate-visual-heading{font-size:8px}.climate-measurement{margin:20px 0;min-height:0}.climate-measurement>strong{font-size:42px}.climate-months button{font-size:12px;padding:12px 0}.climate-volume input{width:90px}.climate-mode-row>span:last-child{font-size:7px}.climate-transport .primary-button{font-size:12px}.climate-source-links{gap:12px 16px}}
+@media(prefers-reduced-motion:reduce){.climate-explore *{animation:none!important;transition:none!important}}

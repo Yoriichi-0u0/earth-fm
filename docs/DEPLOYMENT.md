@@ -2,6 +2,8 @@
 
 Live website: [earth-fm.vercel.app](https://earth-fm.vercel.app/).
 
+Earth Symphony Studio 2.0 beta: [Open Studio](https://earth-fm.vercel.app/?studio=1). English is the default, with an optional persistent Simplified Chinese language choice. The previous application remains at the default URL; its navigation links to Studio. See [Studio science, sound and verification notes](EARTH_SYMPHONY_STUDIO.md).
+
 Earth FM uses a single branch and deployment workflow: **`main` → Vercel production**. All code and setup remain on `main`. Preview deployments are disabled, and `vercel.json` permits automatic Git deployments only from `main`. Test suites and testing pipelines are not part of this workflow.
 
 The connected [Vercel project `earth-fm`](https://vercel.com/chia-0u0-s-projects/earth-fm) uses GitHub repository `Yoriichi-0u0/earth-fm`, production branch `main`, and the repository root. Build settings are Node.js 24, install command `npm ci`, build command `npm run build`, and output directory `dist`.
