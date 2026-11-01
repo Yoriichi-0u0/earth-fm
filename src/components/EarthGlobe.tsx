@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
+import { useStudioLanguage } from '../lib/studioLanguage';
 import world from '../data/world.json';
 import './EarthGlobe.css';
 
@@ -59,6 +60,7 @@ const clampLatitude = (lat: number) => Math.min(65, Math.max(-65, lat));
 const shortestAngle = (difference: number) => ((difference + 540) % 360) - 180;
 
 export default function EarthGlobe({ locations, selectedId, onSelect, playing }: EarthGlobeProps) {
+  const {t}=useStudioLanguage();
   const uniqueId = useId().replace(/:/g, '');
   const selected = locations.find((location) => location.id === selectedId);
   const initialRotation = { lat: selected ? selected.lat * 0.55 : 12, lon: selected?.lon ?? 22 };
@@ -160,7 +162,7 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
 
   return (
     <div className={`earth-globe${playing ? ' earth-globe--playing' : ''}${dragging ? ' earth-globe--dragging' : ''}`}>
-      <svg className="earth-globe__scene" viewBox="0 0 760 560" aria-label="Interactive Earth. Drag to rotate, or select a location." role="group">
+      <svg className="earth-globe__scene" viewBox="0 0 760 560" aria-label={t(locations.length ? "Interactive Earth. Drag to rotate, or select a location." : "Earth illustration. Drag or use the left and right arrow keys to rotate. This is not a local temperature map.")} role="group" tabIndex={locations.length ? undefined : 0} onKeyDown={event=>{if(locations.length || !["ArrowLeft","ArrowRight"].includes(event.key))return;event.preventDefault();const next={...rotationRef.current,lon:rotationRef.current.lon+(event.key==="ArrowLeft"?-15:15)};rotationRef.current=next;targetRef.current=next;setRotation(next);}}>
         <defs>
           <radialGradient id={gradientId} cx="62%" cy="36%" r="69%">
             <stop offset="0%" stopColor="#073d42" />
@@ -247,8 +249,8 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
           <text x="380" y="551" textAnchor="middle">{Math.abs(rotation.lat).toFixed(2)}° {rotation.lat >= 0 ? 'N' : 'S'}  /  {Math.abs(((rotation.lon + 540) % 360) - 180).toFixed(2)}° {((rotation.lon + 540) % 360) - 180 >= 0 ? 'E' : 'W'}</text>
         </g>
       </svg>
-      <span className="earth-globe__interaction-hint" aria-hidden="true"><span>↔</span> DRAG TO EXPLORE</span>
-      <span className="earth-globe__sr-only">Land boundaries use public-domain Natural Earth data. Select a visible location with Tab and Enter, or choose a location from the track list.</span>
+      <span className="earth-globe__interaction-hint" aria-hidden="true"><span>↔</span> {t("DRAG TO EXPLORE")}</span>
+      <span className="earth-globe__sr-only">{t(locations.length ? "Land boundaries use public-domain Natural Earth data. Select a visible location with Tab and Enter, or choose a location from the track list." : "Earth illustration uses public-domain Natural Earth boundaries. Use the left and right arrow keys to rotate. Scientific measurements are in the climate spiral.")}</span>
     </div>
   );
 }

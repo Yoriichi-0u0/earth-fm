@@ -410,7 +410,7 @@ test('Climate Explore is accessible and fits a mobile screen in available and mi
 
 test('Symphony Studio keeps scientific pitches independent of mix, cancels playback and handles missing months', async ({ page }) => {
   await page.goto('/?studio=1');
-  await expect(page.getByRole('heading', { name: 'Earth Symphony Studio.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /See our Earth/ })).toBeVisible();
   await page.getByRole('button',{name:/Play year/}).click();
   await expect(page.getByRole('status')).toContainText('February', {timeout:5000});
   await page.getByLabel('Master volume').fill('0.4');
@@ -424,7 +424,7 @@ test('Symphony Studio keeps scientific pitches independent of mix, cancels playb
   await expect(page.getByLabel('Rhythm / drums')).toBeDisabled();
   await expect(page.getByLabel('Harmony',{exact:true})).toBeDisabled();
   await page.getByRole('button',{name:/Data Lab/}).click();
-  await page.getByLabel('Year A').selectOption('2026');
+  await page.getByLabel(/Year A|Choose a year/).selectOption('2026');
   await page.getByRole('button',{name:'Oct',exact:true}).click();
   await expect(page.locator('.ss-measure')).toContainText('No observation');
   const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
@@ -437,11 +437,11 @@ test('Symphony A/B completes in order without changing Year A and toggles geomet
   test.setTimeout(60000);
   await page.goto('/?studio=1');
   await page.getByRole('button',{name:/Data Lab/}).click();
-  await page.getByLabel('Year A').selectOption('2025');
+  await page.getByLabel(/Year A|Choose a year/).selectOption('2025');
   await page.getByLabel('Year B').selectOption('1880');
   await page.getByRole('button',{name:/A → B/}).click();
   await expect(page.locator('.ss-measure')).toContainText('January 1880',{timeout:27000});
-  await expect(page.getByLabel('Year A')).toHaveValue('2025');
+  await expect(page.getByLabel(/Year A|Choose a year/)).toHaveValue('2025');
   await expect(page.getByRole('status')).toContainText('Complete.',{timeout:27000});
   await expect(page.getByRole('button',{name:'■ Stop'})).toHaveCount(0);
   await page.getByRole('button',{name:'Explore 3D'}).click();
@@ -453,6 +453,7 @@ test('Symphony A/B completes in order without changing Year A and toggles geomet
 
 test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation', async ({page})=>{
   await page.goto('/?studio=1');
+  await page.getByText('Choose your sound',{exact:true}).click();
   await expect(page.getByLabel('Melody tone')).toBeVisible();
   const result=await page.evaluate(async()=>{
     const path='/src/lib/symphony.ts';
@@ -517,7 +518,7 @@ test('data-to-sound guide explains actual NASA notes, auditions mapped fundament
   await expect(guide.locator('.ss-proof-chain')).toContainText('−0.25 ≤ ΔT < +0.00°C');
   await expect(guide.locator('.ss-proof-chain')).toContainText('G3 · 196.00 Hz');
   expect(await page.evaluate(()=>(window as unknown as { proofPitches: number[] }).proofPitches[0])).toBeCloseTo(195.997718,5);
-  await expect(page.getByRole('checkbox',{name:/Hear Data Only/})).toBeChecked();
+  await expect(page.locator('.ss-mix-state')).toHaveText('DATA ONLY');
   await page.getByRole('button',{name:'■ Stop'}).click();
   await page.evaluate(()=>(window as unknown as { proofPitches: number[] }).proofPitches=[]);
   await guide.getByRole('button',{name:/Hear 2025-01/}).click();
@@ -528,7 +529,7 @@ test('data-to-sound guide explains actual NASA notes, auditions mapped fundament
   await expect(guide).toContainText('+1.10°C and +1.20°C');
   await guide.getByText(/Show the full pitch scale/).click();
   await expect(guide.getByRole('table').first().getByRole('row')).toHaveCount(11);
-  await page.getByLabel('Year A').selectOption('2026');
+  await page.getByLabel(/Year A|Choose a year/).selectOption('2026');
   await page.getByRole('button',{name:'Oct',exact:true}).click();
   await expect(guide.locator('.ss-proof-chain')).toContainText('Silence');
   await guide.getByText(/Trace every month/).click();
@@ -554,7 +555,7 @@ test('Studio language choice keeps English clean, localizes Chinese, preserves a
   expect(englishText).not.toMatch(/[\u3400-\u9fff]/);
   await page.getByRole('button',{name:/Earth Remix Studio/}).click();
   await page.getByLabel('Melody tone').selectOption('Soft Pluck');
-  await page.getByLabel('Year A').selectOption('1980');
+  await page.getByLabel(/Year A|Choose a year/).selectOption('1980');
   await page.getByRole('button',{name:'Mar',exact:true}).click();
   const value=await page.locator('.ss-measure strong').innerText();
   const pitch=(await page.locator('.ss-measure div').innerText()).split(' · ').slice(0,2).join(' · ');
@@ -562,7 +563,7 @@ test('Studio language choice keeps English clean, localizes Chinese, preserves a
   await expect(page.locator('html')).toHaveAttribute('lang','zh-Hans');
   await expect(page.getByRole('heading',{name:'你的地球，你的音乐。'})).toBeVisible();
   await expect(page.getByLabel('主旋律音色')).toHaveValue('Soft Pluck');
-  await expect(page.getByLabel('年份 A')).toHaveValue('1980');
+  await expect(page.getByLabel(/年份 A|选择年份/)).toHaveValue('1980');
   await expect(page.locator('.ss-measure strong')).toHaveText(value);
   expect((await page.locator('.ss-measure div').innerText()).split(' · ').slice(0,2).join(' · ')).toBe(pitch);
   await expect(page.getByRole('heading',{name:'数据如何变成声音？'})).toBeVisible();
@@ -577,7 +578,7 @@ test('Studio language choice keeps English clean, localizes Chinese, preserves a
   await page.reload();
   await expect(page.getByLabel('语言',{exact:true})).toHaveValue('zh');
   await page.getByRole('button',{name:/数据实验室/}).click();
-  await page.getByLabel('年份 A').selectOption('2026');
+  await page.getByLabel(/年份 A|选择年份/).selectOption('2026');
   await page.getByRole('button',{name:'10 月',exact:true}).click();
   await expect(page.locator('.ss-measure strong')).toHaveText('暂无观测数据');
   const guide=page.locator('#data-to-sound');
@@ -608,4 +609,56 @@ test('language controls remain usable when preference storage is blocked',async(
   await page.getByLabel('语言',{exact:true}).selectOption('en');
   await expect(page.getByRole('heading',{name:'Listen to a changing world.'})).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test('unified listening room explains two paths and safely switches between climate and visual sound',async({page})=>{
+  await page.goto('/?studio=1');
+  await expect(page.getByRole('heading',{name:/See our Earth/})).toBeVisible();
+  await expect(page.getByText('No music or science experience needed.',{exact:false})).toBeVisible();
+  await expect(page.getByLabel('Motion effects')).not.toBeChecked();
+  const earth=page.locator('.ss-earth-scene svg');
+  const before=await page.locator('.ss-earth-scene .earth-globe__coordinates text').textContent();
+  await earth.focus(); await earth.press('ArrowRight');
+  expect(await page.locator('.ss-earth-scene .earth-globe__coordinates text').textContent()).not.toBe(before);
+  await page.getByRole('button',{name:/Start listening/}).click();
+  await expect(page.getByRole('status')).toContainText('January 2025');
+  await expect(page.getByRole('button',{name:'■ Stop'})).toBeVisible();
+  await page.getByRole('button',{name:/Hear an Earth visual/}).click();
+  await expect(page.getByRole('button',{name:'■ Stop'})).toHaveCount(0);
+  await expect(page.getByText('You are hearing visual patterns.',{exact:false})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Hear this visual',exact:true})).toBeEnabled();
+  await page.getByRole('button',{name:'Hear this visual',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Pause visual',exact:true})).toBeVisible();
+  await page.waitForTimeout(650);
+  expect(Number((await page.locator('.visual-scan span').innerText()).split('/')[0])).toBeGreaterThan(1);
+  await page.getByRole('button',{name:/Hear climate change/}).click();
+  await expect(page.getByRole('button',{name:'Pause visual',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Listen to a changing world.'})).toBeVisible();
+  await expect(page.getByText('You are hearing measurements.',{exact:false})).toBeVisible();
+  await expect(page.locator('.ss-sound-controls')).not.toHaveAttribute('open');
+  await page.getByText('Choose your sound',{exact:true}).click();
+  await expect(page.getByLabel('Melody tone')).toBeVisible();
+});
+
+test('integrated visual experience is bilingual, accessible, and respects the motion switch on mobile',async({page})=>{
+  await page.goto('/?studio=1');
+  await page.getByRole('button',{name:'Hear a NASA visual ↗',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Hear this visual',exact:true})).toBeEnabled();
+  await page.locator('.frame-options button').nth(2).click();
+  await expect(page.getByLabel('Follow the animation')).toBeDisabled();
+  await page.getByLabel('Motion effects').check();
+  await page.getByLabel('Follow the animation').check();
+  await page.getByRole('button',{name:'Hear this visual',exact:true}).click();
+  await expect.poll(()=>page.locator('.visual-screen video').evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.1);
+  await page.getByLabel('Motion effects').uncheck();
+  await expect(page.getByLabel('Follow the animation')).not.toBeChecked();
+  expect(await page.locator('.visual-screen video').evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);
+  await page.getByRole('button',{name:'Pause visual',exact:true}).click();
+  await page.getByLabel('Language',{exact:true}).selectOption('zh');
+  await expect(page.getByRole('heading',{name:'不止看见地球，也听见它。'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'聆听这幅画面',exact:true})).toBeEnabled();
+  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations).toEqual([]);
+  await page.setViewportSize({width:390,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await expect(page.getByRole('button',{name:/带入你自己的 EIC 画面/})).toBeVisible();
 });
