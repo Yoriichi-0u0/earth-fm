@@ -25,7 +25,11 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
   const [error, setError] = useState('');
   const [exporting, setExporting] = useState(false);
   const [announcement, setAnnouncement] = useState('');
+  const [sampledTime,setSampledTime]=useState(0);
+  const scheduledFrames=useRef<Array<{steps:FrameStep[];time:number}>>([]);
   const imageRef = useRef<HTMLImageElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
+  const [frameFit,setFrameFit]=useState({left:0,width:100});
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const audioRef = useRef<FrameAudio | null>(null);
@@ -61,20 +65,39 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
     context.drawImage(source, 0, 0, canvas.width, canvas.height);
     return imageToSequence(context.getImageData(0, 0, canvas.width, canvas.height), SCAN_STEPS);
   };
-  const prepare = () => { try { const sequence = sample(); liveStepsRef.current = sequence; setSteps(sequence); setScanIndex(0); setReady(true); setError(''); } catch { setReady(false); setError('This visual could not be read. Choose another frame or upload a local image.'); } };
+  const fitFrame=()=>{
+    const screen=screenRef.current,media=videoUrl?videoRef.current:imageRef.current;
+    const width=videoUrl?videoRef.current?.videoWidth:imageRef.current?.naturalWidth;
+    const height=videoUrl?videoRef.current?.videoHeight:imageRef.current?.naturalHeight;
+    if(!screen||!media||!width||!height||!screen.clientWidth)return;
+    const visibleWidth=Math.min(screen.clientWidth,screen.clientHeight*width/height);
+    setFrameFit({left:(screen.clientWidth-visibleWidth)/2/screen.clientWidth*100,width:visibleWidth/screen.clientWidth*100});
+  };
+  const prepare = () => { try { const sequence = sample(); liveStepsRef.current = sequence; setSteps(sequence); setScanIndex(0); setReady(true); setError(''); fitFrame(); } catch { setReady(false); setError('This visual could not be read. Choose another frame or upload a local image.'); } };
+  // A cached media element can already be decoded before readiness listeners
+  // are attached. Observe native readiness and also inspect current state.
+  useEffect(()=>{
+    const video=videoRef.current;
+    let prepared=false;
+    const decoded=()=>{if(!prepared&&video&&video.readyState>=2){prepare();prepared=true;}};
+    if(video){video.addEventListener('loadeddata',decoded);video.addEventListener('canplay',decoded);decoded();}
+    else if(imageRef.current?.complete&&imageRef.current.naturalWidth)prepare();
+    const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(fitFrame);if(screenRef.current)observer?.observe(screenRef.current);
+    return()=>{observer?.disconnect();video?.removeEventListener('loadeddata',decoded);video?.removeEventListener('canplay',decoded);};
+  },[videoUrl,imageUrl]);
   const changeFrame = (id: string) => { stop(); setFrameId(id); setLocalFrame(null); setReady(false); setScanIndex(0); setSteps([]); setError(''); setAnnouncement(''); };
   const start = async () => {
     onStart();
     const session = ++sessionRef.current;
-    setError(''); setScanIndex(0);
+    setError(''); setScanIndex(0); scheduledFrames.current=[];
     try {
       // Start the audio context from the user gesture before awaiting media decoding.
       const initialSequence = sample(); liveStepsRef.current = initialSequence;
       if (videoRef.current && animate && motionAllowed) void videoRef.current.play().catch(() => { setError('Animation playback was blocked. The visible frame can still be heard.'); });
       await audioRef.current?.start(initialSequence, {
         tempo, volume,
-        sampleStep: i => { const sequence = sample(); liveStepsRef.current = sequence; return sequence[i]; },
-        onStep: i => { if (session === sessionRef.current) { setScanIndex(i); setSteps(liveStepsRef.current); } },
+        sampleStep: i => { const sequence = sample(); liveStepsRef.current = sequence; scheduledFrames.current[i]={steps:sequence,time:videoRef.current?.currentTime??0}; return sequence[i]; },
+        onStep: i => { if (session === sessionRef.current) { setScanIndex(i); setSteps(scheduledFrames.current[i]?.steps??liveStepsRef.current); setSampledTime(scheduledFrames.current[i]?.time??0); } },
         onEnd: () => { if (session === sessionRef.current) { setPlaying(false); onPlayingChange(false); videoRef.current?.pause(); } },
       });
       if (session === sessionRef.current) { setPlaying(true); onPlayingChange(true); }
@@ -102,14 +125,14 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
     <div className="section-heading"><div><div className="eyebrow muted">{t("THE EARTH INFORMATION CENTER, IN SOUND")}</div><h2>{t("Don’t just see the Earth. Hear it.")}</h2></div><span className="visual-tag"><Radio size={12}/> {t("REAL-TIME SONIFICATION")}</span></div>
     <div className="visual-layout">
       <div className="visual-screen-panel">
-        <div className="visual-screen-header"><span><span className="live-dot"/>{t(playing ? 'ON AIR' : simple ? 'NASA SVS / CLIMATE SPIRAL' : 'VISUAL RADIO')}</span><span>{t(videoUrl ? 'LIVE FRAME SAMPLING' : 'PIXELS → SOUND')}</span></div>
-        <div className="visual-screen" aria-label={t("Visual frame and scan position")}>
-          {videoUrl ? <video key={videoUrl} ref={videoRef} src={videoUrl} poster={!localFrame ? frame.imageUrl : undefined} muted loop playsInline preload="auto" onLoadedData={prepare} onError={() => { setReady(false); setError('The animation could not load. Try another frame.'); }} aria-label={localFrame ? `${t("Uploaded visualization:")} ${title}` : t(frame.description)}/> : <img key={imageUrl} ref={imageRef} src={imageUrl} alt={localFrame ? `${t("Uploaded visualization:")} ${title}` : t(frame.description)} onLoad={prepare} onError={() => { setReady(false); setError('The image could not load. Try another frame.'); }}/>}
-          {ready && <div className={`visual-scan ${playing ? 'is-scanning' : ''}`} style={{ left: `${(scanIndex + .5) / SCAN_STEPS * 100}%` }}><span>{String(scanIndex + 1).padStart(2, '0')} / 48</span></div>}
+        <div className="visual-screen-header"><span><span className="live-dot"/>{t(playing ? 'ON AIR' : simple ? (videoUrl?'NASA EIC / EARTH IN MOTION':'NASA SVS / CLIMATE SPIRAL') : 'VISUAL RADIO')}</span><span>{t(videoUrl ? 'LIVE FRAME SAMPLING' : 'PIXELS → SOUND')}</span></div>
+        <div ref={screenRef} className="visual-screen" aria-label={t("Visual frame and scan position")}>
+          {videoUrl ? <video key={videoUrl} ref={videoRef} src={videoUrl} muted loop playsInline preload="auto" onError={() => { setReady(false); setError('The animation could not load. Try another frame.'); }} aria-label={localFrame ? `${t("Uploaded visualization:")} ${title}` : t(frame.description)}/> : <img key={imageUrl} ref={imageRef} src={imageUrl} alt={localFrame ? `${t("Uploaded visualization:")} ${title}` : t(frame.description)} onLoad={prepare} onError={() => { setReady(false); setError('The image could not load. Try another frame.'); }}/>}
+          {ready && <div className={`visual-scan ${playing ? 'is-scanning' : ''}`} style={{ left: `${frameFit.left+(scanIndex + .5) / SCAN_STEPS * frameFit.width}%` }}><span>{String(scanIndex + 1).padStart(2, '0')} / 48</span></div>}
           {!ready && !error && <span className="visual-loading">{t("Loading the Earth’s signal…")}</span>}
         </div>
-        {simple && <div className="obs-visual-cue"><span className="obs-cue-label">{t('IMAGE → SOUND')}</span><h3>{t('Follow the light. Hear the pattern.')}</h3><dl><div><dt>{t('Brightness')}</dt><dd>{t('Pitch')}</dd></div><div><dt>{t('Colour')}</dt><dd>{t('Tone')}</dd></div><div><dt>{t('Scan position')}</dt><dd>{t('Left / right sound')}</dd></div></dl><p>{t('These notes describe pixels. The next step listens to temperature measurements.')}</p></div>}
-        <div className="visual-screen-caption"><span>{title}</span><span>{t(localFrame ? 'LOCAL FILE · STAYS ON YOUR DEVICE' : referenceFrame ? 'NASA SVS 5190 · REFERENCE IMAGE' : 'EARTH.GOV ASSET MIRROR')}</span></div>
+        {simple && <div className="obs-visual-cue"><span className="obs-cue-label">{t('IMAGE → SOUND')}</span><h3>{t('Follow the light. Hear the pattern.')}</h3><dl><div><dt>{t('Brightness')}</dt><dd>{t('Pitch')}</dd></div><div><dt>{t('Colour')}</dt><dd>{t('Tone')}</dd></div><div><dt>{t('Scan position')}</dt><dd>{t('Left / right sound')}</dd></div></dl><p>{t('These notes describe pixels. The next step listens to temperature measurements.')}</p>{videoUrl&&<label className="st-moving-control"><input type="checkbox" checked={animate&&motionAllowed} disabled={!motionAllowed} onChange={e=>{stop();setAnimate(e.target.checked);}}/>{t('Follow the animation')}</label>}{videoUrl&&!motionAllowed&&<small className="st-motion-off">{t('Motion is off. Listen to a still frame, or enable Motion effects in the footer.')}</small>}</div>}
+        <div className="visual-screen-caption"><span>{title}</span><span>{t(localFrame ? 'LOCAL FILE · STAYS ON YOUR DEVICE' : referenceFrame?.id==='nasa-climate-spiral' ? 'NASA SVS 5190 · REFERENCE IMAGE' : 'EARTH.GOV ASSET MIRROR')}</span></div>
         <div className="visual-spectrum" role="img" aria-label={t("Current frame brightness across 48 vertical strips")}>{steps.map((s, i) => <i key={i} className={i === scanIndex ? 'active' : ''} style={{ height: `${Math.max(8, s.brightness * 100)}%` }}/>)}</div>
         <div className="visual-transport"><button className={`icon-button${simple?' sp-hide':''}`} aria-label={t("Restart visual scan")} disabled={!ready} onClick={() => { stop(); setScanIndex(0); }}><RotateCcw size={16}/></button><button id="play-visual-button" className="primary-button" disabled={!ready} onClick={() => playing ? stop() : void start()}>{playing ? <Pause size={15} fill="currentColor"/> : <Play size={15} fill="currentColor"/>}{t(simple ? (playing?'Stop visual sound':'Play visual sound') : (playing ? 'Pause visual' : 'Hear this visual'))}</button><div className="visual-note"><strong>{note}</strong><span>{current ? `${Math.round(current.brightness * 100)}% ${t('LUMA')}` : t('READING PIXELS')}</span></div><div className="visual-volume"><Volume2 size={15}/><label className="sr-only" htmlFor="visual-volume">{t("Visual volume")}</label><input id="visual-volume" type="range" min="0" max="1" step=".01" value={volume} onChange={e => setVolume(Number(e.target.value))}/></div></div>
       </div>
@@ -123,7 +146,8 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
       </div>}
     </div>
     <div className="visual-science-note"><Info size={14}/><p>{t("Image sounds describe visual patterns, not measured temperature or concentration. Animated pixels are sampled again at every note. For scientific temperature values, choose Hear climate change.")}</p></div>
-    <div className="visual-provenance">{localFrame ? <span>{t("Your file is processed only in this browser. No upload or account required.")}</span> : <><span>{frame.credit}. {t(frame.date)}.</span><a href={frame.mirrorUrl} target="_blank" rel="noreferrer">{t(referenceFrame ? "View NASA source" : "View archived source")} <ArrowRight size={12}/></a></>}</div>
+    <div className="visual-provenance">{localFrame ? <span>{t("Your file is processed only in this browser. No upload or account required.")}</span> : <><span>{frame.credit}. {t(frame.date)}.</span><a href={frame.mirrorUrl} target="_blank" rel="noreferrer">{t(referenceFrame?.id==='nasa-climate-spiral' ? "View NASA source" : "View archived source")} <ArrowRight size={12}/></a></>}</div>
+    {simple&&<details className="sp-disclosure st-live-proof"><summary>{t('Inspect the pixel-to-sound mapping')}</summary><dl><div><dt>{t('Sampled frame time')}</dt><dd>{sampledTime.toFixed(2)} s</dd></div><div><dt>{t('Scan strip')}</dt><dd>{scanIndex+1} / 48</dd></div><div><dt>{t('Brightness · 0 to 1')}</dt><dd>{current?.brightness.toFixed(4)??'—'}</dd></div><div><dt>{t('Target pitch')}</dt><dd>{current?`${note} · ${mapValueToNote(current.brightness,0,1).frequency.toFixed(2)} Hz`:'—'}</dd></div></dl><p>{t('Brightness is the average displayed sRGB luma estimate in a vertical strip: 0.2126R + 0.7152G + 0.0722B. It selects a fixed musical pitch; colour changes harmonics and horizontal position changes stereo pan. It is not a physical temperature retrieval.')}</p><p>{t(frame.date)}</p></details>}
     {error && <p className="visual-error" role="alert">{t(error)}</p>}{announcement && <p className="visual-announcement" role="status"><AudioLines size={14}/>{t(announcement)}</p>}
   </section>;
 }

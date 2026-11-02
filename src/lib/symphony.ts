@@ -11,6 +11,15 @@ export const defaults: Settings = { style: 'Electronic Pulse', timbre: 'Warm Key
 
 /** All sounds are synthesized. The scientific fundamental is never transposed by style. */
 export function renderScore(context: BaseAudioContext, destination: AudioNode, points: MonthlyObservation[], settings: Settings, start: number) {
+  return renderPitchedScore(context, destination, points.map(point => {
+    const event = mapData(point);
+    return event.kind === 'note' ? event.frequencyHz : null;
+  }), settings, start);
+}
+
+/** Reusable synthesis boundary: frequencies are compiled from scientific observations upstream. */
+export function renderPitchedScore(context: BaseAudioContext, destination: AudioNode, pitches: readonly (number | null)[], settings: Settings, start: number) {
+  if (pitches.some(hz => hz !== null && (!Number.isFinite(hz) || hz <= 0 || hz > 20000))) throw new RangeError('Invalid scientific target frequency.');
   const step = 120 / settings.tempo;
   const bus = context.createGain(); bus.gain.value = settings.volume * .65;
   const compressor = context.createDynamicsCompressor(); compressor.threshold.value = -12; compressor.ratio.value = 4;
@@ -62,14 +71,14 @@ export function renderScore(context: BaseAudioContext, destination: AudioNode, p
   }
   const pulse = settings.style === 'Electronic Pulse';
   const cinematic = settings.style === 'Cinematic';
-  points.forEach((point, i) => {
-    const event = mapData(point), time = start + i * step;
-    if (event.kind === 'rest') return;
-    melody(event.frequencyHz,time,step,.42);
+  pitches.forEach((frequencyHz, i) => {
+    const time = start + i * step;
+    if (frequencyHz === null) return;
+    melody(frequencyHz,time,step,.42);
     if (settings.dataOnly) return;
     // Soft syncopated repeats articulate the same measurement; they never invent pitches.
-    melody(event.frequencyHz,time+step*.375,step*.32,.13);
-    melody(event.frequencyHz,time+step*.75,step*.22,.09);
+    melody(frequencyHz,time+step*.375,step*.32,.13);
+    melody(frequencyHz,time+step*.75,step*.22,.09);
     if (settings.harmony) {
       const chords = [[130.8128,164.8138,195.9977],[110,130.8128,164.8138],[87.3071,130.8128,174.6141],[97.9989,146.8324,195.9977]];
       const chord = chords[Math.floor(i/2)%chords.length];
@@ -90,7 +99,7 @@ export function renderScore(context: BaseAudioContext, destination: AudioNode, p
       if(pulse) kick(time+step*.875,.07);
     }
   });
-  return { duration: points.length * step + .8, setVolume: (value: number) => bus.gain.setTargetAtTime(Math.max(0, Math.min(1, value)) * .65, context.currentTime, .015), stop: () => { bus.gain.cancelScheduledValues(context.currentTime); bus.gain.setTargetAtTime(0, context.currentTime, .008); setTimeout(() => { for (const source of sources) { try { source.stop(); } catch {} } for (const node of nodes) node.disconnect(); }, 50); } };
+  return { duration: pitches.length * step + .8, setVolume: (value: number) => bus.gain.setTargetAtTime(Math.max(0, Math.min(1, value)) * .65, context.currentTime, .015), stop: () => { bus.gain.cancelScheduledValues(context.currentTime); bus.gain.setTargetAtTime(0, context.currentTime, .008); setTimeout(() => { for (const source of sources) { try { source.stop(); } catch {} } for (const node of nodes) node.disconnect(); }, 50); } };
 }
 
 export class SymphonyPlayer {
@@ -99,18 +108,22 @@ export class SymphonyPlayer {
   private frame = 0;
   private generation = 0;
   async play(points: MonthlyObservation[], settings: Settings, onPoint: (index: number) => void, onEnd: () => void) {
+    return this.playPitches(points.map(point => {const event=mapData(point);return event.kind==='note'?event.frequencyHz:null;}),settings,onPoint,onEnd);
+  }
+  async playPitches(pitches: readonly (number|null)[], settings: Settings, onPoint: (index:number)=>void, onEnd:()=>void) {
+    if (!pitches.length) throw new RangeError('Choose at least one observation.');
     this.stop(); const token = this.generation;
     this.context ??= new AudioContext();
     await this.context.resume();
     if (token !== this.generation) return;
     if (this.context.state !== 'running') throw new Error('Audio is unavailable. Try playing again.');
     const start = this.context.currentTime + .05;
-    this.score = renderScore(this.context, this.context.destination, points, settings, start);
+    this.score = renderPitchedScore(this.context, this.context.destination, pitches, settings, start);
     let previous = -1;
     const tick = () => {
       if (token !== this.generation || !this.context) return;
       const elapsed = this.context.currentTime - start;
-      const index = Math.min(points.length - 1, Math.floor(elapsed / (120 / settings.tempo)));
+      const index = Math.min(pitches.length - 1, Math.floor(elapsed / (120 / settings.tempo)));
       if (index >= 0 && index !== previous) { previous = index; onPoint(index); }
       if (elapsed >= this.score!.duration) { this.stop(); onEnd(); return; }
       this.frame = requestAnimationFrame(tick);

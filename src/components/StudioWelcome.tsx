@@ -2,6 +2,7 @@ import {useState} from 'react';
 import EarthGlobe from './EarthGlobe';
 import {observatoryImagery} from '../data/observatory';
 import {storyFrame} from '../data/guidedStory';
+import {goToPage,pageUrl} from '../lib/studioRouter';
 import {useStudioLanguage} from '../lib/studioLanguage';
 
 type Props = {playing: boolean; motion: boolean; onListen: () => void};
@@ -38,7 +39,7 @@ export default function StudioWelcome({playing, motion, onListen}: Props) {
         <article><span>01</span><div><h3>{t('Look at a NASA visual')}</h3><p>{t('Watch a picture become sound in real time.')}</p></div></article>
         <article><span>02</span><div><h3>{t('Listen to real data')}</h3><p>{t('Hear selected temperature measurements across time.')}</p></div></article>
         <article><span>03</span><div><h3>{t('Notice what changes')}</h3><p>{t('Then explore music and data at your own pace.')}</p></div></article>
-      </div></div>
+      </div><a className="st-browse-link" href={pageUrl('listen','all')} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen','all');}}>{t('Explore Earth Stations')} →</a></div>
     </section>
   </div>;
 }

@@ -713,3 +713,68 @@ for(const failure of ['graphics unavailable','image unavailable']){
     expect(errors).toEqual([]);
   });
 }
+
+test('Earth Stations directory preserves the five-page layout and source-aware links',async({page})=>{
+ await page.goto('/');await page.getByRole('link',{name:'Explore Earth Stations →',exact:true}).click();await expect(page).toHaveURL(/station=all/);
+ await expect(page.getByRole('heading',{name:'One planet. Listen closely.'})).toBeVisible();await expect(page.locator('.st-station-card')).toHaveCount(2);
+ await page.getByRole('link',{name:'Listen to Arctic September →',exact:true}).click();await expect(page).toHaveURL(/station=arctic/);
+ await page.reload();await expect(page.getByRole('heading',{name:'Listen to the ice record.'})).toBeVisible();
+ await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();await expect(page).toHaveURL(/\/data\?station=arctic$/);
+ await expect(page.getByRole('heading',{name:'Every ice note has an observation.'})).toBeVisible();
+ await page.getByLabel('Earth Station',{exact:true}).selectOption('climate');await expect(page.getByRole('heading',{name:'Every note has a number.'})).toBeVisible();
+ await page.goBack();await expect(page.getByRole('heading',{name:'Every ice note has an observation.'})).toBeVisible();
+});
+
+test('Arctic listening preserves real first and retry answers, evidence use and a private reflection',async({page})=>{
+ const posts:string[]=[];page.on('request',r=>{if(r.method()==='POST')posts.push(r.url());});
+ await page.goto('/listen?station=arctic');
+ await expect(page.getByText('7.2787',{exact:true})).toHaveCount(0);
+ await page.getByRole('button',{name:/Hear the two Septembers/}).click();await expect(page.getByRole('status')).toContainText('September 1987');
+ await expect(page.getByRole('status')).toContainText('September 2022',{timeout:5000});
+ await page.getByLabel('Arctic volume').fill('0.35');await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toBeVisible();await page.getByRole('button',{name:'■ Stop',exact:true}).click();
+ await page.getByRole('radio',{name:'1987',exact:true}).check();await page.getByRole('button',{name:'Save my prediction',exact:true}).click();
+ await page.getByRole('button',{name:'Inspect the observations →',exact:true}).click();await expect(page.locator('.st-pair-values')).toContainText('7.2787');await expect(page.locator('.st-pair-values')).toContainText('4.8969');
+ await page.getByRole('button',{name:'← Back',exact:true}).click();await page.getByRole('radio',{name:'2022',exact:true}).check();await page.getByRole('button',{name:'Save my prediction',exact:true}).click();
+ await page.getByRole('button',{name:'Inspect the observations →',exact:true}).click();await page.getByRole('button',{name:'Explain what changed →',exact:true}).click();
+ const fields=page.locator('fieldset');await fields.nth(0).getByLabel('Sea ice thickness',{exact:true}).check();await fields.nth(1).getByLabel('No. Extent alone does not identify the cause.',{exact:true}).check();await page.getByRole('button',{name:'Check these ideas',exact:true}).click();await expect(page.getByRole('status')).toContainText('1 / 2');
+ await fields.nth(0).getByLabel('September mean sea ice extent',{exact:true}).check();await page.getByRole('button',{name:'Check these ideas',exact:true}).click();await expect(page.getByRole('status')).toContainText('2 / 2');
+ await page.getByLabel('My explanation (optional)',{exact:true}).fill('Automated fixture: 1987 was 7.2787 million km²; 2022 was 4.8969. Extent does not identify a cause.');
+ const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download my reflection',exact:true}).click();const record=JSON.parse(await readFile((await(await pending).path())!,'utf8'));
+ expect(record.attempts.map((a:{correct:number})=>a.correct)).toEqual([0,1,1,2]);expect(record.attempts.slice(0,2).map((a:{evidenceViewed:boolean})=>a.evidenceViewed)).toEqual([false,true]);expect(record.firstAudioAt).toBeTruthy();expect(record.notice).toContain('not a participant study');expect(posts).toEqual([]);
+ await page.getByRole('button',{name:'Shape this station’s sound →',exact:true}).click();await expect(page).toHaveURL(/\/create\?station=arctic$/);
+});
+
+test('Arctic data and mix compile the actual fixed frequencies and export a reproducible trace and WAV',async({page})=>{
+ await page.addInitScript(()=>{const original=AudioContext.prototype.createOscillator;(window as unknown as {icePitches:number[]}).icePitches=[];AudioContext.prototype.createOscillator=function(){const osc=original.call(this),set=osc.frequency.setValueAtTime.bind(osc.frequency);osc.frequency.setValueAtTime=(value,time)=>{(window as unknown as {icePitches:number[]}).icePitches.push(value);return set(value,time);};return osc;};});
+ await page.goto('/data?station=arctic');await expect(page.locator('.st-proof')).toContainText('4.8969');await page.getByRole('button',{name:'Hear this September',exact:true}).click();
+ expect(await page.evaluate(()=>(window as unknown as {icePitches:number[]}).icePitches[0])).toBeCloseTo(195.997718,5);
+ await page.getByLabel('Choose a year',{exact:true}).selectOption('1987');await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toHaveCount(0);await expect(page.locator('.st-proof')).toContainText('7.2787');await expect(page.locator('.st-proof')).toContainText('392.00 Hz');
+ await page.getByText('Inspect all 36 observations and download the trace',{exact:true}).click();const trace=page.waitForEvent('download');await page.getByRole('button',{name:'Download data → notes CSV',exact:true}).click();const csv=await readFile((await(await trace).path())!,'utf8');expect(csv).toContain('1987-09,7.2787,9,G4,391.995');expect(csv.trim().split('\n')).toHaveLength(37);
+ await page.getByText('Source and method · project-derived September means',{exact:true}).click();
+ const source=page.getByRole('link',{name:'Pinned daily source CSV ↓',exact:true});expect(await source.getAttribute('href')).toBe('/data/sources/arctic-daily-extent.csv');
+ await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
+ await page.evaluate(()=>(window as unknown as {icePitches:number[]}).icePitches=[]);await page.getByRole('button',{name:/Play my mix/}).click();expect(await page.evaluate(()=>(window as unknown as {icePitches:number[]}).icePitches[0])).toBeCloseTo(391.995436,5);
+ await page.getByRole('button',{name:'■ Stop',exact:true}).click();const filePromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download 25-second WAV',exact:true}).click();const file=await filePromise;expect(file.suggestedFilename()).toContain('Arctic-September');const wav=await readFile((await file.path())!);expect(wav.toString('ascii',0,4)).toBe('RIFF');expect(wav.length).toBe(2187404);
+});
+
+test('moving Earth sound samples video during playback and obeys still-frame and motion controls',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/listen?visual=motion');
+ const video=page.locator('.visual-screen video');await expect(video).toBeVisible();await page.getByText('Inspect the pixel-to-sound mapping',{exact:true}).click();
+ await page.getByRole('button',{name:'Play visual sound',exact:true}).click();await expect.poll(()=>video.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.3);
+ const proof=page.locator('.st-live-proof');await expect.poll(async()=>parseFloat(await proof.locator('dd').nth(0).innerText())).toBeGreaterThan(0);
+ await expect(proof).toContainText('Hz');await page.getByLabel('Follow the animation',{exact:true}).uncheck();expect(await video.evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);
+ const paused=await video.evaluate((v:HTMLVideoElement)=>v.currentTime);await page.getByRole('button',{name:'Play visual sound',exact:true}).click();await page.waitForTimeout(400);expect(await video.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBe(paused);
+ await page.getByLabel('Motion effects',{exact:true}).uncheck();await expect(page.getByLabel('Follow the animation',{exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Continue to the real data →',exact:true}).click();await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toHaveCount(0);await expect(page.getByRole('heading',{name:'Now, hear the measurements.'})).toBeVisible();
+});
+
+test('new stations and live proof remain bilingual, accessible and usable on mobile',async({page})=>{
+ test.setTimeout(90000);await page.setViewportSize({width:390,height:844});
+ for(const language of ['en','zh'])for(const route of ['/listen?station=all','/listen?station=arctic','/data?station=arctic','/create?station=arctic','/listen?visual=motion']){
+  await page.goto(route);await page.locator('h1').waitFor();await page.locator('.sp-language select').selectOption(language);
+  if(route==='/data?station=arctic'){await page.locator('details').first().locator('summary').first().click();}
+  if(route==='/listen?visual=motion'){await page.locator('.st-live-proof summary').click();await expect(page.getByLabel(language==='en'?'Follow the animation':'跟随动画',{exact:true})).toBeDisabled();}
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({route,language,id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
+ }
+});

@@ -33,3 +33,9 @@ The software's 34 unit tests or browser scenario counts are not human participan
 ## Ready-to-run assets
 
 The application provides a three-step lesson, source-linked comparison, explanatory feedback and optional local record export. It sends no answers to an application backend. Hosting request logs may exist independently; do not describe the entire web as having no network metadata. No study data is prefilled and no aggregate results are shown.
+
+## Public, self-guided station review
+
+Visitors can use `/listen?station=all` without an account. Arctic September (`/listen?station=arctic`) offers an optional prediction before numeric evidence, full record inspection, two concept checks, a free-text scientific explanation and a local JSON export. The export separates first/retry attempts, records whether the evidence step had already been revealed, counts play requests, and timestamps the first scheduled audible observation. It does not grade free text, transmit answers, infer demographic information or aggregate learning scores. Shared exports are actual personal practice records only when a real visitor chooses to provide them. Automated test fixtures must remain separate from learner evidence.
+
+No human review is required as a deployment gate. This implementation makes real-learner review possible on production; it does not pretend that a participant study has already taken place.
