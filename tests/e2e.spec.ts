@@ -408,53 +408,191 @@ test('Climate Explore is accessible and fits a mobile screen in available and mi
   await scene.screenshot({ path: 'test-results/climate-explore-mobile.png' });
 });
 
-test('Symphony Studio keeps scientific pitches independent of mix, cancels playback and handles missing months', async ({ page }) => {
-  await page.goto('/?studio=1');
-  await expect(page.getByRole('heading', { name: /See our Earth/ })).toBeVisible();
-  await page.getByRole('button',{name:/Play year/}).click();
-  await expect(page.getByRole('status')).toContainText('February', {timeout:5000});
-  await page.getByLabel('Master volume').fill('0.4');
-  await expect(page.getByRole('button',{name:'■ Stop'})).toBeVisible();
-  await page.getByRole('button',{name:/Earth Remix Studio/}).click();
-  await expect(page.getByRole('button',{name:'■ Stop'})).toHaveCount(0);
-  const pitch = await page.locator('.ss-measure div').innerText();
-  await page.getByRole('button',{name:'Cinematic',exact:true}).click();
-  await expect(page.locator('.ss-measure div')).toHaveText(pitch);
-  await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
-  await expect(page.getByLabel('Rhythm / drums')).toBeDisabled();
-  await expect(page.getByLabel('Harmony',{exact:true})).toBeDisabled();
-  await page.getByRole('button',{name:/Data Lab/}).click();
-  await page.getByLabel(/Year A|Choose a year/).selectOption('2026');
-  await page.getByRole('button',{name:'Oct',exact:true}).click();
-  await expect(page.locator('.ss-measure')).toContainText('No observation');
-  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
-  expect(scan.violations).toEqual([]);
-  await page.setViewportSize({width:390,height:844});
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+test('five real pages keep the homepage simple, support history and direct reloads, and preserve the original entry',async({page})=>{
+  await page.goto('/');
+  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Hear Earth’s changing climate.');
+  await expect(page.getByRole('button',{name:/Start the experience/})).toBeVisible();
+  await expect(page.getByRole('group',{name:'Melody tone'})).toHaveCount(0);
+  await expect(page.getByLabel('Choose a year',{exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:/Start the experience/}).click();
+  await expect(page).toHaveURL(/\/listen$/);
+  await expect(page.getByRole('heading',{name:'First, hear the picture.'})).toBeVisible();
+  await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();
+  await expect(page).toHaveURL(/\/create$/);
+  await page.reload();await expect(page.getByRole('heading',{name:'Make the music yours.'})).toBeVisible();
+  await page.goBack();await expect(page).toHaveURL(/\/listen$/);
+  await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Every note has a number.'})).toBeVisible();
+  await page.getByRole('link',{name:'About & sources',exact:true}).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.getByRole('heading',{level:1})).toBeVisible();
+  await page.getByRole('link',{name:/Original experience/}).click();
+  await expect(page.getByRole('heading',{name:/A moment in time/})).toBeVisible();
+  await page.goto('/#climate-spiral');await expect(page.locator('#climate-spiral .climate-measurement')).toContainText('+1.37°C');
 });
 
-test('Symphony A/B completes in order without changing Year A and toggles geometric view', async ({page})=>{
-  test.setTimeout(60000);
-  await page.goto('/?studio=1');
-  await page.getByRole('button',{name:/Data Lab/}).click();
-  await page.getByLabel(/Year A|Choose a year/).selectOption('2025');
-  await page.getByLabel('Year B').selectOption('1880');
-  await page.getByRole('button',{name:/A → B/}).click();
-  await expect(page.locator('.ss-measure')).toContainText('January 1880',{timeout:27000});
-  await expect(page.getByLabel(/Year A|Choose a year/)).toHaveValue('2025');
+test('Listen guides visual sound into real data with clean stops and optional honest learning records',async({page})=>{
+  await page.addInitScript(()=>{
+    const contexts:AudioContext[]=[];(window as unknown as {contexts:AudioContext[]}).contexts=contexts;
+    const Context=window.AudioContext;window.AudioContext=class extends Context{constructor(){super();contexts.push(this);}};
+  });
+  await page.goto('/listen');
+  await expect(page.getByRole('img',{name:/NASA Climate Spiral overview showing monthly/})).toBeVisible();
+  await expect(page.getByText('Image brightness makes the notes',{exact:false})).toBeVisible();
+  await page.getByRole('button',{name:'Play visual sound',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toBeVisible();
+  await expect.poll(async()=>Number((await page.locator('.visual-scan span').innerText()).split('/')[0])).toBeGreaterThan(1);
+  await page.getByRole('button',{name:/Continue to the real data/}).click();
+  await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:/Play the data melody/}).click();
+  await expect(page.locator('.ss-story-readout')).toContainText('January 1880');
+  await expect(page.locator('.ss-story-readout')).toContainText('G3 · 196.00 Hz');
+  await expect(page.locator('.ss-story-readout')).toContainText('January 1900',{timeout:5000});
+  await page.getByRole('button',{name:/Continue to the discovery/}).click();
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Two sounds. Two different meanings.'})).toBeVisible();
+  await expect(page.locator('.sp-optional-check')).not.toHaveAttribute('open');
+  await page.getByText('Check your understanding (optional)',{exact:true}).click();
+  await expect(page.getByRole('button',{name:'Download my learning-check record'})).toBeDisabled();
+  const groups=page.locator('fieldset');
+  await groups.nth(0).getByLabel('January 1880',{exact:true}).check();
+  await groups.nth(1).getByLabel('No',{exact:true}).check();
+  await groups.nth(2).getByLabel('The published temperature anomaly',{exact:true}).check();
+  await groups.nth(3).getByLabel('A global anomaly relative to the January baseline',{exact:true}).check();
+  await page.getByRole('button',{name:'Check my answers',exact:true}).click();
+  await expect(page.getByRole('status')).toContainText('3 / 4');
+  await groups.nth(0).getByLabel('January 2025',{exact:true}).check();
+  await page.getByRole('button',{name:'Check my answers',exact:true}).click();
+  await expect(page.getByRole('status')).toContainText('4 / 4');
+  const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download my learning-check record'}).click();
+  const record=JSON.parse(await readFile((await(await pending).path())!,'utf8'));
+  expect(record.attempts.map((a:{correct:number})=>a.correct)).toEqual([3,4]);
+  expect(record.notice).toContain('not aggregate research evidence');
+  await page.getByRole('button',{name:/Try your own sound/}).click();await expect(page).toHaveURL(/\/create$/);
+  await expect.poll(()=>page.evaluate(()=>(window as unknown as {contexts:AudioContext[]}).contexts.every(c=>c.state==='closed'))).toBe(true);
+});
+
+test('Create separates musical choices, keeps volume live, stops on changes and exports a real WAV',async({page})=>{
+  await page.goto('/create');
+  await page.getByRole('button',{name:/Play my mix/}).click();
+  await expect(page.getByRole('status')).toContainText('February 2025',{timeout:5000});
+  await page.getByLabel('Master volume').fill('0.4');
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toBeVisible();
+  await page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:'Soft Pluck',exact:true}).click();
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toHaveCount(0);
+  await page.getByRole('group',{name:'Music style'}).getByRole('button',{name:/Cinematic/}).click();
+  await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
+  await page.getByText('More sound controls',{exact:true}).click();
+  await expect(page.getByLabel('Rhythm / drums')).toBeDisabled();await expect(page.getByLabel('Harmony',{exact:true})).toBeDisabled();
+  await page.getByLabel('Tempo',{exact:true}).fill('96');
+  await expect(page.getByRole('button',{name:/Play my mix · 16s/})).toBeVisible();
+  const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download 25-second WAV'}).click();
+  const file=await pending;const data=await readFile((await file.path())!);
+  expect(file.suggestedFilename()).toBe('Earth-FM-2025-Soft-Pluck-Data-Only.wav');
+  expect(data.toString('ascii',0,4)).toBe('RIFF');expect(data.toString('ascii',8,12)).toBe('WAVE');expect(data.length).toBeGreaterThan(1000000);
+  expect(data.some((value,i)=>i>44&&value!==0)).toBe(true);
+  await page.getByRole('button',{name:'Reset sound',exact:true}).click();
+  await expect(page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:'Warm Keys',exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(page.getByRole('checkbox',{name:/Hear Data Only/})).not.toBeChecked();
+  await page.getByRole('button',{name:/Play my mix/}).click();
+  await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toHaveCount(0);
+  await expect(page.locator('.sp-data-summary')).toContainText('+1.37°C');
+});
+
+test('Data compares complete A/B melodies in order with fixed settings and optional spiral geometry',async({page})=>{
+  test.setTimeout(65000);await page.goto('/data');
+  await page.getByRole('checkbox',{name:'Compare another year',exact:true}).check();
+  await page.getByLabel('Year B',{exact:true}).selectOption('1880');
+  await page.getByRole('button',{name:'Compare A → B · 49s',exact:true}).click();
+  await expect(page.locator('.sp-data-summary')).toContainText('January 2025');
+  await expect(page.locator('.sp-data-summary')).toContainText('January 1880',{timeout:27000});
+  await expect(page.getByLabel('Year A',{exact:true})).toHaveValue('2025');
   await expect(page.getByRole('status')).toContainText('Complete.',{timeout:27000});
-  await expect(page.getByRole('button',{name:'■ Stop'})).toHaveCount(0);
-  await page.getByRole('button',{name:'Explore 3D'}).click();
-  await expect(page.getByLabel('Tilt spiral')).toBeVisible();
-  await page.getByLabel('Tilt spiral').fill('55');
-  await page.getByRole('button',{name:'Use 2D'}).click();
-  await expect(page.getByLabel('Tilt spiral')).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toHaveCount(0);
+  await page.getByText('Explore the Climate Spiral',{exact:true}).click();
+  await page.getByRole('button',{name:'Explore 3D',exact:true}).click();await expect(page.getByLabel('Tilt spiral')).toBeVisible();
+  await page.getByLabel('Tilt spiral').fill('55');await page.getByRole('button',{name:'Use 2D',exact:true}).click();await expect(page.getByLabel('Tilt spiral')).toHaveCount(0);
+});
+
+test('Data explains exact NASA mapping, auditions fixed frequencies, and exports missing observations honestly',async({page})=>{
+  await page.addInitScript(()=>{
+    const original=AudioContext.prototype.createOscillator;(window as unknown as {proofPitches:number[]}).proofPitches=[];
+    AudioContext.prototype.createOscillator=function(){const osc=original.call(this),set=osc.frequency.setValueAtTime.bind(osc.frequency);osc.frequency.setValueAtTime=(value,time)=>{(window as unknown as {proofPitches:number[]}).proofPitches.push(value);return set(value,time);};return osc;};
+  });
+  await page.goto('/data');await page.getByText('How does this value become a note?',{exact:true}).click();
+  const guide=page.locator('#data-to-sound');
+  await expect(guide.locator('.ss-proof-chain')).toContainText('+1.37°C');await expect(guide.locator('.ss-proof-chain')).toContainText('+1.25 ≤ ΔT ≤ +1.50°C');
+  await guide.getByRole('button',{name:/Hear 1880-01/}).click();
+  await expect(guide.locator('.ss-proof-chain')).toContainText('G3 · 196.00 Hz');
+  expect(await page.evaluate(()=>(window as unknown as {proofPitches:number[]}).proofPitches[0])).toBeCloseTo(195.997718,5);
+  await page.getByRole('button',{name:'■ Stop',exact:true}).click();await page.evaluate(()=>(window as unknown as {proofPitches:number[]}).proofPitches=[]);
+  await guide.getByRole('button',{name:/Hear 2025-01/}).click();await expect(guide.locator('.ss-proof-chain')).toContainText('A4 · 440.00 Hz');
+  expect(await page.evaluate(()=>(window as unknown as {proofPitches:number[]}).proofPitches[0])).toBe(440);
+  await page.getByRole('button',{name:'■ Stop',exact:true}).click();
+  await guide.getByText('Show the full pitch scale',{exact:true}).click();await expect(guide.getByRole('table').first().getByRole('row')).toHaveCount(11);
+  await page.getByLabel('Choose a year',{exact:true}).selectOption('2026');await page.getByLabel('Month',{exact:true}).selectOption('10');
+  await expect(page.locator('.sp-data-summary')).toContainText('No observation');await expect(page.getByRole('button',{name:'▶ Hear this month',exact:true})).toBeDisabled();
+  await expect(guide.locator('.ss-proof-chain')).toContainText('Silence');await guide.getByText(/Trace every month/).click();
+  await expect(guide.getByRole('button',{name:'Hear data 2026-10',exact:true})).toBeDisabled();
+  const pending=page.waitForEvent('download');await guide.getByRole('button',{name:/Download 2026 data/}).click();const csv=await readFile((await(await pending).path())!,'utf8');
+  expect(csv).toContain('2026-10,,1951-1980,,,,gistemp-fixed-bands-v1,symphony-ten-v1,missing');
+  await guide.getByRole('link',{name:'Full science & NASA credits ↓',exact:true}).click();await expect(page).toHaveURL(/\/about#sources$/);await expect(page.locator('#sources')).toBeInViewport();
+});
+
+test('language choice persists across the pages, keeps English clean and preserves selected tones',async({page})=>{
+  await page.goto('/create');await expect(page.locator('html')).toHaveAttribute('lang','en');
+  expect(await page.locator('main').textContent()).not.toMatch(/[\u3400-\u9fff]/);
+  await page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:'Soft Pluck',exact:true}).click();
+  await page.getByRole('button',{name:/Play my mix/}).click();await page.getByLabel('Language',{exact:true}).selectOption('zh');
+  await expect(page.locator('html')).toHaveAttribute('lang','zh-Hans');await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{level:1})).toHaveText('创作你的地球旋律。');
+  await expect(page.getByRole('group',{name:'主旋律音色'}).getByRole('button',{name:'柔和拨音',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('navigation').getByRole('link',{name:'探索数据',exact:true}).click();
+  await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toHaveCount(0);
+  await expect(page.locator('.sp-data-summary')).toContainText('+1.37°C');
+  await page.getByRole('navigation').getByRole('link',{name:'创作',exact:true}).click();
+  await expect(page.getByRole('group',{name:'主旋律音色'}).getByRole('button',{name:'柔和拨音',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.reload();await expect(page.getByLabel('语言',{exact:true})).toHaveValue('zh');
+  await page.getByLabel('语言',{exact:true}).selectOption('en');await expect(page.getByRole('heading',{name:'Make the music yours.'})).toBeVisible();
+});
+
+test('five pages and expanded data are accessible and fit English and Chinese mobile screens',async({page})=>{
+  test.setTimeout(90000);
+  for(const language of ['en','zh']){
+    for(const path of ['/','/listen','/create','/data','/about']){
+      await page.setViewportSize({width:390,height:844});await page.goto(path);await page.locator('h1').waitFor();
+      await page.locator('.sp-language select').selectOption(language);
+      if(path==='/data'){
+        await page.getByLabel(language==='en'?'Choose a year':'选择年份',{exact:true}).selectOption('2026');
+        await page.getByLabel(language==='en'?'Month':'月份',{exact:true}).selectOption('10');
+        await page.locator('.sp-page-data > details').nth(0).locator('summary').first().click();
+      }
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+      const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+      expect(scan.violations.map(v=>({page:path,language,id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
+    }
+  }
+});
+
+test('Chinese Listen is simple and sound controls recover with blocked preference storage',async({page})=>{
+  await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked');};Storage.prototype.setItem=()=>{throw Error('blocked');};});
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');await page.getByLabel('Language',{exact:true}).selectOption('zh');
+  await page.getByRole('button',{name:/开始体验/}).click();
+  await expect(page.getByRole('heading',{name:'先听听这幅画面。'})).toBeVisible();
+  await page.getByRole('button',{name:/继续聆听真实数据/}).click();
+  await page.getByRole('button',{name:/播放数据旋律/}).click();
+  await expect(page.getByRole('status')).toContainText('1880 年 1 月');
+  await page.getByRole('navigation').getByRole('link',{name:'创作',exact:true}).click();
+  await page.getByRole('button',{name:/播放我的混音/}).click();await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'■ 停止',exact:true}).click();
+  await expect(page.getByRole('status')).toHaveText('已停止。');expect(errors).toEqual([]);
 });
 
 test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation', async ({page})=>{
-  await page.goto('/?studio=1');
-  await page.getByText('Choose your sound',{exact:true}).click();
-  await expect(page.getByLabel('Melody tone')).toBeVisible();
+  await page.goto('/create');
+  await expect(page.getByRole('group',{name:'Melody tone'})).toBeVisible();
   const result=await page.evaluate(async()=>{
     const path='/src/lib/symphony.ts';
     const sound=await import(path);
@@ -490,227 +628,88 @@ test('all five melody tones retain mapped fundamentals, deterministic data-only 
     if(item.dataOnly) expect(item.voices).toBeLessThanOrEqual(5);
     else expect(item.voices).toBeGreaterThan(10);
   }
-  const readout=await page.locator('.ss-measure div').innerText();
   for(const tone of ['Warm Keys','Velvet Pad','Soft Pluck','Mellow Reed','Soft Glass']){
-    await page.getByLabel('Melody tone').selectOption(tone);
-    await expect(page.locator('.ss-measure div')).toHaveText(readout);
+    await page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:tone,exact:true}).click();
+    await expect(page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:tone,exact:true})).toHaveAttribute('aria-pressed','true');
   }
 });
 
-test('data-to-sound guide explains actual NASA notes, auditions mapped fundamentals and exports missing values honestly', async ({page})=>{
+test('homepage globe rotates gently, pauses for interaction, and obeys motion preferences',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.goto('/');
+  const coordinates=page.locator('.ss-earth-scene .earth-globe__coordinates text');
+  const initial=await coordinates.textContent();
+  await expect.poll(()=>coordinates.textContent()).not.toBe(initial);
+  await page.getByRole('button',{name:'Pause rotation',exact:true}).click();
+  const paused=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(paused);
+  await page.getByRole('button',{name:'Resume rotation',exact:true}).click();
+  await expect.poll(()=>coordinates.textContent()).not.toBe(paused);
+  const surface=page.locator('.ss-earth-scene .earth-globe__drag-surface');const box=await surface.boundingBox();
+  await page.mouse.move(box!.x+box!.width/2,box!.y+box!.height/2);await page.mouse.down();await page.mouse.move(box!.x+box!.width/2+25,box!.y+box!.height/2);
+  const held=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(held);
+  await page.mouse.up();await page.waitForTimeout(250);expect(await coordinates.textContent()).toBe(held);
+  await expect.poll(()=>coordinates.textContent(),{timeout:3500}).not.toBe(held);
+  await page.getByLabel('Motion effects').uncheck();await page.evaluate(()=>scrollTo(0,0));
+  const disabled=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(disabled);
+  await expect(page.getByRole('button',{name:'Rotation paused',exact:true})).toBeDisabled();
+  await page.getByLabel('Motion effects').check();await page.evaluate(()=>scrollTo(0,0));
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(page.getByRole('button',{name:'Rotation paused',exact:true})).toBeDisabled();
+  const reduced=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(reduced);
+});
+
+test('NASA surface renders the correct geographic texture, responds to the camera and keeps source credits visible',async({page})=>{
   await page.addInitScript(()=>{
-    const context=window.AudioContext;
-    const original=context.prototype.createOscillator;
-    (window as unknown as { proofPitches: number[] }).proofPitches=[];
-    context.prototype.createOscillator=function(){
-      const osc=original.call(this), setter=osc.frequency.setValueAtTime.bind(osc.frequency);
-      osc.frequency.setValueAtTime=(value,time)=>{(window as unknown as { proofPitches: number[] }).proofPitches.push(value);return setter(value,time);};return osc;
+    const original=WebGLRenderingContext.prototype.drawArrays;
+    WebGLRenderingContext.prototype.drawArrays=function(...args){
+      original.apply(this,args);
+      const pixel=new Uint8Array(4);
+      this.readPixels(384,384,1,1,this.RGBA,this.UNSIGNED_BYTE,pixel);
+      (window as unknown as {surfacePixel:number[]}).surfacePixel=Array.from(pixel);
     };
   });
-  await page.goto('/?studio=1');
-  await page.getByRole('link',{name:/Why this note/}).click();
-  const guide=page.locator('#data-to-sound');
-  await expect(guide.getByRole('heading',{name:'How does data become sound?'})).toBeVisible();
-  await expect(guide.locator('.ss-proof-chain')).toContainText('+1.37°C');
-  await expect(guide.locator('.ss-proof-chain')).toContainText('+1.25 ≤ ΔT ≤ +1.50°C');
-  await expect(guide.locator('.ss-proof-chain')).toContainText('A4 · 440.00 Hz');
-  await guide.getByRole('button',{name:/Hear 1880-01/}).click();
-  await expect(guide.locator('.ss-proof-chain')).toContainText('−0.25 ≤ ΔT < +0.00°C');
-  await expect(guide.locator('.ss-proof-chain')).toContainText('G3 · 196.00 Hz');
-  expect(await page.evaluate(()=>(window as unknown as { proofPitches: number[] }).proofPitches[0])).toBeCloseTo(195.997718,5);
-  await expect(page.locator('.ss-mix-state')).toHaveText('DATA ONLY');
-  await page.getByRole('button',{name:'■ Stop'}).click();
-  await page.evaluate(()=>(window as unknown as { proofPitches: number[] }).proofPitches=[]);
-  await guide.getByRole('button',{name:/Hear 2025-01/}).click();
-  await expect(guide.locator('.ss-proof-chain')).toContainText('A4 · 440.00 Hz');
-  expect(await page.evaluate(()=>(window as unknown as { proofPitches: number[] }).proofPitches[0])).toBe(440);
-  await page.getByRole('button',{name:'■ Stop'}).click();
-  await guide.getByText(/Why can different values sound the same/).click();
-  await expect(guide).toContainText('+1.10°C and +1.20°C');
-  await guide.getByText(/Show the full pitch scale/).click();
-  await expect(guide.getByRole('table').first().getByRole('row')).toHaveCount(11);
-  await page.getByLabel(/Year A|Choose a year/).selectOption('2026');
-  await page.getByRole('button',{name:'Oct',exact:true}).click();
-  await expect(guide.locator('.ss-proof-chain')).toContainText('Silence');
-  await guide.getByText(/Trace every month/).click();
-  await expect(guide.getByRole('button',{name:'Hear data 2026-10',exact:true})).toBeDisabled();
-  const downloadPromise=page.waitForEvent('download');
-  await guide.getByRole('button',{name:/Download 2026 data/}).click();
-  const download=await downloadPromise;
-  expect(download.suggestedFilename()).toBe('Earth-Symphony-2026-data-to-notes.csv');
-  const file=await download.path();
-  const csv=await readFile(file!,'utf8');
-  expect(csv).toContain('2026-10,,1951-1980,,,,gistemp-fixed-bands-v1,symphony-ten-v1,missing');
-  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
-  expect(scan.violations).toEqual([]);
-  await page.setViewportSize({width:390,height:844});
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-});
-
-test('Studio language choice keeps English clean, localizes Chinese, preserves audio settings and persists', async ({page})=>{
-  await page.goto('/?studio=1');
-  await expect(page.locator('html')).toHaveAttribute('lang','en');
-  await expect(page.getByLabel('Language',{exact:true})).toHaveValue('en');
-  const englishText=await page.locator('main.ss').evaluate(el=>{const copy=el.cloneNode(true) as HTMLElement;copy.querySelector('.ss-language')?.remove();return copy.textContent;});
-  expect(englishText).not.toMatch(/[\u3400-\u9fff]/);
-  await page.getByRole('button',{name:/Earth Remix Studio/}).click();
-  await page.getByLabel('Melody tone').selectOption('Soft Pluck');
-  await page.getByLabel(/Year A|Choose a year/).selectOption('1980');
-  await page.getByRole('button',{name:'Mar',exact:true}).click();
-  const value=await page.locator('.ss-measure strong').innerText();
-  const pitch=(await page.locator('.ss-measure div').innerText()).split(' · ').slice(0,2).join(' · ');
-  await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await expect(page.locator('html')).toHaveAttribute('lang','zh-Hans');
-  await expect(page.getByRole('heading',{name:'你的地球，你的音乐。'})).toBeVisible();
-  await expect(page.getByLabel('主旋律音色')).toHaveValue('Soft Pluck');
-  await expect(page.getByLabel(/年份 A|选择年份/)).toHaveValue('1980');
-  await expect(page.locator('.ss-measure strong')).toHaveText(value);
-  expect((await page.locator('.ss-measure div').innerText()).split(' · ').slice(0,2).join(' · ')).toBe(pitch);
-  await expect(page.getByRole('heading',{name:'数据如何变成声音？'})).toBeVisible();
-  await page.getByRole('button',{name:/播放全年/}).click();
-  await expect(page.getByRole('status')).toHaveText('1980 年 1 月');
-  await page.getByLabel('语言',{exact:true}).selectOption('en');
-  await expect(page.getByRole('button',{name:'■ Stop'})).toBeVisible();
-  await expect(page.getByRole('status')).toContainText('January 1980');
-  await expect(page.getByLabel('Melody tone')).toHaveValue('Soft Pluck');
-  await page.getByRole('button',{name:'■ Stop'}).click();
-  await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await page.reload();
-  await expect(page.getByLabel('语言',{exact:true})).toHaveValue('zh');
-  await page.getByRole('button',{name:/数据实验室/}).click();
-  await page.getByLabel(/年份 A|选择年份/).selectOption('2026');
-  await page.getByRole('button',{name:'10 月',exact:true}).click();
-  await expect(page.locator('.ss-measure strong')).toHaveText('暂无观测数据');
-  const guide=page.locator('#data-to-sound');
-  await guide.getByText('查看完整十音映射',{exact:true}).click();
-  await guide.getByText(/核对每个月的数据与音符/).click();
-  await expect(guide.getByRole('button',{name:'试听数据 2026-10',exact:true})).toBeDisabled();
-  const promise=page.waitForEvent('download');await guide.getByRole('button',{name:/下载 2026 数据/}).click();
-  const download=await promise;const csv=await readFile((await download.path())!,'utf8');
-  expect(csv).toContain('2026-10,,1951-1980,,,,gistemp-fixed-bands-v1,symphony-ten-v1,missing');
-  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations).toEqual([]);
-  await page.setViewportSize({width:390,height:844});
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-});
-
-test('language controls remain usable when preference storage is blocked',async({page})=>{
-  await page.addInitScript(()=>{
-    Storage.prototype.getItem=()=>{throw new Error('Storage blocked');};
-    Storage.prototype.setItem=()=>{throw new Error('Storage blocked');};
+  await page.goto('/');await expect(page.locator('.earth-globe--photographic')).toBeVisible();
+  await expect(page.getByRole('link',{name:'NASA Earth Observatory · Blue Marble ↗',exact:true})).toBeVisible();
+  await expect(page.getByText('July 2004 composite.',{exact:false})).toBeVisible();
+  const proof=await page.evaluate(async()=>{
+    const image=new Image();image.src='/frames/blue-marble-july-2004-2048.jpg';await image.decode();
+    const source=document.createElement('canvas');source.width=image.width;source.height=image.height;
+    const context=source.getContext('2d')!;context.drawImage(image,0,0);
+    // Initial camera is 12°N, 22°E. A spherical projection must sample this location, not its mirror.
+    const expected=Array.from(context.getImageData(Math.floor((.5+22/360)*image.width),Math.floor((.5-12/180)*image.height),1,1).data);
+    return {expected,actual:(window as unknown as {surfacePixel:number[]}).surfacePixel};
   });
-  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/?studio=1');
-  await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await expect(page.getByRole('heading',{name:'聆听变化中的地球。'})).toBeVisible();
-  await page.getByRole('button',{name:/播放全年/}).click();
-  await expect(page.getByRole('button',{name:'■ 停止'})).toBeVisible();
-  await page.getByRole('button',{name:'■ 停止'}).click();
-  await expect(page.getByRole('status')).toHaveText('已停止，可播放当前选择。');
-  await page.getByLabel('语言',{exact:true}).selectOption('en');
-  await expect(page.getByRole('heading',{name:'Listen to a changing world.'})).toBeVisible();
-  expect(errors).toEqual([]);
+  expect(proof.actual[3]).toBe(255);
+  for(let channel=0;channel<3;channel++)expect(Math.abs(proof.expected[channel]-proof.actual[channel])).toBeLessThan(15);
+  const globe=page.locator('.ss-earth-scene svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');
+  await expect.poll(()=>page.evaluate(()=>(window as unknown as {surfacePixel:number[]}).surfacePixel)).not.toEqual(proof.actual);
+  await page.evaluate(()=>{
+    const gl=document.querySelector<HTMLCanvasElement>('.earth-globe__surface')!.getContext('webgl')!;
+    const extension=gl.getExtension('WEBGL_lose_context')!;
+    extension.loseContext();setTimeout(()=>extension.restoreContext(),500);
+  });
+  await expect(page.locator('.earth-globe--photographic')).toHaveCount(0);
+  await expect(page.locator('.earth-globe--photographic')).toBeVisible();
+  await page.getByRole('button',{name:/Start the experience/}).click();await expect(page).toHaveURL(/\/listen$/);
+  await page.getByRole('button',{name:'Play visual sound',exact:true}).click();await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toBeVisible();
 });
 
-test('unified listening room explains two paths and safely switches between climate and visual sound',async({page})=>{
-  await page.goto('/?studio=1');
-  await expect(page.getByRole('heading',{name:/See our Earth/})).toBeVisible();
-  await expect(page.getByText('No music or science experience needed.',{exact:false})).toBeVisible();
-  await expect(page.getByLabel('Motion effects')).not.toBeChecked();
-  const earth=page.locator('.ss-earth-scene svg');
-  const before=await page.locator('.ss-earth-scene .earth-globe__coordinates text').textContent();
-  await earth.focus(); await earth.press('ArrowRight');
-  expect(await page.locator('.ss-earth-scene .earth-globe__coordinates text').textContent()).not.toBe(before);
-  await page.getByRole('button',{name:/Play year/}).click();
-  await expect(page.getByRole('status')).toContainText('January 2025');
-  await expect(page.getByRole('button',{name:'■ Stop'})).toBeVisible();
-  await page.getByRole('button',{name:/Hear an Earth visual/}).click();
-  await expect(page.getByRole('button',{name:'■ Stop'})).toHaveCount(0);
-  await expect(page.getByText('You are hearing visual patterns.',{exact:false})).toBeVisible();
-  await expect(page.getByRole('button',{name:'Hear this visual',exact:true})).toBeEnabled();
-  await page.getByRole('button',{name:'Hear this visual',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Pause visual',exact:true})).toBeVisible();
-  await page.waitForTimeout(650);
-  expect(Number((await page.locator('.visual-scan span').innerText()).split('/')[0])).toBeGreaterThan(1);
-  await page.getByRole('button',{name:/Hear climate change/}).click();
-  await expect(page.getByRole('button',{name:'Pause visual',exact:true})).toHaveCount(0);
-  await expect(page.getByRole('heading',{name:'Listen to a changing world.'})).toBeVisible();
-  await expect(page.getByText('You are hearing measurements.',{exact:false})).toBeVisible();
-  await expect(page.locator('.ss-sound-controls')).not.toHaveAttribute('open');
-  await page.getByText('Choose your sound',{exact:true}).click();
-  await expect(page.getByLabel('Melody tone')).toBeVisible();
-});
-
-test('integrated visual experience is bilingual, accessible, and respects the motion switch on mobile',async({page})=>{
-  await page.goto('/?studio=1');
-  await page.getByRole('button',{name:'Hear a NASA visual ↗',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Hear this visual',exact:true})).toBeEnabled();
-  await page.locator('.frame-options button').nth(2).click();
-  await expect(page.getByLabel('Follow the animation')).toBeDisabled();
-  await page.getByLabel('Motion effects').check();
-  await page.getByLabel('Follow the animation').check();
-  await page.getByRole('button',{name:'Hear this visual',exact:true}).click();
-  await expect.poll(()=>page.locator('.visual-screen video').evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.1);
-  await page.getByLabel('Motion effects').uncheck();
-  await expect(page.getByLabel('Follow the animation')).not.toBeChecked();
-  expect(await page.locator('.visual-screen video').evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);
-  await page.getByRole('button',{name:'Pause visual',exact:true}).click();
-  await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await expect(page.getByRole('heading',{name:'不止看见地球，也听见它。'})).toBeVisible();
-  await expect(page.getByRole('button',{name:'聆听这幅画面',exact:true})).toBeEnabled();
-  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations).toEqual([]);
-  await page.setViewportSize({width:390,height:844});
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await expect(page.getByRole('button',{name:/带入你自己的 EIC 画面/})).toBeVisible();
-});
-
-test('canonical entry offers a NASA visual to data lesson with real comprehension attempts and private export',async({page})=>{
-  await page.goto('/');
-  await expect(page.getByRole('heading',{name:/See our Earth/})).toBeVisible();
-  await page.getByRole('button',{name:/Start listening/}).click();
-  await expect(page.getByRole('heading',{name:'One climate story. Two ways to listen.'})).toBeVisible();
-  await expect(page.getByRole('img',{name:/NASA Climate Spiral overview showing monthly/})).toBeVisible();
-  await expect(page.getByText('NASA SVS 5190 · REFERENCE IMAGE',{exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'Hear this visual',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Pause visual',exact:true})).toBeVisible();
-  await page.getByRole('button',{name:/Next: hear the actual measurements/}).click();
-  await expect(page.getByRole('button',{name:'Pause visual',exact:true})).toHaveCount(0);
-  await page.getByRole('button',{name:/Play the comparison/}).click();
-  await expect(page.locator('.ss-story-readout')).toContainText('January 1880');
-  await expect(page.locator('.ss-story-readout')).toContainText('G3 · 196.00 Hz');
-  await page.waitForTimeout(2300);
-  await expect(page.locator('.ss-story-readout')).toContainText('January 1900');
-  await page.getByRole('button',{name:'■ Stop',exact:true}).click();
-  await page.locator('.ss-story-years').getByRole('button',{name:'2025',exact:true}).click();
-  await expect(page.locator('.ss-story-readout')).toContainText('+1.37°C');
-  await expect(page.locator('.ss-story-readout')).toContainText('A4 · 440.00 Hz');
-  await page.getByRole('button',{name:/Next: check what you learned/}).click();
-  await expect(page.getByRole('button',{name:'Download my learning-check record'})).toBeDisabled();
-  const groups=page.locator('.ss-lesson fieldset');
-  await groups.nth(0).getByLabel('January 1880',{exact:true}).check();
-  await groups.nth(1).getByLabel('No',{exact:true}).check();
-  await groups.nth(2).getByLabel('The published temperature anomaly',{exact:true}).check();
-  await groups.nth(3).getByLabel('A global anomaly relative to the January baseline',{exact:true}).check();
-  await page.getByRole('button',{name:'Check my answers',exact:true}).click();
-  await expect(page.getByRole('status')).toContainText('3 / 4');
-  await groups.nth(0).getByLabel('January 2025',{exact:true}).check();
-  await page.getByRole('button',{name:'Check my answers',exact:true}).click();
-  await expect(page.getByRole('status')).toContainText('4 / 4');
-  const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download my learning-check record'}).click();const file=await pending;const record=JSON.parse(await readFile((await file.path())!,'utf8'));
-  expect(record.attempts.map((a:{correct:number})=>a.correct)).toEqual([3,4]);
-  expect(record.notice).toContain('not aggregate research evidence');
-  const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations).toEqual([]);
-  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-});
-
-test('guided lesson stays usable in Chinese and legacy root anchors still open the original app',async({page})=>{
-  await page.goto('/');await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await page.getByRole('button',{name:/开始聆听/}).click();
-  await expect(page.getByRole('heading',{name:'一个气候故事，两种聆听方式。'})).toBeVisible();
-  await page.getByRole('button',{name:/2. 聆听观测/}).click();
-  await page.getByRole('button',{name:/播放对比/}).click();
-  await expect(page.locator('.ss-lesson').getByRole('status')).toContainText('1880 年 1 月');
-  await page.getByRole('button',{name:/聆听气候变化/}).click();
-  await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toHaveCount(0);
-  await expect(page.getByRole('heading',{name:'聆听变化中的地球。'})).toBeVisible();
-  await page.goto('/#climate-spiral');await expect(page.getByRole('heading',{name:/A moment in time/})).toBeVisible();
-});
+for(const failure of ['graphics unavailable','image unavailable']){
+  test(`NASA globe preserves the introductory experience when ${failure}`,async({page})=>{
+    const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+    if(failure==='graphics unavailable')await page.addInitScript(()=>{
+      const original=HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext=function(type:string,...args:unknown[]){
+        return type==='webgl'?null:Reflect.apply(original,this,[type,...args]);
+      } as typeof original;
+    });
+    else await page.route('**/blue-marble-july-2004-2048.jpg',route=>route.abort());
+    await page.goto('/');
+    await expect(page.getByRole('link',{name:'Interactive Earth illustration ↗',exact:true})).toBeVisible();
+    await expect(page.locator('.earth-globe--photographic')).toHaveCount(0);
+    const coordinates=page.locator('.earth-globe__coordinates text'),initial=await coordinates.textContent();
+    const globe=page.locator('.ss-earth-scene svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');await expect(coordinates).not.toHaveText(initial!);
+    await page.getByRole('button',{name:/Start the experience/}).click();await expect(page.getByRole('button',{name:'Play visual sound',exact:true})).toBeEnabled();
+    expect(errors).toEqual([]);
+  });
+}

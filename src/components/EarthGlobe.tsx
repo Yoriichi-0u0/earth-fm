@@ -1,7 +1,8 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { useStudioLanguage } from '../lib/studioLanguage';
 import world from '../data/world.json';
+import EarthSurface from './EarthSurface';
 import './EarthGlobe.css';
 
 export type GlobeLocation = { id: string; name: string; lat: number; lon: number };
@@ -11,6 +12,9 @@ type EarthGlobeProps = {
   selectedId: string;
   onSelect: (id: string) => void;
   playing: boolean;
+  autoRotate?: boolean;
+  photographic?: boolean;
+  onSurfaceReady?: (ready: boolean) => void;
 };
 
 type Rotation = { lat: number; lon: number };
@@ -59,8 +63,10 @@ for (let lon = -180; lon < 180; lon += 30) {
 const clampLatitude = (lat: number) => Math.min(65, Math.max(-65, lat));
 const shortestAngle = (difference: number) => ((difference + 540) % 360) - 180;
 
-export default function EarthGlobe({ locations, selectedId, onSelect, playing }: EarthGlobeProps) {
+export default function EarthGlobe({ locations, selectedId, onSelect, playing, autoRotate = false, photographic = false, onSurfaceReady }: EarthGlobeProps) {
   const {t}=useStudioLanguage();
+  const [surfaceReady, setSurfaceReady] = useState(false);
+  const surfaceChanged = useCallback((ready:boolean) => {setSurfaceReady(ready); onSurfaceReady?.(ready);}, [onSurfaceReady]);
   const uniqueId = useId().replace(/:/g, '');
   const selected = locations.find((location) => location.id === selectedId);
   const initialRotation = { lat: selected ? selected.lat * 0.55 : 12, lon: selected?.lon ?? 22 };
@@ -69,7 +75,12 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
   const targetRef = useRef(initialRotation);
   const dragRef = useRef<{ x: number; y: number; rotation: Rotation } | null>(null);
   const [dragging, setDragging] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [rotationPaused,setRotationPaused]=useState(false);
+  const [inView,setInView]=useState(true);
+  const [pageVisible,setPageVisible]=useState(()=>!document.hidden);
+  const rootRef=useRef<HTMLDivElement>(null);
+  const resumeAfter=useRef(0);
   const frameRef = useRef(0);
   const lastFrameRef = useRef(0);
 
@@ -91,26 +102,40 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
     }
   }, [selected?.id, selected?.lat, selected?.lon, reducedMotion]);
 
+  useEffect(()=>{
+    const update=()=>setPageVisible(!document.hidden);
+    document.addEventListener('visibilitychange',update);
+    const observer=typeof IntersectionObserver==='undefined'?null:new IntersectionObserver(([entry])=>setInView(entry.isIntersecting),{threshold:.05});
+    if(rootRef.current)observer?.observe(rootRef.current);
+    return()=>{document.removeEventListener('visibilitychange',update);observer?.disconnect();};
+  },[]);
+
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !pageVisible || !inView) return;
+    lastFrameRef.current=0;
     const animate = (timestamp: number) => {
       frameRef.current = requestAnimationFrame(animate);
-      if (timestamp - lastFrameRef.current < 40 || dragRef.current) return;
+      const elapsed=lastFrameRef.current?timestamp-lastFrameRef.current:0;
+      if (lastFrameRef.current && elapsed < 40) return;
       lastFrameRef.current = timestamp;
+      if(dragRef.current || timestamp < resumeAfter.current) return;
       const previous = rotationRef.current;
+      if(autoRotate && !rotationPaused){
+        // Camera longitude advances at 3 degrees/second; this is a visual effect, not a scientific clock.
+        const next={lat:previous.lat,lon:((previous.lon+Math.min(elapsed,80)*.003+540)%360)-180};
+        rotationRef.current=next;targetRef.current=next;setRotation(next);
+        return;
+      }
       const longitudeDelta = shortestAngle(targetRef.current.lon - previous.lon);
       const latitudeDelta = targetRef.current.lat - previous.lat;
       if (Math.abs(longitudeDelta) < 0.02 && Math.abs(latitudeDelta) < 0.02) return;
-      const next = {
-        lon: previous.lon + longitudeDelta * 0.09,
-        lat: previous.lat + latitudeDelta * 0.09,
-      };
+      const next = {lon:previous.lon+longitudeDelta*.09,lat:previous.lat+latitudeDelta*.09};
       rotationRef.current = next;
       setRotation(next);
     };
     frameRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [reducedMotion]);
+  }, [reducedMotion,autoRotate,rotationPaused,pageVisible,inView]);
 
   const geometry = useMemo(() => {
     const dots = ['', '', ''];
@@ -156,13 +181,14 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
   };
 
   const handlePointerUp = () => {
+    resumeAfter.current=performance.now()+2000;
     dragRef.current = null;
     setDragging(false);
   };
 
   return (
-    <div className={`earth-globe${playing ? ' earth-globe--playing' : ''}${dragging ? ' earth-globe--dragging' : ''}`}>
-      <svg className="earth-globe__scene" viewBox="0 0 760 560" aria-label={t(locations.length ? "Interactive Earth. Drag to rotate, or select a location." : "Earth illustration. Drag or use the left and right arrow keys to rotate. This is not a local temperature map.")} role="group" tabIndex={locations.length ? undefined : 0} onKeyDown={event=>{if(locations.length || !["ArrowLeft","ArrowRight"].includes(event.key))return;event.preventDefault();const next={...rotationRef.current,lon:rotationRef.current.lon+(event.key==="ArrowLeft"?-15:15)};rotationRef.current=next;targetRef.current=next;setRotation(next);}}>
+    <div ref={rootRef} className={`earth-globe${playing ? ' earth-globe--playing' : ''}${dragging ? ' earth-globe--dragging' : ''}${surfaceReady ? ' earth-globe--photographic' : ''}`}>
+      <svg className="earth-globe__scene" viewBox={photographic ? "105 5 550 550" : "0 0 760 560"} aria-label={t(locations.length ? "Interactive Earth. Drag to rotate, or select a location." : "Earth illustration. Drag or use the left and right arrow keys to rotate. This is not a local temperature map.")} role="group" tabIndex={locations.length ? undefined : 0} onKeyDown={event=>{if(locations.length || !["ArrowLeft","ArrowRight"].includes(event.key))return;event.preventDefault();resumeAfter.current=performance.now()+2000;const next={...rotationRef.current,lon:rotationRef.current.lon+(event.key==="ArrowLeft"?-15:15)};rotationRef.current=next;targetRef.current=next;setRotation(next);}}>
         <defs>
           <radialGradient id={gradientId} cx="62%" cy="36%" r="69%">
             <stop offset="0%" stopColor="#073d42" />
@@ -205,7 +231,9 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
         <circle cx={CX} cy={CY} r={RADIUS + 1} stroke="#48d4d4" strokeWidth="1.7" strokeOpacity="0.42" fill="none" />
         <circle cx={CX} cy={CY} r={RADIUS} fill={`url(#${gradientId})`} />
 
-        <g clipPath={`url(#${clipId})`} aria-hidden="true" pointerEvents="none">
+        {photographic && <foreignObject x={CX-RADIUS} y={CY-RADIUS} width={RADIUS*2} height={RADIUS*2} pointerEvents="none" aria-hidden="true"><EarthSurface lat={rotation.lat} lon={rotation.lon} onReady={surfaceChanged}/></foreignObject>}
+
+        <g className="earth-globe__map-overlay" clipPath={`url(#${clipId})`} aria-hidden="true" pointerEvents="none">
           <path d={geometry.grid} fill="none" stroke="#49bbbc" strokeWidth="0.65" opacity="0.1" />
           <path d={geometry.coast} fill="none" stroke="#41cfce" strokeWidth="0.8" opacity="0.25" />
           {geometry.dots.map((path, index) => (
@@ -249,6 +277,7 @@ export default function EarthGlobe({ locations, selectedId, onSelect, playing }:
           <text x="380" y="551" textAnchor="middle">{Math.abs(rotation.lat).toFixed(2)}° {rotation.lat >= 0 ? 'N' : 'S'}  /  {Math.abs(((rotation.lon + 540) % 360) - 180).toFixed(2)}° {((rotation.lon + 540) % 360) - 180 >= 0 ? 'E' : 'W'}</text>
         </g>
       </svg>
+      {locations.length===0 && <button type="button" className="earth-globe__rotation-control" disabled={!autoRotate||reducedMotion} aria-pressed={rotationPaused||!autoRotate||reducedMotion} onClick={()=>setRotationPaused(value=>!value)}>{t(!autoRotate||reducedMotion?'Rotation paused':rotationPaused?'Resume rotation':'Pause rotation')}</button>}
       <span className="earth-globe__interaction-hint" aria-hidden="true"><span>↔</span> {t("DRAG TO EXPLORE")}</span>
       <span className="earth-globe__sr-only">{t(locations.length ? "Land boundaries use public-domain Natural Earth data. Select a visible location with Tab and Enter, or choose a location from the track list." : "Earth illustration uses public-domain Natural Earth boundaries. Use the left and right arrow keys to rotate. Scientific measurements are in the climate spiral.")}</span>
     </div>

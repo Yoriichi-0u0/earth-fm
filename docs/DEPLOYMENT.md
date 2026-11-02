@@ -2,7 +2,7 @@
 
 Live website: [earth-fm.vercel.app](https://earth-fm.vercel.app/).
 
-Earth Symphony Studio 2.0 beta: [Open Studio](https://earth-fm.vercel.app/?studio=1). English is the default, with an optional persistent Simplified Chinese language choice. The guided revision makes Studio the canonical root entry. The original application remains at `?legacy=1`, with old anchors and shared-mix links preserved. The user approved publishing the guided revision through main on 2026-11-02. See [Studio science, sound and verification notes](EARTH_SYMPHONY_STUDIO.md).
+Earth Symphony Studio 2.0 beta: [Open Studio](https://earth-fm.vercel.app/?studio=1). English is the default, with an optional persistent Simplified Chinese language choice. The guided revision makes Studio the canonical root entry. The original application remains at `?legacy=1`, with old anchors and shared-mix links preserved. The user approved publishing the five-page and NASA observatory revision through main on 2026-11-02. Home, Listen, Create, Explore Data and About have separate routes; exact static rewrites support direct refresh while preserving `/data/…` source files. See [Studio science, sound and verification notes](EARTH_SYMPHONY_STUDIO.md).
 
 Earth FM uses a single branch and deployment workflow: **`main` → Vercel production**. All code and setup remain on `main`. Preview deployments are disabled, and `vercel.json` permits automatic Git deployments only from `main`. Test suites and testing pipelines are not part of this workflow.
 

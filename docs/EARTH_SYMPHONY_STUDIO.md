@@ -1,4 +1,8 @@
-# Earth Symphony Studio — production beta
+# Earth Symphony Studio — science and implementation notes
+
+Current five-page release (2026-11-02): the five-page redesign supersedes the original screen descriptions below. Open `/` → Start the experience → `/listen`; `/create` controls music, `/data` explains and compares values, `/about` contains methods and sources. The homepage globe now rotates slowly with pause/resume and motion preferences. See [five-page review](FIVE_PAGE_REDESIGN.md). The user approved publishing the five-page and NASA observatory revision through main after local review.
+
+The following original beta milestone and dated updates are retained as implementation history.
 
 Implemented 2026-11-01 in Yoriichi-0u0/earth-fm. The user explicitly approved committing and pushing this revision to main for production on 2026-11-01. Earlier no-push statements below record the local review milestones before that release approval. Original recordings and existing source snapshots were retained; environment and deployment settings were not changed.
 

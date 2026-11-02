@@ -4,7 +4,9 @@
 
 Earth FM is BoboMimi’s prototype for the NASA Space Apps Earth Information Jukebox challenge. The reviewed Studio combines a guided NASA Climate Spiral visual-to-sound experience, a transparent comparison of real January temperature observations, a personal learning check and free exploration/remixing. The primary audience is first-time learners; educational effectiveness has not yet been established by a user study.
 
-The guided Studio is the canonical entry for this release. Open `/` for the canonical Studio, `/?studio=1` for the same Studio alias, or `/?legacy=1` for the preserved original app. Old climate/visual anchors and shared-mix query parameters remain compatible. See [the current submission draft](docs/SUBMISSION.md) and [the actual-user pilot protocol](docs/USER_TEST_PROTOCOL.md).
+The Studio is organized into five pages: Home (`/`), Listen (`/listen`), Create (`/create`), Explore Data (`/data`) and About (`/about`). The homepage offers one guided entry and a slowly rotating illustrative globe. The NASA observatory visual follow-up adds an attributed Blue Marble globe, clearer NASA source identity and a more prominent Climate Spiral. See [the visual review](docs/NASA_OBSERVATORY_REFINEMENT.md) and [five-page review notes](docs/FIVE_PAGE_REDESIGN.md). The user approved publishing the five-page and NASA observatory revision through main on 2026-11-02.
+
+The guided Studio is the canonical entry. Open `/` for the canonical Studio, `/?studio=1` for the same Studio alias, or `/?legacy=1` for the preserved original app. Old climate/visual anchors and shared-mix query parameters remain compatible. See [the current submission draft](docs/SUBMISSION.md) and [the actual-user pilot protocol](docs/USER_TEST_PROTOCOL.md).
 
 | Team BoboMimi | Role | Username |
 | --- | --- | --- |
@@ -22,11 +24,13 @@ npm ci
 npm run dev
 ```
 
-Open the address printed by Vite. Click **Start listening** to enter the guided story, then **Hear this visual** or **Play the comparison** to start browser audio. Headphones reveal the spatial scan. No credentials or API keys are needed. The app’s fonts, visuals, and observation snapshots are bundled; there are no runtime data requests or uploads.
+Open the address printed by Vite. Click **Start the experience** to open Listen, then **Play visual sound**, continue, and **Play the data melody** to start browser audio. Headphones reveal the spatial scan. No credentials or API keys are needed. The app’s fonts, visuals, and observation snapshots are bundled; there are no runtime data requests or uploads.
 
 In this cloud workspace, use `npm --cache /workspace/.npm-cache ci` if the default home cache is not writable. The existing checkout is already isolated; a separate worktree is unnecessary.
 
 ## What works
+
+The five-page Studio separates guided listening, music controls and numerical exploration. The following broader collection and visual tools remain available through **Original experience** (`/?legacy=1`).
 
 - **Visual radio:** three attributed earth.gov mirror assets: NASA/NOAA nighttime imagery, an EIC exhibit photograph, and an EIC immersive animation. A 48-strip scan generates D-minor pentatonic notes. Brightness controls pitch, RGB blends harmonics, and scan position controls stereo pan. Animation pixels are resampled at each note’s scheduling boundary.
 - **Bring your own frame:** PNG, JPEG, WebP, GIF, MP4, and WebM files up to 20 MB are decoded and analyzed in the browser. Files stay on the device. MP4/WebM support depends on the browser’s codecs. GIF scanning may use the decoder’s current/poster frame; use a video for reliable temporal sampling.
@@ -45,7 +49,7 @@ git commit -m "Describe the change"
 git push origin main
 ```
 
-All work stays on `main`. Vercel builds each push and publishes directly to [Earth FM](https://earth-fm.vercel.app/). Preview deployments and testing workflows are not used. For an explicit terminal deployment, run `vercel deploy --prod --yes --scope chia-0u0-s-projects` from this linked checkout.
+Publish only after the user approves that release. The current five-page and NASA observatory revision was explicitly approved for release on 2026-11-02. All work stays on `main`. Vercel builds each push and publishes directly to [Earth FM](https://earth-fm.vercel.app/). Preview deployments and testing workflows are not used. For an explicit terminal deployment, run `vercel deploy --prod --yes --scope chia-0u0-s-projects` from this linked checkout.
 
 `npm run data:refresh` verifies the checked-in source hashes and deterministically rebuilds the observation data. `node scripts/refresh-data.mjs --download` restores the same pinned versions using verified HTTPS and recorded hashes; it does not silently refresh to a moving upstream branch.
 

@@ -1,0 +1,23 @@
+{
+  "id": "nasa-blue-marble-july-2004",
+  "retrievedOn": "2026-11-02",
+  "sourcePage": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/",
+  "retrievalUrl": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/july/world.topo.200407.3x5400x2700.jpg",
+  "credit": "NASA Earth Observatory \u00b7 Blue Marble: Next Generation",
+  "observationPeriod": "July 2004 monthly composite",
+  "original": {
+    "width": 5400,
+    "height": 2700,
+    "bytes": 1629528,
+    "sha256": "85a24885616097b5e06532b7d8e30fa5d749a782e70ea55971dd8539a0899206"
+  },
+  "display": {
+    "url": "/frames/blue-marble-july-2004-2048.jpg",
+    "width": 2048,
+    "height": 1024,
+    "bytes": 320457,
+    "sha256": "6da8d03b9e9af60544c7ef2d0d991a96ace09bf1c157c3b47aa9f4eefe2d29b8",
+    "processing": "Resized to 2048x1024 and JPEG-compressed at quality 82 with macOS sips; no generated imagery."
+  },
+  "interpretation": "Historical surface composite used for a contextual globe. Illustrative lighting and rotation do not show current weather, solar time, selected GISTEMP month or local temperatures. Natural Earth SVG illustration remains the fallback when the texture cannot render."
+}

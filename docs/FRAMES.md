@@ -4,7 +4,7 @@ The app bundles NASA / NOAA and Earth Information Center (EIC) visual assets. Th
 
 The mirror's README says: **“Visual comparison of compression options for earth.gov images”**, explains that the originals came from `public/images/`, and documents the original paths encoded into filenames. It contains `portals/earth-information-center.png`, `visit/immersive-experience/untethered-4.gif`, and other EIC exhibition images. This is the evidence for their EIC relationship. A copy of that README is retained in [`public/frames/MIRROR-README.md`](../public/frames/MIRROR-README.md).
 
-Direct requests to `earth.gov`, `svs.gsfc.nasa.gov`, and NASA EIC endpoints were denied by the development environment's network proxy. We therefore **did not independently compare the mirror's files with current official website bytes**, verify an exact photograph/observation date, or obtain full creator credits. The app labels the assets as an earth.gov mirror and does not invent missing dates or claim a direct NASA download. Original URLs below are reconstructed from the mirror's documented path convention; they are not independently checked live URLs.
+During the original mirror-asset milestone, direct requests to `earth.gov`, `svs.gsfc.nasa.gov`, and NASA EIC endpoints were denied by that development environment's network proxy. We therefore **did not independently compare the mirror's files with current official website bytes**, verify an exact photograph/observation date, or obtain full creator credits. The app labels the assets as an earth.gov mirror and does not invent missing dates or claim a direct NASA download. Original URLs below are reconstructed from the mirror's documented path convention; they are not independently checked live URLs.
 
 | Bundled asset | What it shows | Mirror-reported earth.gov original path | Provenance and interpretation |
 | --- | --- | --- | --- |
@@ -25,3 +25,7 @@ Animated imagery should play only through explicit interaction and respect reduc
 ## Credits and reuse
 
 Retain the embedded NOAA/NASA credit and the mirror provenance when distributing these visuals. The app is an independent Space Apps project and does not claim NASA or NOAA endorsement. NASA generally permits reuse of its imagery with attribution, but NASA assets may contain third-party material, people, or separately credited work. The mirror supplies no additional asset license or complete production-credit list. Before public distribution beyond this prototype, verify the exact original asset credits and reuse terms through the official EIC site and the [NASA media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/).
+
+## NASA observatory follow-up (2026-11-02)
+
+The local five-page Studio now also uses a directly retrieved NASA Earth Observatory Blue Marble: Next Generation surface composite for its contextual globe. This source is separate from the original mirror assets above. [The dedicated provenance record](../public/frames/observatory-provenance.json) identifies the official source URL, July 2004 period, original and display hashes, and downsampling. The bundled derivative is 2048×1024 and approximately 313 KiB. Its illustrative lighting and rotation do not encode temperature or current weather. Full behavior and verification are in [the NASA visual refinement notes](NASA_OBSERVATORY_REFINEMENT.md).

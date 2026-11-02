@@ -1,0 +1,193 @@
+/* Earth observation gallery: source-led imagery, quiet instruments, one clear action. */
+.ss.ss-observatory {
+  --mint: #d9f397;
+  --muted: #adc0cf;
+  background:
+    radial-gradient(ellipse at 83% 13%, #10376370, transparent 36%),
+    radial-gradient(ellipse at 5% 50%, #0c20372c, transparent 34%), #070d17;
+}
+.ss-observatory .sp-header {border-bottom-color: #8cbee721;}
+.ss-observatory .sp-brand>span:first-child {color: #a8d9fc;}
+.ss-observatory .sp-brand small {color: #8daec8;}
+.ss-observatory .sp-nav a {color: #bacbd8;}
+.ss-observatory .sp-nav a[aria-current=page] {color: var(--mint);}
+.ss-observatory .sp-page-heading .ss-kicker {color: #a8d7f7!important;}
+.ss-observatory .sp-card {
+  background: linear-gradient(125deg, #14243a55, transparent 70%), #0e1929;
+  border-color: #82abcb2e;
+}
+.ss-observatory .sp-page-home .ss-welcome {
+  grid-template-columns: 1.04fr 1fr;
+  padding: 30px 0 20px;
+  min-height: 565px;
+  gap: 32px;
+}
+.obs-eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  color: #a9d8f6; font-size: 10px; letter-spacing: 1.9px;
+  line-height: 1.7; margin: 0 0 20px;
+}
+.obs-eyebrow>span {font-size: 24px;line-height: 1;color: #89c7fa;}
+.ss-observatory .ss-welcome h1 {font-size: clamp(47px, 4.7vw, 68px);line-height: 1.12;margin: 23px 0 27px;letter-spacing: -2.7px;}
+.ss-observatory .ss-welcome h1 em {color: #9ed6f7;}
+.ss-observatory .ss-welcome-lead {max-width: 465px;font-size: 16px;line-height: 1.85;color: #b3c6d4;}
+.ss-observatory .ss-welcome-actions .ss-primary {max-width: 315px;padding: 15px 28px;box-shadow: 0 3px 30px #d4f29a0d;}
+.ss-observatory .ss-welcome-actions .ss-primary small {font-weight: 400;}
+.ss-observatory .ss-welcome-how {display: inline-block;margin-top: 19px;color: #bed1de;font-size: 12px;}
+.obs-independent {font-size: 9px;line-height: 1.8;color: #8faabc;margin: 28px 0 0;max-width: 410px;}
+.ss-observatory .obs-earth-view {position: relative;padding: 15px 0 10px;overflow: hidden;}
+.obs-earth-top {display: flex;align-items: center;gap: 8px;font-size: 8px;letter-spacing: 1.6px;color: #c0d9eb;}
+.obs-earth-top>span:last-child {margin-left: auto;color: #91b3cc;letter-spacing: 1px;}
+.obs-status-dot {height: 5px;width: 5px;border-radius: 50%;background: #91cdf3;box-shadow: 0 0 12px #69b9ff;}
+.obs-earth-view .earth-globe {height: 440px;}
+.obs-earth-view .earth-globe__scene {overflow: hidden;}
+.earth-globe__surface {width: 100%;height: 100%;display: block;}
+.earth-globe--photographic .earth-globe__map-overlay {opacity: .12;}
+.obs-earth-view .earth-globe__orbits {stroke: #76b7e8;opacity: .25;}
+.obs-earth-view .earth-globe__rotation-control {top: 12px;right: 2px;border-color: #8bb7d445;background: #0a1726db;color: #cfe4ef;font-size: 9px;}
+.obs-earth-view .earth-globe__coordinates text {fill: #97b9d1;font-size: 7px;}
+.obs-earth-view .earth-globe__interaction-hint {display: none;}
+.obs-earth-caption {display: flex;justify-content: space-between;gap: 20px;font-size: 9px;line-height: 1.7;color: #b4cbdc;margin-top: 9px;}
+.obs-earth-caption a {color: #b6d8ef;text-decoration: underline;text-underline-offset: 3px;}
+.obs-earth-caption>span {flex-shrink: 0;color: #d9f397;}
+.ss-observatory .obs-earth-view .ss-scene-note {font-size: 9px;line-height: 1.8;color: #8faabb;margin: 9px 0 0;}
+.obs-record-strip {
+  display: flex;align-items: center;gap: 32px;justify-content: space-between;
+  padding: 24px 30px;margin: 12px 0 40px;
+  border-top: 1px solid #86b8db36;border-bottom: 1px solid #86b8db24;
+  background: linear-gradient(100deg, #14283b99, #10233744 55%, transparent);
+}
+.obs-record-source {display: flex;align-items: center;gap: 19px;}
+.obs-record-source strong {display: block;color: #e1edf6;font-size: 15px;font-weight: 500;letter-spacing: .5px;}
+.obs-record-source strong small {font-size: 10px;color: #91b3cc;}
+.obs-record-source div>span {display: block;font-size: 8px;letter-spacing: 1.6px;color: #9cb8cd;margin-top: 8px;}
+.obs-mini-orbit {width: 36px;height: 36px;border: 1px solid #8fc5e4;border-radius: 50%;position: relative;flex-shrink: 0;}
+.obs-mini-orbit:before {content: '';position: absolute;inset: 9px -5px;border: 1px solid #eca778;border-radius: 50%;transform: rotate(-40deg);}
+.obs-record-years {font-family: 'Space Grotesk', sans-serif;font-size: 27px;letter-spacing: -1px;margin: 0;color: #d8e5ed;}
+.obs-record-years>span {color: #d6a680;font-size: 20px;margin: 0 10px;}
+.obs-record-years small {display: block;font-family: 'DM Sans', sans-serif;letter-spacing: 0;font-size: 10px;margin-top: 7px;color: #9bb8cb;}
+.obs-record-strip>a {font-size: 11px;color: #b9d8ed;text-decoration: underline;text-underline-offset: 4px;}
+.obs-first-story {display: grid;grid-template-columns: 285px 1fr;gap: 40px;align-items: center;margin-bottom: 52px;scroll-margin-top: 30px;}
+.obs-story-preview {margin: 0;border: 1px solid #86b9df29;border-radius: 10px;overflow: hidden;background: #020711;}
+.obs-story-preview img {display: block;width: 100%;height: 225px;object-fit: contain;}
+.obs-story-preview figcaption {display: flex;justify-content: space-between;gap: 10px;font-size: 8px;color: #c0d4e2;background: #0c1927;padding: 13px 14px;line-height: 1.7;}
+.obs-story-preview figcaption a {color: #a8c7dd;}
+.obs-story-intro>.ss-kicker {color: #e6b895!important;font-size: 9px!important;}
+.ss-observatory .obs-story-intro>h2 {font-size: 29px;line-height: 1.3;letter-spacing: -.7px;margin: 14px 0 28px;}
+.obs-story-steps {display: grid;grid-template-columns: repeat(3,1fr);gap: 25px;}
+.obs-story-steps article>span {font-family: 'Space Grotesk', sans-serif;font-size: 11px;color: #a1cce9;border-bottom: 1px solid #7ea5c433;display: block;padding-bottom: 11px;margin-bottom: 14px;}
+.obs-story-steps h3 {font-size: 13px;line-height: 1.5;margin: 0 0 9px;font-weight: 500;color: #e0e9f0;}
+.obs-story-steps p {font-size: 11px;line-height: 1.8;margin: 0;color: #9db6c8;}
+/* NASA visual as the exhibition piece; controls stay in a quiet side column. */
+.ss-observatory .sp-guided-player .visual-layout {background: linear-gradient(125deg, #12253d, #0c1829);border-color: #8bbae44a;border-radius: 13px;}
+.ss-observatory .sp-guided-player .visual-screen-panel {
+  display: grid;grid-template-columns: minmax(0,1fr) 240px;column-gap: 30px;
+  grid-template-areas: 'head head' 'screen cue' 'screen spectrum' 'screen transport';
+  padding: 22px;
+}
+.ss-observatory .sp-guided-player .visual-screen-header {grid-area: head;color: #abc8dc;margin-bottom: 20px;}
+.ss-observatory .sp-guided-player .visual-screen-header>span:first-child {color: #b3d9f2;}
+.ss-observatory .sp-guided-player .visual-screen {grid-area: screen;height: 360px;max-height: 360px;border-color: #7fa5c23a;background: #02060d;}
+.obs-visual-cue {grid-area: cue;align-self: center;}
+.obs-cue-label {font-size: 8px;letter-spacing: 1.8px;color: #b5d6ea;}
+.ss-observatory .obs-visual-cue h3 {font-size: 23px;line-height: 1.3;letter-spacing: -.4px;margin: 12px 0 20px;}
+.obs-visual-cue dl {font-size: 11px;line-height: 1.8;margin: 0;}
+.obs-visual-cue dl>div {display: flex;justify-content: space-between;gap: 12px;margin: 8px 0;}
+.obs-visual-cue dt {color: #a9c2d5;}
+.obs-visual-cue dd {margin: 0;color: #e0c4a1;}
+.obs-visual-cue dd:before {content: '→';padding-right: 12px;color: #7794ae;}
+.obs-visual-cue p {font-size: 10px;line-height: 1.9;color: #a5bbcd;margin: 16px 0 4px;}
+.ss-observatory .sp-guided-player .visual-spectrum {grid-area: spectrum;height: 24px;margin: 12px 0 0;gap: 3px;}
+.ss-observatory .sp-guided-player .visual-spectrum i {background: #6babc8;}
+.ss-observatory .sp-guided-player .visual-spectrum i.active {background: #d5f18e;}
+.ss-observatory .sp-guided-player .visual-transport {grid-area: transport;display: flex;flex-direction: column;align-items: stretch;padding-top: 14px;margin-top: 13px;border-top-color: #8bb1d23b;gap: 14px;}
+.ss-observatory .sp-guided-player .visual-transport>.primary-button {justify-content: center;padding: 13px 17px;}
+.ss-observatory .sp-guided-player .visual-note {display: none;}
+.ss-observatory .sp-guided-player .visual-volume {margin: 0;justify-content: flex-end;display: flex;color: #acc6db;}
+.ss-observatory .sp-guided-player .visual-volume input {width: 120px;}
+.ss-observatory .sp-guided-player .visual-scan {background: #a5d8ff;box-shadow: 0 0 20px 3px #84cfff44;}
+.ss-observatory .sp-visual-credit {color: #a2b9cb;}
+.ss-observatory .sp-visual-credit a {color: #bad8ec;}
+.obs-measurement-label {display: flex;justify-content: space-between;gap: 15px;color: #b2d4ed;font-size: 9px;letter-spacing: 1px;line-height: 1.8;margin: 0 0 14px;}
+.obs-measurement-label>span:last-child {font-size: 8px;color: #9fb9ce;}
+.ss-observatory .sp-listen-progress [aria-current=step] {color: #b0daf5;}
+.ss-observatory .sp-listen-progress [aria-current=step]:after {background: #a6d8f9;}
+.ss-observatory .sp-footer {border-color: #8cb8dc26;}
+@media (max-width: 1050px) {
+ .ss-observatory .sp-page-home .ss-welcome {gap: 10px;}
+ .ss-observatory .ss-welcome h1 {font-size: 54px;}
+ .obs-earth-view .earth-globe {height: 380px;}
+ .obs-first-story {grid-template-columns: 240px 1fr;gap: 28px;}
+ .obs-story-steps {gap: 17px;}
+ .obs-story-preview img {height: 215px;}
+ .ss-observatory .sp-guided-player .visual-screen-panel {grid-template-columns: minmax(0,1fr) 220px;gap: 0 22px;}
+}
+@media (max-width: 800px) and (min-width: 651px) {
+ .ss-observatory .ss-welcome h1 {font-size: 44px;}
+ .ss-observatory .ss-welcome-lead {font-size: 14px;}
+ .obs-earth-view .earth-globe {height: 330px;}
+ .obs-earth-caption {flex-direction: column;gap: 6px;}
+ .obs-record-strip {padding: 22px;gap: 22px;}
+ .obs-record-source strong {font-size: 13px;}
+ .obs-record-years {font-size: 23px;}
+ .obs-first-story {grid-template-columns: 210px 1fr;}
+ .obs-story-steps {grid-template-columns: 1fr;gap: 12px;}
+ .obs-story-steps article {display: flex;gap: 14px;}
+ .obs-story-steps article>span {border: 0;margin: 0;padding: 2px 0;}
+ .obs-story-steps h3 {margin-bottom: 4px;}
+ .ss-observatory .obs-story-intro>h2 {font-size: 25px;margin-bottom: 20px;}
+}
+@media (max-width: 650px) {
+ .ss-observatory .sp-page-home .ss-welcome {display: flex;padding: 34px 0 10px;gap: 16px;min-height: 0;}
+ .obs-eyebrow {font-size: 9px;letter-spacing: 1.3px;margin-bottom: 18px;}
+ .ss-observatory .ss-welcome h1 {font-size: clamp(42px,11.8vw,54px);letter-spacing: -2px;margin: 16px 0 23px;}
+ .ss-observatory .ss-welcome-lead {font-size: 14px;line-height: 1.9;}
+ .ss-observatory .ss-welcome-actions {margin-top: 23px;}
+ .ss-observatory .ss-welcome-actions .ss-primary {width: 100%;max-width: 100%;flex: 1;min-height: 65px;}
+ .ss-observatory .ss-welcome-how {margin-top: 14px;}
+ .obs-independent {margin-top: 22px;font-size: 8px;}
+ .ss-observatory .obs-earth-view {padding-top: 7px;margin-top: 5px;}
+ .obs-earth-top {font-size: 7px;letter-spacing: 1px;}
+ .obs-earth-top>span:last-child {font-size: 7px;}
+ .obs-earth-view .earth-globe {height: 345px;max-height: 345px;}
+ .obs-earth-view .earth-globe__rotation-control {font-size: 8px;right: 0;top: 14px;}
+ .obs-earth-caption {font-size: 8px;gap: 15px;margin-top: 0;}
+ .ss-observatory .obs-earth-view .ss-scene-note {font-size: 8px;line-height: 1.8;margin-top: 10px;}
+ .obs-record-strip {padding: 22px 0;margin: 19px 0 32px;gap: 22px;flex-wrap: wrap;background: none;}
+ .obs-record-source {gap: 13px;}
+ .obs-mini-orbit {width: 29px;height: 29px;}
+ .obs-record-source strong {font-size: 13px;}
+ .obs-record-source div>span {font-size: 7px;letter-spacing: .8px;}
+ .obs-record-years {font-size: 22px;}
+ .obs-record-years>span {font-size: 16px;margin: 0 5px;}
+ .obs-record-years small {font-size: 8px;max-width: 130px;line-height: 1.6;}
+ .obs-record-strip>a {font-size: 10px;}
+ .obs-first-story {display: flex;flex-direction: column;gap: 24px;margin-bottom: 38px;}
+ .obs-story-preview {width: 100%;}
+ .obs-story-preview img {height: 230px;}
+ .obs-story-preview figcaption {font-size: 9px;}
+ .obs-story-intro {width: 100%;}
+ .ss-observatory .obs-story-intro>h2 {font-size: 25px;margin: 13px 0 22px;}
+ .obs-story-steps {grid-template-columns: 1fr;gap: 20px;}
+ .obs-story-steps article {display: flex;gap: 17px;}
+ .obs-story-steps article>span {border: 0;margin: 0;padding-top: 3px;}
+ .obs-story-steps h3 {font-size: 13px;margin-bottom: 5px;}
+ .obs-story-steps p {font-size: 12px;}
+ .ss-observatory .sp-guided-player .visual-screen-panel {padding: 16px;display: grid;grid-template-columns: 1fr;grid-template-areas: 'head' 'transport' 'screen' 'cue' 'spectrum';gap: 0;}
+ .ss-observatory .sp-guided-player .visual-screen-header {font-size: 6px;letter-spacing: .7px;margin-bottom: 15px;}
+ .ss-observatory .sp-guided-player .visual-screen {height: 275px;max-height: 275px;}
+ .ss-observatory .sp-guided-player .visual-transport {flex-direction: row;align-items: center;flex-wrap: wrap;border: 0;padding: 0;margin: 0 0 16px;gap: 13px;}
+ .ss-observatory .sp-guided-player .visual-transport>.primary-button {flex: 1;font-size: 12px;padding: 12px;}
+ .ss-observatory .sp-guided-player .visual-volume {margin: 0;}
+ .ss-observatory .sp-guided-player .visual-volume input {width: 63px;}
+ .obs-visual-cue {margin-top: 15px;}
+ .obs-cue-label,.ss-observatory .obs-visual-cue h3,.obs-visual-cue>p {display: none;}
+ .obs-visual-cue dl {display: grid;grid-template-columns: repeat(3,1fr);gap: 10px;font-size: 10px;}
+ .obs-visual-cue dl>div {display: block;margin: 0;}
+ .obs-visual-cue dd {margin-top: 2px;line-height: 1.7;}
+ .obs-visual-cue dd:before {padding-right: 4px;}
+ .ss-observatory .sp-guided-player .visual-spectrum {margin-top: 17px;}
+ .obs-measurement-label {font-size: 8px;letter-spacing: .5px;flex-wrap: wrap;gap: 5px;}
+ .obs-measurement-label>span:last-child {font-size: 7px;}
+ .ss-observatory:lang(zh-Hans) .ss-welcome h1 {font-size: 43px;letter-spacing: 0;line-height: 1.2;}
+}

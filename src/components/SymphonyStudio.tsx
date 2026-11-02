@@ -1,113 +1,40 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { climateSnapshot, climateYears, getClimateMonth } from '../data/climateSpiral';
-import { MONTHS, formatAnomaly } from '../lib/climateMapping';
-import type { MonthlyObservation } from '../lib/climateMapping';
-import { defaults, mapData, NOTES, TIMBRES, renderScore, SymphonyPlayer, wav } from '../lib/symphony';
-import type { Settings, Style, Timbre } from '../lib/symphony';
-import DataSoundGuide from './DataSoundGuide';
+import {useEffect,useRef,useState} from 'react';
+import type {MouseEvent} from 'react';
 import StudioWelcome from './StudioWelcome';
 import GuidedStory from './GuidedStory';
-import FrameJukebox from './FrameJukebox';
-import { StudioLanguageProvider, useStudioLanguage } from '../lib/studioLanguage';
-import type { Language } from '../lib/studioLanguage';
+import {CreatePage,DataPage} from './pages/ClimatePages';
+import AboutPage from './pages/AboutPage';
+import {StudioLanguageProvider,useStudioLanguage} from '../lib/studioLanguage';
+import type {Language} from '../lib/studioLanguage';
+import {defaults} from '../lib/symphony';
+import type {Settings} from '../lib/symphony';
+import {PAGE_PATHS,pageForPath,goToPage} from '../lib/studioRouter';
+import type {StudioPage} from '../lib/studioRouter';
 import './SymphonyStudio.css';
-const modes = ['Earth Journey', 'Earth Remix Studio', 'Data Lab'] as const;
-const yearPoints = (year: number) => MONTHS.map((_, i) => getClimateMonth(year, i + 1));
-
-function Spiral({ current, playing }: { current: MonthlyObservation; playing: boolean }) {
-  const {t,language} = useStudioLanguage();
-  const [tilt, setTilt] = useState(30), [rotation, setRotation] = useState(0), [flat, setFlat] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
-  function project(anomaly: number, month: number, year: number) {
-    const angle = (month - 1) * Math.PI / 6 + rotation * Math.PI / 180;
-    const radius = 65 + (anomaly + 1) * 65;
-    const x = radius * Math.sin(angle), y = -radius * Math.cos(angle);
-    const z = flat ? 0 : (year - 1953) * 1.25;
-    const a = (flat ? 0 : tilt) * Math.PI / 180;
-    return [300 + x, 280 + y * Math.cos(a) - z * Math.sin(a)];
-  }
-  const paths = useMemo(() => climateSnapshot.years.map(row => {
-    let path = '', connected = false;
-    row.months.forEach((value, i) => { if (value === null) { connected = false; return; } const [x,y] = project(value,i+1,row.year); path += `${connected ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)} `; connected = true; });
-    return { year: row.year, path };
-  }), [flat, tilt, rotation]);
-  const selected = current.anomaly === null ? null : project(current.anomaly,current.month,current.year);
-  return <figure className="ss-spiral" data-playing={playing}><div className="ss-figure-top"><span>{t("01 / CLIMATE SPIRAL")}</span><button onClick={() => setFlat(!flat)}>{t(flat ? 'Explore 3D' : 'Use 2D')}</button></div>
-    <svg viewBox="0 0 600 560" role="img" aria-label={t("Global monthly temperature anomalies: angle is month, radius is anomaly, height is year in 3D. Cyan marker shows the selected observation.")}>
-      <defs><radialGradient id="ss-halo"><stop stopColor="#734de2" stopOpacity=".24"/><stop offset="1" stopColor="#734de2" stopOpacity="0"/></radialGradient></defs>
-      <circle cx="300" cy="280" r="265" fill="url(#ss-halo)"/>
-      {[-1,0,1,1.5].map(value => <g key={value}><path d={Array.from({length:73},(_,i) => { const [x,y] = project(value,1+i/6,1953); return `${i ? 'L':'M'}${x},${y}`; }).join(' ')} fill="none" stroke="#66828c" strokeOpacity=".35" strokeDasharray="3 5"/></g>)}
-      {paths.map(row => <path key={row.year} d={row.path} fill="none" stroke={row.year === current.year ? '#f8eed8' : `hsl(${205-(row.year-1880)/146*195} 85% 65%)`} strokeWidth={row.year === current.year ? 2.8 : .7} opacity={row.year === current.year ? 1 : .36}/>) }
-      {MONTHS.map((name,i) => { const [x,y] = project(1.9,i+1,1953); return <text key={name} x={x} y={y} textAnchor="middle" fill="#b7cbd5" fontSize="11">{language==='zh' ? t(name) : name.slice(0,3).toUpperCase()}</text>; })}
-      {selected && <g className="ss-data-marker"><circle className="ss-melody-halo" cx={selected[0]} cy={selected[1]} r={playing ? 16 : 10} fill="#7efce1" opacity=".13"/><circle cx={selected[0]} cy={selected[1]} r="5" fill="#7efce1" stroke="#fff"/></g>}
-    </svg>
-    <figcaption>{t("Each line is a year; warmer colours indicate later years.")}<br/>{t("1880 → 2026 · radius = anomaly · angle = month")}{!flat && t(' · height = year')}<br/>{t("Reference rings: −1 / 0 / +1 / +1.5°C. White: selected year. Cyan: selected measurement. Halo: decoration only.")}</figcaption>
-    <details className="ss-reference"><summary>{t("NASA reference image")}</summary><img src={climateSnapshot.provenance.visual.localSource} alt={t("NASA Climate Spiral overview showing the record into 2026; not the selected month.")} loading="lazy"/><p>{t("NASA’s Scientific Visualization Studio · Mark SubbaRao and Ed Hawkins. The published visual and this numeric snapshot may use different data revisions.")}</p></details>
-    <div className="ss-view-controls"><label>{t("Rotate")} <input aria-label={t("Rotate spiral")} type="range" min="-180" max="180" value={rotation} onChange={e=>setRotation(+e.target.value)}/></label>{!flat && <label>{t("Tilt")} <input aria-label={t("Tilt spiral")} type="range" min="0" max="65" value={tilt} onChange={e=>setTilt(+e.target.value)}/></label>}</div>
-  </figure>;
+import './StudioPages.css';
+import './Observatory.css';
+const pageNames:Record<StudioPage,string>={home:'Home',listen:'Listen',create:'Create',data:'Explore Data',about:'About'};
+const ignorePlayback=(_value:boolean)=>{};
+function StudioContent(){
+  const {t,language,setLanguage}=useStudioLanguage();
+  const [page,setPage]=useState<StudioPage>(()=>pageForPath(location.pathname));
+  const [motion,setMotion]=useState(()=>!matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [settings,setSettings]=useState<Settings>({...defaults});
+  const content=useRef<HTMLElement>(null);
+  useEffect(()=>{const update=()=>setPage(pageForPath(location.pathname));window.addEventListener('popstate',update);return()=>window.removeEventListener('popstate',update);},[]);
+  useEffect(()=>{const previous=document.title;document.title=`Earth FM — ${t(pageNames[page])}`;return()=>{document.title=previous;};},[page,language]);
+  useEffect(()=>{const target=location.hash?document.getElementById(location.hash.slice(1)):null;if(target){target.scrollIntoView();}else{window.scrollTo({top:0,behavior:'instant'});content.current?.querySelector<HTMLElement>('h1')?.focus({preventScroll:true});}},[page]);
+  function link(event:MouseEvent<HTMLAnchorElement>,target:StudioPage){if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();goToPage(target);}
+  return <div className={`ss ss-pages ss-observatory${motion?' ss-motion':''}`} lang={language==='zh'?'zh-Hans':'en'}><a className="sp-skip" href="#page-content">{t('Skip to content')}</a>
+    <header className="sp-header"><a className="sp-brand" href="/" onClick={e=>link(e,'home')} aria-label={t('Earth FM home')}><span>◉</span><span>EARTH FM<small>{t('SEE · HEAR · DISCOVER')}</small></span></a><nav className="sp-nav" aria-label={t('Main navigation')}>{(['home','listen','create','data'] as StudioPage[]).map(target=><a key={target} href={PAGE_PATHS[target]} aria-current={page===target?'page':undefined} onClick={e=>link(e,target)}>{t(pageNames[target])}</a>)}</nav><label className="sp-language"><span>{t('Language')}</span><select aria-label={t('Language')} value={language} onChange={e=>setLanguage(e.target.value as Language)}><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">简体中文</option></select></label></header>
+    <main id="page-content" ref={content} className={`sp-page sp-page-${page}`}>
+      {page==='home'&&<StudioWelcome motion={motion} playing={false} onListen={()=>goToPage('listen')}/>}
+      {page==='listen'&&<><header className="sp-page-heading sp-listen-heading"><p className="ss-kicker">{t('LISTEN / YOUR FIRST EARTH STORY')}</p><h1 tabIndex={-1}>{t('A little looking. A little listening.')}</h1><p>{t('Follow three short steps. No settings to learn. Sound starts only when you press Play.')}</p></header><GuidedStory motion={motion} onPlayingChange={ignorePlayback} onExplore={()=>goToPage('create')} onData={()=>goToPage('data')}/></>}
+      {page==='create'&&<CreatePage settings={settings} setSettings={setSettings}/>}
+      {page==='data'&&<DataPage settings={settings} setSettings={setSettings}/>}
+      {page==='about'&&<AboutPage/>}
+    </main>
+    <footer className="sp-footer"><span>EARTH FM <small>{t('A different way to meet our planet.')}</small></span><div><a href="/about" aria-current={page==='about'?'page':undefined} onClick={e=>link(e,'about')}>{t('About & sources')}</a><a href="/?legacy=1">{t('Original experience')} ↗</a><label><input type="checkbox" checked={motion} onChange={e=>setMotion(e.target.checked)}/>{t('Motion effects')}</label></div></footer>
+  </div>;
 }
-function StudioContent() {
-  const {t,date,language,setLanguage} = useStudioLanguage();
-  useEffect(()=>{const previous=document.title;document.title='Earth FM — Hear the Data. Explore the Earth.';return()=>{document.title=previous;};},[]);
-  const [experience,setExperience] = useState<'climate'|'visual'|'guided'>('climate');
-  const [guidedPlaying,setGuidedPlaying] = useState(false);
-  const [visualPlaying,setVisualPlaying] = useState(false);
-  const [motion,setMotion] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const [mode,setMode] = useState<typeof modes[number]>('Earth Journey');
-  const [settings,setSettings] = useState<Settings>(defaults);
-  const [year,setYear] = useState(2025), [month,setMonth] = useState(1), [compare,setCompare] = useState(1880);
-  const [audible,setAudible] = useState<MonthlyObservation | null>(null);
-  const [playing,setPlaying] = useState(false), [status,setStatus] = useState('Ready when you are. Start with a 25-second journey.');
-  const [exporting,setExporting] = useState(false);
-  const player = useRef<SymphonyPlayer | null>(null), token = useRef(0);
-  const current = audible ?? getClimateMonth(year,month), event = mapData(current);
-  const stop = () => { token.current++; player.current?.stop(); setPlaying(false); setAudible(null); setStatus('Stopped. Ready to play your selection.'); };
-  useEffect(() => { const engine = new SymphonyPlayer(); player.current = engine; const hide = () => { if(document.hidden) { token.current++; engine.stop(); setPlaying(false); setAudible(null); } }; document.addEventListener('visibilitychange',hide); return () => { token.current++; engine.dispose(); document.removeEventListener('visibilitychange',hide); }; },[]);
-  function update(patch: Partial<Settings>) { stop(); setSettings(value=>({...value,...patch})); setStatus('Mix updated. Press play to hear it.'); }
-  async function play(points: MonthlyObservation[], fixed = false, dataOnly = false) {
-    setExperience('climate'); setGuidedPlaying(false); setVisualPlaying(false); stop(); const id = token.current; setPlaying(true); setStatus('Starting audio…');
-    try { await player.current!.play(points,{...settings,dataOnly: dataOnly || settings.dataOnly,tempo:fixed ? 60 : settings.tempo},index => { if(id !== token.current) return; setAudible(points[index]); setStatus('Playing'); },()=>{ if(id===token.current) { setPlaying(false); setAudible(null); setStatus('Complete. Explore another mix or compare years.'); } }); }
-    catch { if(id===token.current) { stop(); setStatus('Audio could not start. Press play to try again.'); } }
-  }
-  function select(y:number,m:number) { stop(); setYear(y); setMonth(m); }
-  async function download() {
-    setExporting(true);
-    try { const context = new OfflineAudioContext(1,Math.ceil(24.8*44100),44100); renderScore(context,context.destination,yearPoints(year),{...settings,tempo:60},0); const result = await context.startRendering(); const url=URL.createObjectURL(wav(result)); const a=document.createElement('a'); a.href=url; a.download=`Earth-Symphony-${year}-${settings.dataOnly ? 'Data-Only' : settings.style.replaceAll(' ','-')}-${settings.timbre.replaceAll(' ','-')}.wav`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); setStatus('25-second WAV exported from the same sound engine.'); } catch { setStatus('Audio export failed. You can still use live playback.'); } finally {setExporting(false);} }
-  const yearSelect = (value:number, change:(year:number)=>void,label:string) => <label>{t(label)}<select value={value} onChange={e=>change(+e.target.value)}>{climateYears.map(y=><option key={y}>{y}</option>)}</select></label>;
-  function openExperience(next: 'climate'|'visual'|'guided') { if(next!==experience) { stop(); setGuidedPlaying(false); setVisualPlaying(false); setExperience(next); } requestAnimationFrame(()=>document.getElementById('experience')?.scrollIntoView({behavior:motion?'smooth':'auto',block:'start'})); }
-  return <main className={`ss ss-refined${motion ? ' ss-motion' : ''}`} lang={language==='zh'?'zh-Hans':'en'}><header className="ss-header"><a href="/" className="ss-brand">◉ <span>EARTH FM <small>SYMPHONY STUDIO</small></span></a><label className="ss-language">{t("Language")}<select aria-label={t("Language")} value={language} onChange={e=>setLanguage(e.target.value as Language)}><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">简体中文</option></select></label><nav className="ss-top-links" aria-label={t("Studio navigation")}><a href="#experience">{t("Explore")}</a><a href="#how-it-works">{t("How it works")}</a><a href="#ss-source-credits">{t("Sources")}</a></nav></header>
-    <StudioWelcome playing={playing||visualPlaying||guidedPlaying} onListen={()=>openExperience('guided')} onVisual={()=>openExperience('visual')}/>
-    <section id="experience" className="ss-experience" aria-labelledby="ss-experience-title"><div className="ss-experience-heading"><div><p className="ss-kicker">{t('YOUR EARTH JUKEBOX')}</p><h2 id="ss-experience-title">{t('What would you like to hear?')}</h2></div><label className="ss-motion-choice"><input type="checkbox" checked={motion} onChange={e=>setMotion(e.target.checked)}/>{t('Motion effects')}</label></div>
-    <button className="ss-guide-entry" aria-pressed={experience==='guided'} onClick={()=>openExperience('guided')}>✦ {t("New here? Start the guided story")} →</button>
-    <div className="ss-experience-options" aria-label={t('Choose a listening experience')}><button aria-pressed={experience==='climate'} onClick={()=>openExperience('climate')}><span className="ss-choice-icon">◉</span><span><strong>{t('Hear climate change')}</strong><small>{t('Real temperature measurements → melody')}</small></span><span>↗</span></button><button aria-pressed={experience==='visual'} onClick={()=>openExperience('visual')}><span className="ss-choice-icon">▥</span><span><strong>{t('Hear an Earth visual')}</strong><small>{t('Image brightness and colour → sound')}</small></span><span>↗</span></button></div>
-    <p className="ss-experience-note">{experience==='guided' ? t('Learn the difference between hearing a visual and hearing a measurement.') : experience==='climate' ? t('You are hearing measurements. The temperature anomaly sets the melody pitch; your mix adds accompaniment.') : t('You are hearing visual patterns. Image brightness and colour create sound; they do not measure temperature.')}</p>
-    {experience==='guided' ? <GuidedStory motion={motion} onPlayingChange={setGuidedPlaying} onExplore={()=>openExperience('climate')}/> : experience==='visual' ? <div className="ss-visual-experience"><FrameJukebox motionAllowed={motion} climatePlaying={playing} onStart={stop} onPlayingChange={setVisualPlaying}/></div> : <>
-    <nav className="ss-tabs" aria-label={t("Studio modes")}>{modes.map((name,i)=><button key={name} aria-pressed={mode===name} onClick={()=>{stop();setMode(name);}}><span>0{i+1}</span>{t(name)}</button>)}</nav>
-    <section className="ss-workspace"><Spiral current={current} playing={playing}/><div className="ss-panel ss-listening-panel"><p className="ss-kicker">{t(mode === 'Earth Journey' ? '1 / LISTEN' : mode === 'Data Lab' ? '3 / UNDERSTAND' : '2 / CREATE')}</p><h2>{t(mode === 'Earth Journey' ? 'Listen to a changing world.' : mode === 'Data Lab' ? 'Every note has a number.' : 'Your planet. Your mix.')}</h2>
-      <p className="ss-help">{t(mode === 'Earth Journey' ? 'Press play for a year of climate history. Watch each month light up, then try another year or sound.' : mode === 'Data Lab' ? 'Compare the same calendar months across two years. The pitch scale and playback speed stay identical.' : 'Shape the accompaniment and texture. The data melody keeps its original scientific pitch.')}</p>
-      <div className="ss-now-playing"><span className={`ss-signal-dot${playing?' is-playing':''}`}/>{playing?t("NOW PLAYING"):t("SELECTED MONTH")}<span className="ss-mix-state">{settings.dataOnly?t("DATA ONLY"):t("FULL MIX")}</span><span className="ss-meter" aria-hidden="true">{[1,2,3,4,5,6,7,8,9,10,11,12].map(i=><i key={i} style={{height:`${6+(i*7%17)}px`,animationDelay:`${i*.07}s`}}/>)}</span></div>
-      <div className="ss-measure"><span>{date(current.year,current.month,MONTHS[current.month-1])} {t("/ GLOBAL")}</span><strong>{current.anomaly===null ? t('No observation') : formatAnomaly(current.anomaly)}</strong><small>{t("Temperature difference from the 1951–1980 average")}</small><p className="ss-hint">{t("Positive means warmer than that month’s baseline. This is a global average, not local weather.")}</p><div>{event.kind==='note' ? `${NOTES[event.bandIndex]} · ${event.frequencyHz.toFixed(2)} Hz · ${t('Band').toLowerCase()} ${event.bandIndex+1}/10` : t('Silence · no mapped note')}</div></div>
-      <a className="ss-explain-link" href="#data-to-sound">{t("Why this note? ↓")}</a>
-      <div className="ss-selects">{yearSelect(year,y=>select(y,month),mode==='Data Lab'?'Year A':'Choose a year')}{mode==='Data Lab' && yearSelect(compare,y=>{stop();setCompare(y);},'Year B')}</div>
-      <div className="ss-months">{MONTHS.map((name,i)=><button key={name} aria-pressed={month===i+1} onClick={()=>select(year,i+1)}>{language==='zh' ? t(name) : name.slice(0,3)}</button>)}</div>
-      <details className="ss-sound-controls" open={mode==='Earth Remix Studio'}><summary><span>{t("Choose your sound")}</span><small>{t("Tone, style and data-only listening")}</small></summary>
-      <label className="ss-timbre">{t("Melody tone")}<select value={settings.timbre} onChange={e=>update({timbre:e.target.value as Timbre})}>{TIMBRES.map(tone=><option key={tone} value={tone}>{t(tone)}</option>)}</select><small>{t("Choose your sound. Every tone keeps the same NASA pitch.")}</small></label>
-      <div className="ss-styles" aria-label={t("Music style")}>{(['Ambient','Electronic Pulse','Cinematic'] as Style[]).map(style=><button key={style} aria-pressed={settings.style===style} onClick={()=>update({style})}>{t(style)}</button>)}</div>
-      <label className="ss-toggle"><input type="checkbox" checked={settings.dataOnly} onChange={e=>update({dataOnly:e.target.checked})}/><span>{t("Hear Data Only")}<small>{t("Selected tone · one note per month · no accompaniment")}</small></span></label>
-      </details>
-      {mode==='Earth Remix Studio' && <div className="ss-mix"><label><input type="checkbox" disabled={settings.dataOnly} checked={settings.drums} onChange={e=>update({drums:e.target.checked})}/> {t("Rhythm / drums")}</label><label><input type="checkbox" disabled={settings.dataOnly} checked={settings.harmony} onChange={e=>update({harmony:e.target.checked})}/> {t("Harmony")}</label><label>{t("Tempo ·")} {settings.tempo} BPM<input type="range" min="48" max="120" value={settings.tempo} onChange={e=>update({tempo:+e.target.value})}/></label><label>{t("Space / echo")}<input type="range" disabled={settings.dataOnly} min="0" max="1" step=".05" value={settings.space} onChange={e=>update({space:+e.target.value})}/></label><label>{t("Brightness")}<input type="range" min="800" max="6000" step="100" value={settings.brightness} onChange={e=>update({brightness:+e.target.value})}/></label></div>}
-      <div className="ss-transport"><button className="ss-primary" onClick={()=>playing ? stop() : void play(yearPoints(year),mode!=='Earth Remix Studio')}>{playing ? `■ ${t('Stop')}` : `▶ ${t('Play year')} · ${mode==='Earth Remix Studio' ? Math.round(1440/settings.tempo+.8) : 25}${t('s')}`}</button>{mode==='Data Lab' && <><button onClick={()=>void play([current],true)}>{t("Hear month")}</button><button onClick={()=>void play([...yearPoints(year),...yearPoints(compare)],true)}>{t("A → B · 49s")}</button></>}</div>
-      <label className="ss-volume">{t("Volume")}<input aria-label={t("Master volume")} type="range" min="0" max="1" step=".05" value={settings.volume} onChange={e=>{ const volume=+e.target.value; setSettings(value=>({...value,volume})); player.current?.setVolume(volume); }}/></label><p role="status" className="ss-status">{status==='Playing' && audible ? date(audible.year,audible.month,MONTHS[audible.month-1]) : t(status)}</p><button className="ss-export" disabled={exporting} onClick={()=>void download()}>{t(exporting ? 'Rendering…' : '↓ Export 25s audition WAV')}</button>
-    </div></section>
-    <DataSoundGuide current={current} onHear={points=>{ setSettings(value=>({...value,dataOnly:true})); void play(points,true,true); }}/>
-    </>}
-    </section>
-    <details className="ss-engine-detail"><summary>{t("Inside the sound engine")}</summary><section className="ss-foundation"><article><span>{t("01 / DATA MELODY")}</span><h3>{t("Science sets the note.")}</h3><p>{t("Fixed −1.00 to +1.50°C range, ten equal 0.25°C bands. C3 D3 E3 G3 A3 C4 D4 E4 G4 A4. Lower bounds included; +1.50 is included in the final band. No rescaling by year. Missing or out-of-range values are silent.")}</p></article><article><span>{t("02 / RHYTHM & HARMONY")}</span><h3>{t("You shape the setting.")}</h3><p>{t("Rhythm and a repeating C-major chord progression are decorative accompaniment. They do not encode additional measurements. Different values within a band share a note; read the number for the exact anomaly.")}</p></article><article><span>{t("03 / SOUND DESIGN")}</span><h3>{t("A synthetic sound world.")}</h3><p>{t("Five warm synthesized tones, gentle syncopation, filtering, echo and compression create the sound. No Sape or Gong recordings are used. No synthesized voice is presented as an authentic traditional instrument.")}</p></article></section>
-    </details>
-    <aside className="ss-purpose"><span>✦</span><div><h2>{t("Earth science, for more of us.")}</h2><p>{t("Inspired by the NASA Space Apps Earth Information Jukebox challenge: pair Earth visuals with real-time sound, so people can explore through sight, hearing and interaction.")}</p><a href="https://www.spaceappschallenge.org/2026/challenges/earth-information-jukebox/" target="_blank" rel="noreferrer">{t("About the challenge")} ↗</a></div></aside>
-    <details id="ss-source-credits" className="ss-sources"><summary>{t("Science, mapping & NASA credits")}</summary><p>{t("NASA GISS GISTEMP v4 · global land–ocean temperature anomalies relative to 1951–1980, not local weather, absolute temperature or a pre-industrial baseline. Uncertainty is not encoded. Fixed snapshot retrieved 18 October 2026: January 1880–September 2026; later months are missing. No live updates.")}</p><p lang="en">{climateSnapshot.provenance.citation}</p><p>{t("Interactive rendering by Earth FM from the numeric snapshot; inspired by NASA’s Scientific Visualization Studio Climate Spiral, Mark SubbaRao and Ed Hawkins. This is not an exact reproduction of the NASA image. No NASA endorsement implied. Height in 3D represents year; rotation and tilt change only the view. Separate year traces do not bridge missing months.")}</p><p><a href="https://data.giss.nasa.gov/gistemp/">NASA GISTEMP</a> · <a href="https://svs.gsfc.nasa.gov/5190/">{t("NASA SVS 5190 / full credits")}</a> · <a href="/data/climate-spiral-provenance.json">{t("Snapshot provenance")}</a> · <a href={climateSnapshot.provenance.localSource}>{t("Source CSV")}</a></p></details><footer><span>EARTH FM / EARTH SYMPHONY STUDIO · <a href="?legacy=1">{t("Original experience")} ↗</a></span><span>{t("Made to listen closer.")}</span></footer>
-  </main>;
-}
-
-export default function SymphonyStudio() {
-  return <StudioLanguageProvider><StudioContent/></StudioLanguageProvider>;
-}
+export default function SymphonyStudio(){return <StudioLanguageProvider><StudioContent/></StudioLanguageProvider>;}

@@ -1,8 +1,8 @@
-# Earth FM — submission draft for the guided-learning revision
+# Earth FM — submission draft for the five-page revision
 
-Status: the guided-learning revision was approved for publication through main on 2026-11-02. This is submission material, not evidence that the team has submitted it or that any user study has been completed.
+Status: five-page and NASA observatory release, 2026-11-02. The user approved publishing this revision through the existing main-to-production workflow after local review. This is submission material, not evidence that the team has submitted it or that any user study has been completed.
 
-**Project:** Earth FM — See our Earth. Hear its story.
+**Project:** Earth FM — Hear Earth’s changing climate.
 
 **Challenge:** The Earth Information Jukebox, NASA Space Apps 2026.
 
@@ -22,10 +22,10 @@ Our contribution is an explainable learning path that distinguishes two ways of 
 
 1. **Hear a NASA visual.** The guided story begins with NASA SVS 5190, the Climate Spiral, identified in NASA's EIC-related Climate Vital Signs Dashboard. A 48-strip left-to-right scan turns visible brightness into pitch, RGB into timbre and position into stereo pan. Sound is generated during playback. Labels and backgrounds also affect the scan; this is explicitly not a physical thermometer.
 2. **Hear real observations.** Twelve selected January GISTEMP v4 anomalies from 1880–2025 play on the same fixed ten-band pitch scale. The first comparison uses a warm synthesized tone with no accompaniment. Dates, values and target frequencies are synchronized; the chart uses actual year spacing. Equal note duration does not encode elapsed time or warming rate. The selection illustrates differences and is not the full record or proof of a trend by itself.
-3. **Check understanding.** Four questions address period comparison, the distinction between image brightness and temperature, the role of data in pitch and the baseline. Feedback explains each answer. A user may download their own local practice record with first and later attempts preserved. This is not aggregate research evidence and is not uploaded to a backend.
-4. **Explore and create.** The Studio retains all monthly observations, Journey/Remix/Data Lab, five synthesized tones, three accompaniment styles, data-only listening, year A/B, CSV traces and audio export. The visual room retains multiple attributed assets, animation sampling and local image/video input.
+3. **Discover and optionally check understanding.** Four questions address period comparison, the distinction between image brightness and temperature, the role of data in pitch and the baseline. Feedback explains each answer. A user may download their own local practice record with first and later attempts preserved. This is not aggregate research evidence and is not uploaded to a backend.
+4. **Explore and create.** Create offers five synthesized tones, three accompaniment styles, data-only listening and audio export. Explore Data has year/month selection, exact values, sequential year A/B, CSV traces and an optional 2D/3D spiral. About explains the mapping and sources. Advanced controls are collapsed. The preserved Original experience has multiple attributed visual assets, animation sampling and local image/video input.
 
-The reviewed Studio is the default local route. Original 1.0 is retained behind `?legacy=1`; old anchors and shared-mix parameters remain compatible. English is default, with persistent Simplified Chinese. Keyboard controls, reduced-motion defaults, motion control and mobile layouts are included. These features do not constitute accessibility certification or proof of suitability for all disabilities.
+Home offers one primary Start the experience action; Listen presents Look → Listen → Discover as separate steps. Create, Explore Data and About have independent page URLs. The reviewed Studio is the default local route. Original 1.0 is retained behind `?legacy=1`; old anchors and shared-mix parameters remain compatible. English is default, with persistent Simplified Chinese. Keyboard controls, reduced-motion defaults, motion control and mobile layouts are included. These features do not constitute accessibility certification or proof of suitability for all disabilities.
 
 ## Challenge alignment
 
