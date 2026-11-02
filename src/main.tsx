@@ -1,9 +1,12 @@
-import React, { lazy, Suspense } from 'react';
+import React, {lazy, Suspense, useEffect, useState} from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-const SymphonyStudio = lazy(() => import('./components/SymphonyStudio'));
+import {isLegacyEntry} from './lib/entry';
 import './styles.css';
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>{new URLSearchParams(location.search).has('studio') ? <Suspense fallback={<p>Loading Earth Symphony Studio…</p>}><SymphonyStudio /></Suspense> : <App />}</React.StrictMode>,
-);
+const App=lazy(()=>import('./App'));
+const SymphonyStudio=lazy(()=>import('./components/SymphonyStudio'));
+function Entry(){
+  const [legacy,setLegacy]=useState(()=>isLegacyEntry(location.search,location.hash));
+  useEffect(()=>{const update=()=>setLegacy(isLegacyEntry(location.search,location.hash));window.addEventListener('hashchange',update);window.addEventListener('popstate',update);return()=>{window.removeEventListener('hashchange',update);window.removeEventListener('popstate',update);};},[]);
+  return <Suspense fallback={<p>Loading Earth FM…</p>}>{legacy?<App/>:<SymphonyStudio/>}</Suspense>;
+}
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><Entry/></React.StrictMode>);

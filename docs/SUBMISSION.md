@@ -1,6 +1,8 @@
-# BoboMimi submission materials
+# Earth FM — submission draft for the guided-learning revision
 
-**Project:** Earth FM — Our planet. One soundtrack.
+Status: the guided-learning revision was approved for publication through main on 2026-11-02. This is submission material, not evidence that the team has submitted it or that any user study has been completed.
+
+**Project:** Earth FM — See our Earth. Hear its story.
 
 **Challenge:** The Earth Information Jukebox, NASA Space Apps 2026.
 
@@ -8,45 +10,52 @@
 
 ## One-sentence pitch
 
-Earth FM lets you listen to NASA Earth Information Center visuals through real-time pixel sonification, then explore the measured climate stories behind our changing planet.
+Earth FM helps first-time learners explore one climate story through a NASA visual, live-generated sound and traceable measurements, then check what they understood.
 
-## Project summary
+## Problem, audience and contribution
 
-Earth science deserves more than a glance. Earth FM turns the planet’s visual signals into an instrument you can play: choose an EIC-related frame, press play, and watch a scan line move as the browser turns brightness into pitch, color into timbre, and horizontal position into stereo sound. An immersive Earth animation is sampled again for each note, making its soundtrack respond to the frame currently on screen. You can also bring your own EIC image or video without uploading it to a server.
+Earth visualizations can be engaging but difficult for a first-time learner to interpret. Our initial audience is students and curious members of the public who are new to climate graphs and sonification. This is a design focus, not a claim that every learner benefits.
 
-For scientific context, four separate recordings translate attributed NASA, NOAA, and NSIDC observations into music: global temperature anomalies, atmospheric CO₂ at Mauna Loa, global satellite sea level, and September Arctic sea ice extent. Each annual note follows a visible chart and retains its original measurement. Select an era, choose a soundscape, save favorites, share a mix, or export a WAV.
+Our contribution is an explainable learning path that distinguishes two ways of listening: image patterns become sound through live pixel sampling; scientific anomalies become melody through a fixed published mapping. Users can hear the difference, inspect the source values and check common misconceptions. The sound is synthesized in the browser and is not a recording of Earth or an authentic traditional instrument.
 
-Earth FM’s interface supports keyboard navigation, descriptive visual alternatives, numeric readings, a still-frame animation option, and mobile screens. Bundled assets and fonts allow the core experience to run without API credentials or ongoing external data requests. The project documents exactly where its sources came from and distinguishes a picture’s color from a physical measurement.
+## What the prototype does
 
-## How this addresses the supplied challenge
+1. **Hear a NASA visual.** The guided story begins with NASA SVS 5190, the Climate Spiral, identified in NASA's EIC-related Climate Vital Signs Dashboard. A 48-strip left-to-right scan turns visible brightness into pitch, RGB into timbre and position into stereo pan. Sound is generated during playback. Labels and backgrounds also affect the scan; this is explicitly not a physical thermometer.
+2. **Hear real observations.** Twelve selected January GISTEMP v4 anomalies from 1880–2025 play on the same fixed ten-band pitch scale. The first comparison uses a warm synthesized tone with no accompaniment. Dates, values and target frequencies are synchronized; the chart uses actual year spacing. Equal note duration does not encode elapsed time or warming rate. The selection illustrates differences and is not the full record or proof of a trend by itself.
+3. **Check understanding.** Four questions address period comparison, the distinction between image brightness and temperature, the role of data in pitch and the baseline. Feedback explains each answer. A user may download their own local practice record with first and later attempts preserved. This is not aggregate research evidence and is not uploaded to a backend.
+4. **Explore and create.** The Studio retains all monthly observations, Journey/Remix/Data Lab, five synthesized tones, three accompaniment styles, data-only listening, year A/B, CSV traces and audio export. The visual room retains multiple attributed assets, animation sampling and local image/video input.
 
-| Challenge goal | Implemented behavior |
-| --- | --- |
-| Pair EIC visual frames and sound | Three attributed earth.gov mirror assets, including an EIC immersive animation, appear alongside their generated sound and scan position. Local EIC frame/video input is supported. |
-| Generate dynamic sonification in real time | Web Audio synthesizes notes near their playback time from newly sampled pixels; animation input is sampled at each note. No soundtrack file is streamed or played. |
-| Make visual Earth science multi-sensory | Brightness, color, and scan position map to pitch, tone, and spatial sound; a visible scan, chart, numerical readouts, and explanatory text provide complementary channels. |
-| Make access engaging and inclusive | Keyboard controls, labeled controls, modal focus handling, reduced-motion behavior, device-local processing, no required account, and responsive layouts. |
+The reviewed Studio is the default local route. Original 1.0 is retained behind `?legacy=1`; old anchors and shared-mix parameters remain compatible. English is default, with persistent Simplified Chinese. Keyboard controls, reduced-motion defaults, motion control and mobile layouts are included. These features do not constitute accessibility certification or proof of suitability for all disabilities.
 
-This mapping covers the summary supplied by the team. It does not claim validation against unavailable full judging criteria or formal accessibility certification.
+## Challenge alignment
 
-## 90-second demo script
+The official summary calls for EIC visual frames paired with dynamic real-time sonification, with accessible, engaging, multisensory exploration. The guided NASA Climate Spiral scan directly demonstrates visual/sound pairing; the numeric sequence is a complementary scientific explanation rather than a replacement. Both stay within one climate story.
 
-1. **0:00–0:10 — Hook.** “What if we could hear our changing planet? We’re BoboMimi, and this is Earth FM.” Show the globe and press **Listen to the Earth**.
-2. **0:10–0:30 — Visual radio.** Explain the scanning line. “Every strip becomes a note. Brightness changes pitch, color shapes its harmonics, and the sound travels from left to right.” Select **Untethered**, enable **Follow the animation** if needed, and show the spectrum changing as the Earth moves.
-3. **0:30–0:45 — Participation.** Show **Bring your own EIC frame**. “This is an instrument for visuals, not just a fixed playlist. Your file stays on your device.” Mention the still-frame option.
-4. **0:45–1:05 — Scientific context.** Choose **The Arctic** and play the ice recording. “Pictures and measurements are different. Here, each note is a real September mean, synchronized with its original numeric value.” Briefly switch to temperature.
-5. **1:05–1:20 — Sharing.** Open **Make it your own**, adjust an era and soundscape, then demonstrate **Share this mix** or WAV download.
-6. **1:20–1:30 — Close.** “One planet. A shared frequency. Earth FM makes Earth science something we can see, hear, and connect with.” Show BoboMimi credits.
+Detailed challenge requirements and the complete 2026 central judging guide have not been independently obtained. The prototype does not claim compliance with unknown scoring weights or requirements. EIC relationship, mirror provenance for older assets, snapshot revisions and source credits are documented.
 
-## Sources and project links
+## Proposed 90-second pitch and demo
 
-- Source repository: https://github.com/Yoriichi-0u0/earth-fm/tree/main
-- Challenge: https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/
-- Project website: https://earth-fm.vercel.app/ (production deployment and homepage verified October 14, 2026).
-- [Observation sources and transformations](DATA.md)
-- [Visual assets, mirror evidence, missing dates, and credits](FRAMES.md)
-- [Sonification method and implementation](SONIFICATION.md)
+- **0:00–0:10 — Purpose.** “A graph can show change. Can sound help a new learner notice and understand it? We are BoboMimi, and this is Earth FM.” Open the canonical Studio homepage and start the guided story.
+- **0:10–0:30 — Respond to the challenge.** Play the NASA Climate Spiral scan. “The browser creates this sound from the visible image in real time. Brightness becomes pitch. This is a visual pattern—not a temperature measurement.” Identify the NASA source.
+- **0:30–0:58 — Explain the scientific difference.** Move to the twelve selected Januaries and play the data-only comparison. “Now the measurements set the notes. We keep the same month, tone and pitch scale across years.” Point to a date, original anomaly and frequency. Mention gaps and equal-duration notes.
+- **0:58–1:12 — Demonstrate transparency.** Contrast 1880 January at −0.19°C/G3 with 2025 January at +1.37°C/A4. “Different values within a band can still share a note, so the exact numbers remain visible.”
+- **1:12–1:23 — Learning and inclusion.** Show the understanding check, optional Chinese, and data-only controls. “We have a working prototype and a real-user test protocol. We have not yet established learning effectiveness.”
+- **1:23–1:30 — Close.** “See it, hear it, then explain what changed. Earth FM makes the mapping visible so the music can become a path into Earth science.”
 
-The EIC visual relationship is supported by an explicitly attributed earth.gov asset mirror. Current official bytes, original observation dates, and complete production credits were not independently verified because the source domains were blocked during development. These are exhibit/imagery assets; they are not year-matched visualizations of the annual climate tracks. The project clearly communicates this boundary and retains the original credits and provenance.
+This is a proposed demo length, not a verified 2026 video-length rule. The team should confirm its actual event's submission requirements before recording final materials.
 
-This document is prepared submission text. It does not register the team, upload a demo, or submit the project on the Space Apps website.
+## Evidence, sources and limits
+
+- Repository: https://github.com/Yoriichi-0u0/earth-fm/tree/main
+- Canonical public entry: https://earth-fm.vercel.app/
+- Direct Studio alias: https://earth-fm.vercel.app/?studio=1
+- Official challenge summary on the official site: https://www.spaceappschallenge.org/2026/find-a-team/proteas/
+- NASA visual: https://svs.gsfc.nasa.gov/5190/
+- EIC-related gallery: https://svs.gsfc.nasa.gov/gallery/climate-vital-signs-dashboard/
+- NASA data: https://data.giss.nasa.gov/gistemp/
+- [Science, sound and source records](EARTH_SYMPHONY_STUDIO.md)
+- [Real-user pilot protocol and reporting limits](USER_TEST_PROTOCOL.md)
+
+GISTEMP snapshot retrieved 2026-10-18 covers January 1880–September 2026. Baseline is 1951–1980 for each corresponding month. Global anomalies are not local weather or absolute temperatures. The original visual's exact data revision is not confirmed to match the snapshot, and no pixel-to-exact-value inference is made. Uncertainty is not encoded in sound.
+
+Automated tests verify software behavior and source integrity. They do not establish learning gains, participant satisfaction or public impact. No participant findings, teacher endorsements, accessibility partnerships or user counts have been collected or invented. Human musical review, physical Safari/iPhone checks and actual novice-user testing remain necessary.

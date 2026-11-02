@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowDownToLine, ArrowRight, AudioLines, Check, ImagePlus, Info, Pause, Play, Radio, RotateCcw, Volume2 } from 'lucide-react';
 import { useStudioLanguage } from '../lib/studioLanguage';
 import { frames } from '../data/frames';
+import type { EarthFrame } from '../data/frames';
 import { FrameAudio, imageSequenceWav, imageToSequence } from '../lib/imageSonification';
 import type { FrameStep } from '../lib/imageSonification';
 import { mapValueToNote } from '../lib/audio';
@@ -10,9 +11,9 @@ import './FrameJukebox.css';
 type LocalFrame = { name: string; url: string; kind: 'image' | 'animation' };
 const SCAN_STEPS = 48;
 
-export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange, motionAllowed = true }: { motionAllowed?: boolean; climatePlaying: boolean; onStart: () => void; onPlayingChange: (playing: boolean) => void }) {
+export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange, motionAllowed = true, referenceFrame, simple = false }: { referenceFrame?: EarthFrame; simple?: boolean; motionAllowed?: boolean; climatePlaying: boolean; onStart: () => void; onPlayingChange: (playing: boolean) => void }) {
   const {t}=useStudioLanguage();
-  const [frameId, setFrameId] = useState(frames[0].id);
+  const [frameId, setFrameId] = useState(referenceFrame?.id ?? frames[0].id);
   const [localFrame, setLocalFrame] = useState<LocalFrame | null>(null);
   const [steps, setSteps] = useState<FrameStep[]>([]);
   const [scanIndex, setScanIndex] = useState(0);
@@ -32,7 +33,7 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
   const liveStepsRef = useRef<FrameStep[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const localUrlRef = useRef<string | null>(null);
-  const frame = frames.find(f => f.id === frameId)!;
+  const frame = referenceFrame ?? frames.find(f => f.id === frameId)!;
   const title = localFrame?.name ?? t(frame.title);
   const videoUrl = localFrame?.kind === 'animation' ? localFrame.url : !localFrame ? frame.videoUrl : undefined;
   const imageUrl = localFrame?.url ?? frame.imageUrl;
@@ -97,7 +98,7 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
     finally { setExporting(false); }
   };
 
-  return <section id="visual-radio" className="content-width visual-section">
+  return <section id="visual-radio" className={`content-width visual-section${simple?' visual-guided':''}`}>
     <div className="section-heading"><div><div className="eyebrow muted">{t("THE EARTH INFORMATION CENTER, IN SOUND")}</div><h2>{t("Don’t just see the Earth. Hear it.")}</h2></div><span className="visual-tag"><Radio size={12}/> {t("REAL-TIME SONIFICATION")}</span></div>
     <div className="visual-layout">
       <div className="visual-screen-panel">
@@ -107,21 +108,21 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
           {ready && <div className={`visual-scan ${playing ? 'is-scanning' : ''}`} style={{ left: `${(scanIndex + .5) / SCAN_STEPS * 100}%` }}><span>{String(scanIndex + 1).padStart(2, '0')} / 48</span></div>}
           {!ready && !error && <span className="visual-loading">{t("Loading the Earth’s signal…")}</span>}
         </div>
-        <div className="visual-screen-caption"><span>{title}</span><span>{t(localFrame ? 'LOCAL FILE · STAYS ON YOUR DEVICE' : 'EARTH.GOV ASSET MIRROR')}</span></div>
+        <div className="visual-screen-caption"><span>{title}</span><span>{t(localFrame ? 'LOCAL FILE · STAYS ON YOUR DEVICE' : referenceFrame ? 'NASA SVS 5190 · REFERENCE IMAGE' : 'EARTH.GOV ASSET MIRROR')}</span></div>
         <div className="visual-spectrum" role="img" aria-label={t("Current frame brightness across 48 vertical strips")}>{steps.map((s, i) => <i key={i} className={i === scanIndex ? 'active' : ''} style={{ height: `${Math.max(8, s.brightness * 100)}%` }}/>)}</div>
         <div className="visual-transport"><button className="icon-button" aria-label={t("Restart visual scan")} disabled={!ready} onClick={() => { stop(); setScanIndex(0); }}><RotateCcw size={16}/></button><button id="play-visual-button" className="primary-button" disabled={!ready} onClick={() => playing ? stop() : void start()}>{playing ? <Pause size={15} fill="currentColor"/> : <Play size={15} fill="currentColor"/>}{t(playing ? 'Pause visual' : 'Hear this visual')}</button><div className="visual-note"><strong>{note}</strong><span>{current ? `${Math.round(current.brightness * 100)}% ${t('LUMA')}` : t('READING PIXELS')}</span></div><div className="visual-volume"><Volume2 size={15}/><label className="sr-only" htmlFor="visual-volume">{t("Visual volume")}</label><input id="visual-volume" type="range" min="0" max="1" step=".01" value={volume} onChange={e => setVolume(Number(e.target.value))}/></div></div>
       </div>
-      <div className="visual-settings"><span className="eyebrow">{t("SELECT A VISUAL FRAME")}</span><div className="frame-options">{frames.map(f => <button key={f.id} className={!localFrame && frameId === f.id ? 'active' : ''} aria-pressed={!localFrame && frameId === f.id} onClick={() => changeFrame(f.id)}><img src={f.id === 'untethered-earth' ? '/frames/eic-immersive.webp' : f.imageUrl} alt=""/><span><strong>{t(f.title)}</strong><small>{t(f.kind === 'animation' ? 'EIC immersive animation' : f.id === 'night-lights' ? 'NASA / NOAA nighttime imagery' : 'EIC exhibit photograph')}</small></span>{!localFrame && frameId === f.id ? <Check size={14}/> : <ArrowRight size={14}/>}</button>)}</div>
+      {!simple && <div className="visual-settings"><span className="eyebrow">{t("SELECT A VISUAL FRAME")}</span><div className="frame-options">{frames.map(f => <button key={f.id} className={!localFrame && frameId === f.id ? 'active' : ''} aria-pressed={!localFrame && frameId === f.id} onClick={() => changeFrame(f.id)}><img src={f.id === 'untethered-earth' ? '/frames/eic-immersive.webp' : f.imageUrl} alt=""/><span><strong>{t(f.title)}</strong><small>{t(f.kind === 'animation' ? 'EIC immersive animation' : f.id === 'night-lights' ? 'NASA / NOAA nighttime imagery' : 'EIC exhibit photograph')}</small></span>{!localFrame && frameId === f.id ? <Check size={14}/> : <ArrowRight size={14}/>}</button>)}</div>
         <input className="sr-only" type="file" id="upload-visual" tabIndex={-1} aria-label={t("Upload a visual image or video")} ref={fileRef} accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm" onChange={e => { upload(e.target.files?.[0]); e.target.value = ''; }}/>
         <button className="upload-button" onClick={() => fileRef.current?.click()}><ImagePlus size={17}/><span>{t("Bring your own EIC frame")}<small>{t("Image or video · up to 20 MB · processed locally")}</small></span><span>+</span></button>
         <div className="visual-mapping"><span className="eyebrow">{t("HOW YOUR EYES BECOME EARS")}</span><p>{t("We scan from left to right. Brightness becomes pitch, color shapes the tone, and position moves the sound between your ears.")}</p><div><span>{t("BRIGHTNESS")}</span><i>↗</i><strong>{t("PITCH")}</strong></div><div><span>{t("RED / GREEN / BLUE")}</span><i>→</i><strong>{t("TIMBRE")}</strong></div><div><span>{t("LEFT → RIGHT")}</span><i>→</i><strong>{t("STEREO PAN")}</strong></div></div>
         <div className="visual-tempo"><label htmlFor="visual-tempo">{t("SCAN TEMPO")}</label><span>{tempo} BPM</span><input id="visual-tempo" type="range" min="60" max="180" step="10" value={tempo} onChange={e => { stop(); setTempo(Number(e.target.value)); }}/></div>
         {videoUrl && <label className="visual-motion"><input type="checkbox" checked={animate && motionAllowed} disabled={!motionAllowed} onChange={e => { stop(); setAnimate(e.target.checked); }}/><span>{t("Follow the animation")}<small>{t("Leave off to hear a still frame with less motion.")}</small></span></label>}
         <button className="outline-button" disabled={!ready || exporting} onClick={() => void download()}><ArrowDownToLine size={15}/>{t(exporting ? 'Rendering…' : 'Download visual soundtrack')}</button>
-      </div>
+      </div>}
     </div>
     <div className="visual-science-note"><Info size={14}/><p>{t("Image sounds describe visual patterns, not measured temperature or concentration. Animated pixels are sampled again at every note. For scientific temperature values, choose Hear climate change.")}</p></div>
-    <div className="visual-provenance">{localFrame ? <span>{t("Your file is processed only in this browser. No upload or account required.")}</span> : <><span>{frame.credit}. {t(frame.date)}.</span><a href={frame.mirrorUrl} target="_blank" rel="noreferrer">{t("View archived source")} <ArrowRight size={12}/></a></>}</div>
+    <div className="visual-provenance">{localFrame ? <span>{t("Your file is processed only in this browser. No upload or account required.")}</span> : <><span>{frame.credit}. {t(frame.date)}.</span><a href={frame.mirrorUrl} target="_blank" rel="noreferrer">{t(referenceFrame ? "View NASA source" : "View archived source")} <ArrowRight size={12}/></a></>}</div>
     {error && <p className="visual-error" role="alert">{t(error)}</p>}{announcement && <p className="visual-announcement" role="status"><AudioLines size={14}/>{t(announcement)}</p>}
   </section>;
 }

@@ -6,6 +6,7 @@ import { defaults, mapData, NOTES, TIMBRES, renderScore, SymphonyPlayer, wav } f
 import type { Settings, Style, Timbre } from '../lib/symphony';
 import DataSoundGuide from './DataSoundGuide';
 import StudioWelcome from './StudioWelcome';
+import GuidedStory from './GuidedStory';
 import FrameJukebox from './FrameJukebox';
 import { StudioLanguageProvider, useStudioLanguage } from '../lib/studioLanguage';
 import type { Language } from '../lib/studioLanguage';
@@ -46,7 +47,9 @@ function Spiral({ current, playing }: { current: MonthlyObservation; playing: bo
 }
 function StudioContent() {
   const {t,date,language,setLanguage} = useStudioLanguage();
-  const [experience,setExperience] = useState<'climate'|'visual'>('climate');
+  useEffect(()=>{const previous=document.title;document.title='Earth FM — Hear the Data. Explore the Earth.';return()=>{document.title=previous;};},[]);
+  const [experience,setExperience] = useState<'climate'|'visual'|'guided'>('climate');
+  const [guidedPlaying,setGuidedPlaying] = useState(false);
   const [visualPlaying,setVisualPlaying] = useState(false);
   const [motion,setMotion] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [mode,setMode] = useState<typeof modes[number]>('Earth Journey');
@@ -61,7 +64,7 @@ function StudioContent() {
   useEffect(() => { const engine = new SymphonyPlayer(); player.current = engine; const hide = () => { if(document.hidden) { token.current++; engine.stop(); setPlaying(false); setAudible(null); } }; document.addEventListener('visibilitychange',hide); return () => { token.current++; engine.dispose(); document.removeEventListener('visibilitychange',hide); }; },[]);
   function update(patch: Partial<Settings>) { stop(); setSettings(value=>({...value,...patch})); setStatus('Mix updated. Press play to hear it.'); }
   async function play(points: MonthlyObservation[], fixed = false, dataOnly = false) {
-    setExperience('climate'); setVisualPlaying(false); stop(); const id = token.current; setPlaying(true); setStatus('Starting audio…');
+    setExperience('climate'); setGuidedPlaying(false); setVisualPlaying(false); stop(); const id = token.current; setPlaying(true); setStatus('Starting audio…');
     try { await player.current!.play(points,{...settings,dataOnly: dataOnly || settings.dataOnly,tempo:fixed ? 60 : settings.tempo},index => { if(id !== token.current) return; setAudible(points[index]); setStatus('Playing'); },()=>{ if(id===token.current) { setPlaying(false); setAudible(null); setStatus('Complete. Explore another mix or compare years.'); } }); }
     catch { if(id===token.current) { stop(); setStatus('Audio could not start. Press play to try again.'); } }
   }
@@ -70,13 +73,14 @@ function StudioContent() {
     setExporting(true);
     try { const context = new OfflineAudioContext(1,Math.ceil(24.8*44100),44100); renderScore(context,context.destination,yearPoints(year),{...settings,tempo:60},0); const result = await context.startRendering(); const url=URL.createObjectURL(wav(result)); const a=document.createElement('a'); a.href=url; a.download=`Earth-Symphony-${year}-${settings.dataOnly ? 'Data-Only' : settings.style.replaceAll(' ','-')}-${settings.timbre.replaceAll(' ','-')}.wav`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); setStatus('25-second WAV exported from the same sound engine.'); } catch { setStatus('Audio export failed. You can still use live playback.'); } finally {setExporting(false);} }
   const yearSelect = (value:number, change:(year:number)=>void,label:string) => <label>{t(label)}<select value={value} onChange={e=>change(+e.target.value)}>{climateYears.map(y=><option key={y}>{y}</option>)}</select></label>;
-  function openExperience(next: 'climate'|'visual') { if(next!==experience) { stop(); setVisualPlaying(false); setExperience(next); } requestAnimationFrame(()=>document.getElementById('experience')?.scrollIntoView({behavior:motion?'smooth':'auto',block:'start'})); }
-  return <main className={`ss ss-refined${motion ? ' ss-motion' : ''}`} lang={language==='zh'?'zh-Hans':'en'}><header className="ss-header"><a href="?studio=1" className="ss-brand">◉ <span>EARTH FM <small>SYMPHONY STUDIO</small></span></a><label className="ss-language">{t("Language")}<select aria-label={t("Language")} value={language} onChange={e=>setLanguage(e.target.value as Language)}><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">简体中文</option></select></label><nav className="ss-top-links" aria-label={t("Studio navigation")}><a href="#experience">{t("Explore")}</a><a href="#how-it-works">{t("How it works")}</a><a href="#ss-source-credits">{t("Sources")}</a></nav></header>
-    <StudioWelcome playing={playing||visualPlaying} onListen={()=>{openExperience('climate'); setMode('Earth Journey'); setYear(2025); setMonth(1); void play(yearPoints(2025),true);}} onVisual={()=>openExperience('visual')}/>
+  function openExperience(next: 'climate'|'visual'|'guided') { if(next!==experience) { stop(); setGuidedPlaying(false); setVisualPlaying(false); setExperience(next); } requestAnimationFrame(()=>document.getElementById('experience')?.scrollIntoView({behavior:motion?'smooth':'auto',block:'start'})); }
+  return <main className={`ss ss-refined${motion ? ' ss-motion' : ''}`} lang={language==='zh'?'zh-Hans':'en'}><header className="ss-header"><a href="/" className="ss-brand">◉ <span>EARTH FM <small>SYMPHONY STUDIO</small></span></a><label className="ss-language">{t("Language")}<select aria-label={t("Language")} value={language} onChange={e=>setLanguage(e.target.value as Language)}><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">简体中文</option></select></label><nav className="ss-top-links" aria-label={t("Studio navigation")}><a href="#experience">{t("Explore")}</a><a href="#how-it-works">{t("How it works")}</a><a href="#ss-source-credits">{t("Sources")}</a></nav></header>
+    <StudioWelcome playing={playing||visualPlaying||guidedPlaying} onListen={()=>openExperience('guided')} onVisual={()=>openExperience('visual')}/>
     <section id="experience" className="ss-experience" aria-labelledby="ss-experience-title"><div className="ss-experience-heading"><div><p className="ss-kicker">{t('YOUR EARTH JUKEBOX')}</p><h2 id="ss-experience-title">{t('What would you like to hear?')}</h2></div><label className="ss-motion-choice"><input type="checkbox" checked={motion} onChange={e=>setMotion(e.target.checked)}/>{t('Motion effects')}</label></div>
+    <button className="ss-guide-entry" aria-pressed={experience==='guided'} onClick={()=>openExperience('guided')}>✦ {t("New here? Start the guided story")} →</button>
     <div className="ss-experience-options" aria-label={t('Choose a listening experience')}><button aria-pressed={experience==='climate'} onClick={()=>openExperience('climate')}><span className="ss-choice-icon">◉</span><span><strong>{t('Hear climate change')}</strong><small>{t('Real temperature measurements → melody')}</small></span><span>↗</span></button><button aria-pressed={experience==='visual'} onClick={()=>openExperience('visual')}><span className="ss-choice-icon">▥</span><span><strong>{t('Hear an Earth visual')}</strong><small>{t('Image brightness and colour → sound')}</small></span><span>↗</span></button></div>
-    <p className="ss-experience-note">{experience==='climate' ? t('You are hearing measurements. The temperature anomaly sets the melody pitch; your mix adds accompaniment.') : t('You are hearing visual patterns. Image brightness and colour create sound; they do not measure temperature.')}</p>
-    {experience==='visual' ? <div className="ss-visual-experience"><FrameJukebox motionAllowed={motion} climatePlaying={playing} onStart={stop} onPlayingChange={setVisualPlaying}/></div> : <>
+    <p className="ss-experience-note">{experience==='guided' ? t('Learn the difference between hearing a visual and hearing a measurement.') : experience==='climate' ? t('You are hearing measurements. The temperature anomaly sets the melody pitch; your mix adds accompaniment.') : t('You are hearing visual patterns. Image brightness and colour create sound; they do not measure temperature.')}</p>
+    {experience==='guided' ? <GuidedStory motion={motion} onPlayingChange={setGuidedPlaying} onExplore={()=>openExperience('climate')}/> : experience==='visual' ? <div className="ss-visual-experience"><FrameJukebox motionAllowed={motion} climatePlaying={playing} onStart={stop} onPlayingChange={setVisualPlaying}/></div> : <>
     <nav className="ss-tabs" aria-label={t("Studio modes")}>{modes.map((name,i)=><button key={name} aria-pressed={mode===name} onClick={()=>{stop();setMode(name);}}><span>0{i+1}</span>{t(name)}</button>)}</nav>
     <section className="ss-workspace"><Spiral current={current} playing={playing}/><div className="ss-panel ss-listening-panel"><p className="ss-kicker">{t(mode === 'Earth Journey' ? '1 / LISTEN' : mode === 'Data Lab' ? '3 / UNDERSTAND' : '2 / CREATE')}</p><h2>{t(mode === 'Earth Journey' ? 'Listen to a changing world.' : mode === 'Data Lab' ? 'Every note has a number.' : 'Your planet. Your mix.')}</h2>
       <p className="ss-help">{t(mode === 'Earth Journey' ? 'Press play for a year of climate history. Watch each month light up, then try another year or sound.' : mode === 'Data Lab' ? 'Compare the same calendar months across two years. The pitch scale and playback speed stay identical.' : 'Shape the accompaniment and texture. The data melody keeps its original scientific pitch.')}</p>

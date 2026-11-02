@@ -2,7 +2,9 @@
 
 **Our planet. A thousand stories. One soundtrack.**
 
-Earth FM is BoboMimi’s working prototype for the [2026 NASA Space Apps Earth Information Jukebox challenge](https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/). It pairs Earth Information Center related visuals with sound synthesized locally in real time. A second listening mode makes four measured climate signals audible and keeps their original values on a synchronized chart.
+Earth FM is BoboMimi’s prototype for the NASA Space Apps Earth Information Jukebox challenge. The reviewed Studio combines a guided NASA Climate Spiral visual-to-sound experience, a transparent comparison of real January temperature observations, a personal learning check and free exploration/remixing. The primary audience is first-time learners; educational effectiveness has not yet been established by a user study.
+
+The guided Studio is the canonical entry for this release. Open `/` for the canonical Studio, `/?studio=1` for the same Studio alias, or `/?legacy=1` for the preserved original app. Old climate/visual anchors and shared-mix query parameters remain compatible. See [the current submission draft](docs/SUBMISSION.md) and [the actual-user pilot protocol](docs/USER_TEST_PROTOCOL.md).
 
 | Team BoboMimi | Role | Username |
 | --- | --- | --- |
@@ -20,7 +22,7 @@ npm ci
 npm run dev
 ```
 
-Open the address printed by Vite. Click **Listen to the Earth** or **Hear this visual** to unlock browser audio. Headphones reveal the spatial scan. No credentials or API keys are needed. The app’s fonts, visuals, and observation snapshots are bundled; there are no runtime data requests or uploads.
+Open the address printed by Vite. Click **Start listening** to enter the guided story, then **Hear this visual** or **Play the comparison** to start browser audio. Headphones reveal the spatial scan. No credentials or API keys are needed. The app’s fonts, visuals, and observation snapshots are bundled; there are no runtime data requests or uploads.
 
 In this cloud workspace, use `npm --cache /workspace/.npm-cache ci` if the default home cache is not writable. The existing checkout is already isolated; a separate worktree is unnecessary.
 
