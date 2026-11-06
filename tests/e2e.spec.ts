@@ -410,11 +410,23 @@ test('Climate Explore is accessible and fits a mobile screen in available and mi
 
 test('five real pages keep the homepage simple, support history and direct reloads, and preserve the original entry',async({page})=>{
   await page.goto('/');
-  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Hear Earth’s changing climate.');
-  await expect(page.getByRole('button',{name:/Start the experience/})).toBeVisible();
+  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Your planet. On the record.');
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(4);
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','data');
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');
+  await expect(page.locator('.jb-data-value')).toContainText('-0.19°C');
+  await expect(page.locator('.jb-note')).toContainText('196.00 Hz');
+  await page.getByRole('button',{name:'Side A: hear the picture',exact:true}).click();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','visual');
+
+  await page.getByRole('button',{name:'Play record',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Stop',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Stop',exact:true}).click();
   await expect(page.getByRole('group',{name:'Melody tone'})).toHaveCount(0);
   await expect(page.getByLabel('Choose a year',{exact:true})).toHaveCount(0);
-  await page.getByRole('button',{name:/Start the experience/}).click();
+  await page.getByRole('link',{name:'Discover the story',exact:true}).click();
   await expect(page).toHaveURL(/\/listen$/);
   await expect(page.getByRole('heading',{name:'First, hear the picture.'})).toBeVisible();
   await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();
@@ -579,7 +591,7 @@ test('Chinese Listen is simple and sound controls recover with blocked preferenc
   await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked');};Storage.prototype.setItem=()=>{throw Error('blocked');};});
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await page.getByRole('button',{name:/开始体验/}).click();
+  await page.getByRole('link',{name:'了解这段故事',exact:true}).click();
   await expect(page.getByRole('heading',{name:'先听听这幅画面。'})).toBeVisible();
   await page.getByRole('button',{name:/继续聆听真实数据/}).click();
   await page.getByRole('button',{name:/播放数据旋律/}).click();
@@ -637,15 +649,17 @@ test('all five melody tones retain mapped fundamentals, deterministic data-only 
 test('homepage globe rotates gently, pauses for interaction, and obeys motion preferences',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.goto('/');
-  const coordinates=page.locator('.ss-earth-scene .earth-globe__coordinates text');
+  await page.locator('.jb-earth-extra summary').click();
+  const coordinates=page.locator('.jb-earth-extra .earth-globe__coordinates text');
   const initial=await coordinates.textContent();
   await expect.poll(()=>coordinates.textContent()).not.toBe(initial);
   await page.getByRole('button',{name:'Pause rotation',exact:true}).click();
   const paused=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(paused);
   await page.getByRole('button',{name:'Resume rotation',exact:true}).click();
   await expect.poll(()=>coordinates.textContent()).not.toBe(paused);
-  const surface=page.locator('.ss-earth-scene .earth-globe__drag-surface');const box=await surface.boundingBox();
+  const surface=page.locator('.jb-earth-extra .earth-globe__drag-surface');await surface.scrollIntoViewIfNeeded();const box=await surface.boundingBox();
   await page.mouse.move(box!.x+box!.width/2,box!.y+box!.height/2);await page.mouse.down();await page.mouse.move(box!.x+box!.width/2+25,box!.y+box!.height/2);
+  await expect(page.locator('.jb-earth-extra .earth-globe')).toHaveClass(/earth-globe--dragging/);
   const held=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(held);
   await page.mouse.up();await page.waitForTimeout(250);expect(await coordinates.textContent()).toBe(held);
   await expect.poll(()=>coordinates.textContent(),{timeout:3500}).not.toBe(held);
@@ -668,7 +682,7 @@ test('NASA surface renders the correct geographic texture, responds to the camer
       (window as unknown as {surfacePixel:number[]}).surfacePixel=Array.from(pixel);
     };
   });
-  await page.goto('/');await expect(page.locator('.earth-globe--photographic')).toBeVisible();
+  await page.goto('/');await page.locator('.jb-earth-extra summary').click();await expect(page.locator('.earth-globe--photographic')).toBeVisible();
   await expect(page.getByRole('link',{name:'NASA Earth Observatory · Blue Marble ↗',exact:true})).toBeVisible();
   await expect(page.getByText('July 2004 composite.',{exact:false})).toBeVisible();
   const proof=await page.evaluate(async()=>{
@@ -681,7 +695,7 @@ test('NASA surface renders the correct geographic texture, responds to the camer
   });
   expect(proof.actual[3]).toBe(255);
   for(let channel=0;channel<3;channel++)expect(Math.abs(proof.expected[channel]-proof.actual[channel])).toBeLessThan(15);
-  const globe=page.locator('.ss-earth-scene svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');
+  const globe=page.locator('.jb-earth-extra svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');
   await expect.poll(()=>page.evaluate(()=>(window as unknown as {surfacePixel:number[]}).surfacePixel)).not.toEqual(proof.actual);
   await page.evaluate(()=>{
     const gl=document.querySelector<HTMLCanvasElement>('.earth-globe__surface')!.getContext('webgl')!;
@@ -690,7 +704,7 @@ test('NASA surface renders the correct geographic texture, responds to the camer
   });
   await expect(page.locator('.earth-globe--photographic')).toHaveCount(0);
   await expect(page.locator('.earth-globe--photographic')).toBeVisible();
-  await page.getByRole('button',{name:/Start the experience/}).click();await expect(page).toHaveURL(/\/listen$/);
+  await page.getByRole('link',{name:'Discover the story',exact:true}).click();await expect(page).toHaveURL(/\/listen$/);
   await page.getByRole('button',{name:'Play visual sound',exact:true}).click();await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toBeVisible();
 });
 
@@ -705,17 +719,18 @@ for(const failure of ['graphics unavailable','image unavailable']){
     });
     else await page.route('**/blue-marble-july-2004-2048.jpg',route=>route.abort());
     await page.goto('/');
+    await page.locator('.jb-earth-extra summary').click();
     await expect(page.getByRole('link',{name:'Interactive Earth illustration ↗',exact:true})).toBeVisible();
     await expect(page.locator('.earth-globe--photographic')).toHaveCount(0);
     const coordinates=page.locator('.earth-globe__coordinates text'),initial=await coordinates.textContent();
-    const globe=page.locator('.ss-earth-scene svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');await expect(coordinates).not.toHaveText(initial!);
-    await page.getByRole('button',{name:/Start the experience/}).click();await expect(page.getByRole('button',{name:'Play visual sound',exact:true})).toBeEnabled();
+    const globe=page.locator('.jb-earth-extra svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');await expect(coordinates).not.toHaveText(initial!);
+    await page.getByRole('link',{name:'Discover the story',exact:true}).click();await expect(page.getByRole('button',{name:'Play visual sound',exact:true})).toBeEnabled();
     expect(errors).toEqual([]);
   });
 }
 
 test('Earth Stations directory preserves the five-page layout and source-aware links',async({page})=>{
- await page.goto('/');await page.getByRole('link',{name:'Explore Earth Stations →',exact:true}).click();await expect(page).toHaveURL(/station=all/);
+ await page.goto('/');await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();await expect(page).toHaveURL(/station=all/);
  await expect(page.getByRole('heading',{name:'One planet. Listen closely.'})).toBeVisible();await expect(page.locator('.st-station-card')).toHaveCount(2);
  await page.getByRole('link',{name:'Listen to Arctic September →',exact:true}).click();await expect(page).toHaveURL(/station=arctic/);
  await page.reload();await expect(page.getByRole('heading',{name:'Listen to the ice record.'})).toBeVisible();

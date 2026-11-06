@@ -1,8 +1,8 @@
 # Earth FM project workflow
 
-- Work directly on `main`. Commit and push changes to `origin/main`.
-- Keep one production workflow: pushes to `main` deploy to Earth FM on Vercel.
-- Do not create additional branches, worktrees, pull requests, preview deployments, or staging environments unless the user explicitly requests them.
-- Do not run test suites or add testing workflows unless the user explicitly requests them. Production builds and deployment status checks are part of publishing.
+- Work on a `codex/` branch and open a draft pull request early. Commit and push complete, reviewable checkpoints frequently, as requested by the user.
+- Keep one production workflow: `main` deploys Earth FM on Vercel. Do not merge or push to `main`, or deploy production, without explicit release approval.
+- Preserve the existing Vercel configuration that disables deployments for other branches. Do not create worktrees, preview deployments, or staging environments unless explicitly requested.
+- The Earth Looper milestone authorizes the existing unit and Playwright suites, including `npm run check`, and focused regression coverage. Do not introduce a new test framework or CI workflow without a task requirement.
 - Use **Earth FM** for display names and `earth-fm` for package and service slugs.
 - Keep credentials and local Vercel/Supabase state out of Git.
