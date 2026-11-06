@@ -814,6 +814,7 @@ test('Earth Looper replays mapped positions and rhythm locally, then clears with
   const replayed=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes);
   expect(replayed.map(n=>n.hz)).toEqual(recorded.map(n=>n.hz));
   for(let i=1;i<3;i++)expect(Math.abs((replayed[i].at-replayed[i-1].at)-(recorded[i].at-recorded[i-1].at))).toBeLessThan(110);
+  await test.info().attach('earth-loop-replay-proof',{body:JSON.stringify({notice:'Automated fixture, not participant or acoustic-latency evidence',recorded,replayed}),contentType:'application/json'});
   expect(await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}))).toEqual(storage);expect(posts).toEqual([]);
   await loop.getByRole('button',{name:'Clear take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay',exact:true})).toBeDisabled();
   await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('20');await expect(loop).toHaveAttribute('data-loop-count','1');

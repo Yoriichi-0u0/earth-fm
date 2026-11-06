@@ -4,10 +4,10 @@ import {mapValueToNote} from '../lib/audio';
 import type {FrameStep} from '../lib/imageSonification';
 import {useStudioLanguage} from '../lib/studioLanguage';
 
-type Props={children:ReactNode;enabled:boolean;steps:readonly FrameStep[];index:number;fit:{left:number;width:number};onSelect:(index:number)=>void;onCancel:()=>void;notice?:string;looper?:ReactNode};
+type Props={children:ReactNode;enabled:boolean;steps:readonly FrameStep[];index:number;fit:{left:number;width:number};onSelect:(index:number)=>void;onCancel:()=>void;notice?:string};
 
 /** Pointer surface has a native range equivalent; the image remains unmodified. */
-export default function ScratchScanner({children,enabled,steps,index,fit,onSelect,onCancel,notice,looper}:Props){
+export default function ScratchScanner({children,enabled,steps,index,fit,onSelect,onCancel,notice}:Props){
   const {t}=useStudioLanguage();
   const range=useRef<HTMLInputElement>(null),pointer=useRef<number|null>(null),last=useRef(-1);
   useEffect(()=>{if(!enabled){pointer.current=null;last.current=-1;}},[enabled]);
@@ -35,6 +35,5 @@ export default function ScratchScanner({children,enabled,steps,index,fit,onSelec
       <p id="earth-scratch-hint">{t('Drag the image or use this slider. Arrows move one strip.')}</p>
       {notice&&<p className="jb-instrument-notice" role="status">{t(notice)}</p>}
     </div>}
-    {enabled&&looper}
   </div>;
 }
