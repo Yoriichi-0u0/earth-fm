@@ -27,6 +27,7 @@ function StudioContent(){
   const [motion,setMotion]=useState(()=>!matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [settings,setSettings]=useState<Settings>({...defaults});
   const content=useRef<HTMLElement>(null);
+  useEffect(()=>{const preference=matchMedia('(prefers-reduced-motion: reduce)');const update=()=>{if(preference.matches)setMotion(false);};preference.addEventListener('change',update);return()=>preference.removeEventListener('change',update);},[]);
   useEffect(()=>{const update=()=>setRoute(location.pathname+location.search);window.addEventListener('popstate',update);return()=>window.removeEventListener('popstate',update);},[]);
   useEffect(()=>{const previous=document.title;document.title=`Earth FM — ${t(pageNames[page])}`;return()=>{document.title=previous;};},[page,language]);
   useEffect(()=>{const target=location.hash?document.getElementById(location.hash.slice(1)):null;if(target){target.scrollIntoView();}else{window.scrollTo({top:0,behavior:'instant'});content.current?.querySelector<HTMLElement>('h1')?.focus({preventScroll:true});}},[route]);

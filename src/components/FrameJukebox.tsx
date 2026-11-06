@@ -3,113 +3,44 @@ import { ArrowDownToLine, ArrowRight, AudioLines, Check, ImagePlus, Info, Pause,
 import { useStudioLanguage } from '../lib/studioLanguage';
 import { frames } from '../data/frames';
 import type { EarthFrame } from '../data/frames';
-import { FrameAudio, imageSequenceWav, imageToSequence } from '../lib/imageSonification';
-import type { FrameStep } from '../lib/imageSonification';
+import { imageSequenceWav } from '../lib/imageSonification';
+import { useVisualTransport, VISUAL_SCAN_STEPS } from '../lib/useVisualTransport';
 import { mapValueToNote } from '../lib/audio';
 import './FrameJukebox.css';
 
 type LocalFrame = { name: string; url: string; kind: 'image' | 'animation' };
-const SCAN_STEPS = 48;
+const SCAN_STEPS = VISUAL_SCAN_STEPS;
 
 export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange, motionAllowed = true, referenceFrame, simple = false }: { referenceFrame?: EarthFrame; simple?: boolean; motionAllowed?: boolean; climatePlaying: boolean; onStart: () => void; onPlayingChange: (playing: boolean) => void }) {
   const {t}=useStudioLanguage();
   const [frameId, setFrameId] = useState(referenceFrame?.id ?? frames[0].id);
   const [localFrame, setLocalFrame] = useState<LocalFrame | null>(null);
-  const [steps, setSteps] = useState<FrameStep[]>([]);
-  const [scanIndex, setScanIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [ready, setReady] = useState(false);
   const [tempo, setTempo] = useState(120);
   const [volume, setVolume] = useState(.55);
   const [animate, setAnimate] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const [error, setError] = useState('');
   const [exporting, setExporting] = useState(false);
   const [announcement, setAnnouncement] = useState('');
-  const [sampledTime,setSampledTime]=useState(0);
-  const scheduledFrames=useRef<Array<{steps:FrameStep[];time:number}>>([]);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const screenRef = useRef<HTMLDivElement>(null);
-  const [frameFit,setFrameFit]=useState({left:0,width:100});
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const audioRef = useRef<FrameAudio | null>(null);
-  const sessionRef = useRef(0);
-  const liveStepsRef = useRef<FrameStep[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const localUrlRef = useRef<string | null>(null);
   const frame = referenceFrame ?? frames.find(f => f.id === frameId)!;
   const title = localFrame?.name ?? t(frame.title);
   const videoUrl = localFrame?.kind === 'animation' ? localFrame.url : !localFrame ? frame.videoUrl : undefined;
   const imageUrl = localFrame?.url ?? frame.imageUrl;
+  const transport = useVisualTransport({imageUrl,videoUrl,animate,motionAllowed,tempo,volume,onStart,onPlayingChange});
+  const {imageRef,videoRef,screenRef,steps,scanIndex,setScanIndex,playing,ready,setReady,error,setError,sampledTime,frameFit,stop,start,sample,prepare}=transport;
   const current = steps[scanIndex] ?? steps[0];
   const note = current ? mapValueToNote(current.brightness, 0, 1).note : '—';
-
-  const stop = () => { sessionRef.current++; audioRef.current?.stop(); videoRef.current?.pause(); setPlaying(false); onPlayingChange(false); };
-  useEffect(() => { audioRef.current = new FrameAudio(); canvasRef.current = document.createElement('canvas'); return () => { sessionRef.current++; audioRef.current?.dispose(); if (localUrlRef.current) URL.revokeObjectURL(localUrlRef.current); }; }, []);
-  useEffect(() => { const hide=()=>{if(document.hidden)stop();}; document.addEventListener('visibilitychange',hide); return ()=>document.removeEventListener('visibilitychange',hide); },[]);
-  useEffect(() => { if (!motionAllowed) { videoRef.current?.pause(); setAnimate(false); } },[motionAllowed]);
-  useEffect(() => { if (climatePlaying) stop(); }, [climatePlaying]);
-  useEffect(() => { audioRef.current?.setVolume(volume); }, [volume]);
-
-  const sample = () => {
-    const video = videoRef.current;
-    const image = imageRef.current;
-    const source = videoUrl ? video : image;
-    const naturalWidth = videoUrl ? video?.videoWidth : image?.naturalWidth;
-    const naturalHeight = videoUrl ? video?.videoHeight : image?.naturalHeight;
-    const canvas = canvasRef.current;
-    if (!source || !canvas || !naturalWidth || !naturalHeight) throw new Error('The visual has not finished loading.');
-    canvas.width = 384; canvas.height = Math.max(1, Math.round(naturalHeight / naturalWidth * 384));
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context) throw new Error('This browser does not support reading image pixels.');
-    context.drawImage(source, 0, 0, canvas.width, canvas.height);
-    return imageToSequence(context.getImageData(0, 0, canvas.width, canvas.height), SCAN_STEPS);
-  };
-  const fitFrame=()=>{
-    const screen=screenRef.current,media=videoUrl?videoRef.current:imageRef.current;
-    const width=videoUrl?videoRef.current?.videoWidth:imageRef.current?.naturalWidth;
-    const height=videoUrl?videoRef.current?.videoHeight:imageRef.current?.naturalHeight;
-    if(!screen||!media||!width||!height||!screen.clientWidth)return;
-    const visibleWidth=Math.min(screen.clientWidth,screen.clientHeight*width/height);
-    setFrameFit({left:(screen.clientWidth-visibleWidth)/2/screen.clientWidth*100,width:visibleWidth/screen.clientWidth*100});
-  };
-  const prepare = () => { try { const sequence = sample(); liveStepsRef.current = sequence; setSteps(sequence); setScanIndex(0); setReady(true); setError(''); fitFrame(); } catch { setReady(false); setError('This visual could not be read. Choose another frame or upload a local image.'); } };
-  // A cached media element can already be decoded before readiness listeners
-  // are attached. Observe native readiness and also inspect current state.
-  useEffect(()=>{
-    const video=videoRef.current;
-    let prepared=false;
-    const decoded=()=>{if(!prepared&&video&&video.readyState>=2){prepare();prepared=true;}};
-    if(video){video.addEventListener('loadeddata',decoded);video.addEventListener('canplay',decoded);decoded();}
-    else if(imageRef.current?.complete&&imageRef.current.naturalWidth)prepare();
-    const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(fitFrame);if(screenRef.current)observer?.observe(screenRef.current);
-    return()=>{observer?.disconnect();video?.removeEventListener('loadeddata',decoded);video?.removeEventListener('canplay',decoded);};
-  },[videoUrl,imageUrl]);
-  const changeFrame = (id: string) => { stop(); setFrameId(id); setLocalFrame(null); setReady(false); setScanIndex(0); setSteps([]); setError(''); setAnnouncement(''); };
-  const start = async () => {
-    onStart();
-    const session = ++sessionRef.current;
-    setError(''); setScanIndex(0); scheduledFrames.current=[];
-    try {
-      // Start the audio context from the user gesture before awaiting media decoding.
-      const initialSequence = sample(); liveStepsRef.current = initialSequence;
-      if (videoRef.current && animate && motionAllowed) void videoRef.current.play().catch(() => { setError('Animation playback was blocked. The visible frame can still be heard.'); });
-      await audioRef.current?.start(initialSequence, {
-        tempo, volume,
-        sampleStep: i => { const sequence = sample(); liveStepsRef.current = sequence; scheduledFrames.current[i]={steps:sequence,time:videoRef.current?.currentTime??0}; return sequence[i]; },
-        onStep: i => { if (session === sessionRef.current) { setScanIndex(i); setSteps(scheduledFrames.current[i]?.steps??liveStepsRef.current); setSampledTime(scheduledFrames.current[i]?.time??0); } },
-        onEnd: () => { if (session === sessionRef.current) { setPlaying(false); onPlayingChange(false); videoRef.current?.pause(); } },
-      });
-      if (session === sessionRef.current) { setPlaying(true); onPlayingChange(true); }
-    } catch { if (session === sessionRef.current) { stop(); setError('Could not start this visual. Check that it has loaded, then try again.'); } }
-  };
+  useEffect(() => () => { if(localUrlRef.current) URL.revokeObjectURL(localUrlRef.current); }, []);
+  useEffect(() => { if(climatePlaying) stop(); }, [climatePlaying,stop]);
+  useEffect(() => { if(!motionAllowed) setAnimate(false); }, [motionAllowed]);
+  const changeFrame = (id: string) => { stop(); setFrameId(id); setLocalFrame(null); setAnnouncement(''); };
   const upload = (file?: File) => {
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/webm', 'video/mp4'].includes(file.type)) { setError('Choose a PNG, JPEG, WebP, GIF, MP4, or WebM file.'); return; }
     if (file.size > 20 * 1024 * 1024) { setError('Please choose a file smaller than 20 MB.'); return; }
     stop(); if (localUrlRef.current) URL.revokeObjectURL(localUrlRef.current);
     const url = URL.createObjectURL(file); localUrlRef.current = url;
-    setLocalFrame({ name: file.name, url, kind: file.type.startsWith('video/') ? 'animation' : 'image' }); setReady(false); setSteps([]); setScanIndex(0); setError(''); setAnnouncement('');
+    setLocalFrame({ name: file.name, url, kind: file.type.startsWith('video/') ? 'animation' : 'image' }); setReady(false); setScanIndex(0); setError(''); setAnnouncement('');
   };
   const download = async () => {
     setExporting(true); setAnnouncement('');
