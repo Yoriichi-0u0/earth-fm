@@ -793,3 +793,67 @@ test('new stations and live proof remain bilingual, accessible and usable on mob
   const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({route,language,id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
  }
 });
+
+test('Earth Looper replays mapped positions and rhythm locally, then clears without persisting a take',async({page})=>{
+  const posts:string[]=[];page.on('request',request=>{if(request.method()==='POST')posts.push(request.url());});
+  await page.addInitScript(()=>{
+    const audit={notes:[] as {hz:number;at:number}[],contexts:[] as AudioContext[]};(window as unknown as {loopAudit:typeof audit}).loopAudit=audit;
+    const Original=AudioContext;let voices=0;window.AudioContext=class extends Original{constructor(){super();audit.contexts.push(this);}createOscillator(){const osc=super.createOscillator(),fundamental=voices++%3===0,set=osc.frequency.setValueAtTime.bind(osc.frequency);osc.frequency.setValueAtTime=(hz,at)=>{if(fundamental)audit.notes.push({hz,at:performance.now()});return set(hz,at);};return osc;}};
+  });
+  await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
+  const loop=page.getByRole('region',{name:'Earth Looper',exact:true}),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
+  const storage=await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}));
+  await loop.getByRole('button',{name:'Record',exact:true}).click();
+  for(const [index,position] of ['12','31','7'].entries()){
+    await slider.fill(position);await expect(loop).toHaveAttribute('data-loop-count',String(index+1));if(index<2)await page.waitForTimeout(index===0?140:230);
+  }
+  await loop.getByRole('button',{name:'Stop take',exact:true}).click();
+  const recorded=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes.splice(0));
+  expect(recorded).toHaveLength(3);await loop.getByRole('button',{name:'Replay',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await expect(loop).toHaveAttribute('data-loop-phase','idle');
+  await expect(loop.getByRole('status')).toHaveText('Your take has finished.');
+  const replayed=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes);
+  expect(replayed.map(n=>n.hz)).toEqual(recorded.map(n=>n.hz));
+  for(let i=1;i<3;i++)expect(Math.abs((replayed[i].at-replayed[i-1].at)-(recorded[i].at-recorded[i-1].at))).toBeLessThan(110);
+  expect(await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}))).toEqual(storage);expect(posts).toEqual([]);
+  await loop.getByRole('button',{name:'Clear take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay',exact:true})).toBeDisabled();
+  await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('20');await expect(loop).toHaveAttribute('data-loop-count','1');
+  await page.getByRole('button',{name:'Select record: Moving Earth',exact:true}).click();await expect.poll(()=>page.evaluate(()=>(window as unknown as {loopAudit:{contexts:AudioContext[]}}).loopAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
+  await page.getByRole('button',{name:'Select record: Climate Spiral',exact:true}).click();await page.getByRole('button',{name:'Play with Earth',exact:true}).click();await expect(page.locator('.jb-looper')).toHaveAttribute('data-loop-count','0');
+});
+
+test('slow manual startup gives an explicit retry and a pending replay can be cancelled',async({page})=>{
+  await page.addInitScript(()=>{
+    const contexts:AudioContext[]=[];(window as unknown as {slowContexts:AudioContext[]}).slowContexts=contexts;
+    const Original=AudioContext;window.AudioContext=class extends Original{delayed=true;constructor(){super();contexts.push(this);}get state():AudioContextState{return this.delayed?'suspended':super.state;}async resume(){await super.resume();if(this.delayed){await new Promise(resolve=>setTimeout(resolve,350));this.delayed=false;}}};
+  });
+  await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();const slider=page.getByRole('slider',{name:'Image scan position',exact:true}),loop=page.locator('.jb-looper');
+  await slider.fill('12');await expect(page.getByText('Audio is ready. Move again or press Hear this position.',{exact:true})).toBeVisible();await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('13');await expect(loop).toHaveAttribute('data-loop-count','1');await loop.getByRole('button',{name:'Stop take',exact:true}).click();
+  await page.evaluate(()=>{for(const context of (window as unknown as {slowContexts:(AudioContext&{delayed:boolean})[]}).slowContexts)context.delayed=true;});
+  await loop.getByRole('button',{name:'Replay',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','preparing');await loop.getByRole('button',{name:'Stop take',exact:true}).click();await page.waitForTimeout(450);await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await loop.getByRole('button',{name:'Replay',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
+  await expect(loop).toHaveAttribute('data-loop-phase','idle');await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await page.waitForTimeout(350);await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+});
+
+test('Earth Looper enforces the note limit and finishes an empty recording at the time limit',async({page})=>{
+  test.setTimeout(35_000);await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();const loop=page.locator('.jb-looper'),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
+  await loop.getByRole('button',{name:'Record',exact:true}).click();
+  for(let i=0;i<64;i++){await slider.fill(String(i%47+2));await expect(loop).toHaveAttribute('data-loop-count',String(i+1));}
+  await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(loop.getByRole('status')).toHaveText('64-note limit reached. Your take is ready.');
+  await loop.getByRole('button',{name:'Record again',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-phase','idle',{timeout:16_000});await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay',exact:true})).toBeDisabled();
+});
+
+test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:390,height:700},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
+  try{
+    await page.goto('http://127.0.0.1:5173/');const compact=page.getByRole('button',{name:'Play selected record',exact:true});await expect(compact).toBeVisible();const playBounds=await compact.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await compact.tap();await page.getByRole('button',{name:'Stop selected record',exact:true}).tap();
+    await page.getByRole('button',{name:'Play with Earth',exact:true}).tap();const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!;const cdp=await context.newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.2,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.75,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await expect(page.getByRole('slider',{name:'Image scan position',exact:true})).toHaveValue('37');
+    const scrolled=await page.evaluate(()=>scrollY);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5-110,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(scrolled);await expect.poll(()=>page.locator('.jb-deck').getAttribute('data-note-serial')).toBe('0');
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(390);await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(page.getByRole('region',{name:'地球旋律录制',exact:true})).toBeVisible();
+    const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
+  }finally{await context.close();}
+});

@@ -16,6 +16,8 @@ import type {RecordSide,RecordSignal} from '../lib/recordSignal';
 import EarthRecord from './EarthRecord';
 import ScratchScanner from './ScratchScanner';
 import {useFrameInstrument} from '../lib/useFrameInstrument';
+import {useEarthLooper} from '../lib/useEarthLooper';
+import EarthLooper from './EarthLooper';
 import {observatoryImagery} from '../data/observatory';
 import './JukeboxHome.css';
 
@@ -33,7 +35,7 @@ type ConsoleProps=DeckState&{record:JukeboxRecord;artwork:ReactNode;volume:numbe
 function DeckConsole({record,artwork,playing,starting,ready,completed,progress,note,frequency,position,input,onPlay,volume,onVolume,error,extra,side,sideControls,recordObject,signal,requestAt,playLabel,manual}:ConsoleProps){
   const {t}=useStudioLanguage();const active=playing||starting;
   return <article className={`jb-deck ${active?'is-playing':''}${side?' jb-two-sided':''}${manual?' jb-manual':''}`} aria-labelledby="jb-record-title" data-record-kind={record.kind} data-record-side={side} data-play-mode={manual?'manual':'automatic'} data-note-serial={signal.event?.serial??0} data-note-at={signal.event?.at??0} data-play-request-at={requestAt} data-frequency={signal.frequency??''}>
-    <header className="jb-deck-header"><div className="jb-record-heading"><span className="jb-catalogue">EARTH FM / {record.number}</span><h2 id="jb-record-title">{t(record.title)}</h2></div><span className="jb-state" role="status"><i className={active?'is-on':''}/>{t(!ready?(error?'Visual unavailable':'Loading…'):starting?'Starting…':playing?'Now playing':completed?'Finished':'Ready to play')}</span></header>
+    <header className="jb-deck-header"><div className="jb-record-heading"><span className="jb-catalogue">EARTH FM / {record.number}</span><h2 id="jb-record-title">{t(record.title)}</h2></div><div className="jb-deck-actions"><span className="jb-state" role="status"><i className={active?'is-on':''}/>{t(!ready?(error?'Visual unavailable':'Loading…'):starting?'Starting…':playing?'Now playing':completed?'Finished':'Ready to play')}</span><button className="jb-compact-play" type="button" disabled={!ready} aria-label={t(active?'Stop selected record':manual?'Hear selected position':'Play selected record')} onClick={onPlay}>{t(active?'Stop':manual?'Hear':'Play')}</button></div></header>
     {sideControls}
     <div className={`jb-artwork${recordObject?' jb-artwork-paired':''}`}>{recordObject}<div className="jb-science-window">{artwork}</div></div>
     <dl className="jb-readout"><div><dt>{t(record.kind==='visual'?'PIXEL INPUT':'OBSERVATION')}</dt><dd>{input}</dd></div><div><dt>{t('GENERATED NOTE')}</dt><dd className="jb-note">{note}<small>{frequency}</small></dd></div><div><dt>{t(record.kind==='visual'?'SCAN POSITION':'RECORD POSITION')}</dt><dd>{position}</dd></div></dl>
@@ -119,10 +121,13 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   // Both adapters persist through a flip; only an explicit Play action starts an engine.
   const visual=useVisualRecord(record,motion,volume),data=useDataRecord(measurementRecord,volume);
   const instrument=useFrameInstrument(visual.visual.steps,volume,manual&&side==='a');
-  function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();instrument.stop();setSide(next);}
-  function changeMode(){visual.visual.stop();instrument.stop();setManual(value=>!value);}
-  function playStrip(index:number){visual.visual.setScanIndex(index);setRequestAt(performance.now());void instrument.play(index);}
-  const manualState:DeckState={...visual.state,manual:true,playing:instrument.playing,starting:instrument.starting,completed:false,progress:visual.visual.scanIndex/(VISUAL_SCAN_STEPS-1),signal:{...visual.state.signal,playing:instrument.playing,event:instrument.noteEvent},requestAt,error:instrument.error||visual.state.error,playLabel:'Hear this position',onPlay:()=>{if(instrument.playing||instrument.starting)instrument.stop();else playStrip(visual.visual.scanIndex);}};
+  const looper=useEarthLooper({enabled:manual&&side==='a'&&visual.visual.ready,sourceImage:record.frame!.imageUrl,stripCount:visual.visual.steps.length,prepare:instrument.prepare,play:instrument.play,stopAudio:instrument.stop,onSelect:index=>{visual.visual.setScanIndex(index);setRequestAt(performance.now());}});
+  const replaying=looper.phase==='replaying'||looper.phase==='preparing';
+  function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setSide(next);}
+  function changeMode(){visual.visual.stop();looper.stop();setManual(value=>!value);}
+  function playStrip(index:number){looper.cancelReplay();visual.visual.setScanIndex(index);setRequestAt(performance.now());void instrument.play(index).then(event=>{if(event)looper.capture(event);});}
+  function cancelGesture(){looper.cancelReplay();instrument.stop();}
+  const manualState:DeckState={...visual.state,manual:true,playing:instrument.playing||looper.phase==='replaying',starting:instrument.starting||looper.phase==='preparing',completed:false,progress:visual.visual.scanIndex/(VISUAL_SCAN_STEPS-1),signal:{...visual.state.signal,playing:instrument.playing||looper.phase==='replaying',event:instrument.noteEvent},requestAt,error:instrument.error||visual.state.error,playLabel:'Hear this position',onPlay:()=>{if(replaying||(looper.phase==='recording'&&(instrument.playing||instrument.starting)))looper.stop();else if(instrument.playing||instrument.starting)instrument.stop();else playStrip(visual.visual.scanIndex);}};
   const current=side==='a'?(manual?manualState:visual.state):data.state;
   const effective=side==='a'?record:{...measurementRecord,id:record.id,number:record.number,title:record.title};
   const controls=<><div className="jb-side-selector" role="group" aria-label={t('Choose a side of Climate Spiral')}>
@@ -131,7 +136,7 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   </div><div className="jb-science-cue"><p>{t(side==='a'?'Brightness → pitch. Not temperature.':'January anomaly (°C) · relative to 1951–1980.')}</p>{side==='a'&&<button className="jb-manual-toggle" type="button" data-manual={manual} disabled={!visual.visual.ready} aria-controls={manual?'earth-scratch-controls':undefined} onClick={changeMode}>{t(manual?'Automatic playback':'Play with Earth')}<span aria-hidden="true">{manual?' ↗':' ↔'}</span></button>}</div></>;
   const picture=<VisualArtwork record={record} transport={visual} manual={manual}/>;
   return <DeckConsole record={effective} {...current} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={current.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')}/>}
-    artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={instrument.stop}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={data.point}/></div></>}
+    artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice} looper={<EarthLooper looper={looper}/>}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={data.point}/></div></>}
     volume={volume} onVolume={onVolume} extra={side==='b'?data.extra:undefined}/>;
 }
 
