@@ -742,5 +742,9 @@
   "Finish recording": "完成录制",
   "Stop replay": "停止重播",
   "Replay take": "重播演奏",
-  "notes": "个音符"
+  "notes": "个音符",
+  "Appearance": "外观",
+  "Auto": "自动",
+  "Light": "浅色",
+  "Dark": "深色"
 }
