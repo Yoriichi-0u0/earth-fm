@@ -807,16 +807,24 @@ test('Earth Looper replays mapped positions and rhythm locally, then clears with
   for(const [index,position] of ['12','31','7'].entries()){
     await slider.fill(position);await expect(loop).toHaveAttribute('data-loop-count',String(index+1));if(index<2)await page.waitForTimeout(index===0?140:230);
   }
-  await loop.getByRole('button',{name:'Stop take',exact:true}).click();
+  await loop.getByRole('button',{name:'Finish recording',exact:true}).click();
+  await expect(loop).toContainText('3 / 64 notes');
+  await expect(loop.getByRole('button',{name:'Finish recording',exact:true})).toBeDisabled();
   const recorded=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes.splice(0));
-  expect(recorded).toHaveLength(3);await loop.getByRole('button',{name:'Replay',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await expect(loop).toHaveAttribute('data-loop-phase','idle');
+  expect(recorded).toHaveLength(3);await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await expect(loop.getByRole('button',{name:'Stop replay',exact:true})).toBeEnabled();await expect(loop).toHaveAttribute('data-loop-phase','idle');
   await expect(loop.getByRole('status')).toHaveText('Your take has finished.');
   const replayed=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes);
   expect(replayed.map(n=>n.hz)).toEqual(recorded.map(n=>n.hz));
   for(let i=1;i<3;i++)expect(Math.abs((replayed[i].at-replayed[i-1].at)-(recorded[i].at-recorded[i-1].at))).toBeLessThan(110);
   await test.info().attach('earth-loop-replay-proof',{body:JSON.stringify({notice:'Automated fixture, not participant or acoustic-latency evidence',recorded,replayed}),contentType:'application/json'});
   expect(await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}))).toEqual(storage);expect(posts).toEqual([]);
-  await loop.getByRole('button',{name:'Clear take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay',exact:true})).toBeDisabled();
+  await page.getByRole('button',{name:'Back to playback',exact:true}).click();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-play-mode','automatic');
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeVisible();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
+  await expect(loop).toHaveAttribute('data-loop-count','3');
+  await loop.getByRole('button',{name:'Clear take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
   await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('20');await expect(loop).toHaveAttribute('data-loop-count','1');
   await page.getByRole('button',{name:'Select record: Moving Earth',exact:true}).click();await expect.poll(()=>page.evaluate(()=>(window as unknown as {loopAudit:{contexts:AudioContext[]}}).loopAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
   await page.getByRole('button',{name:'Select record: Climate Spiral',exact:true}).click();await page.getByRole('button',{name:'Play with Earth',exact:true}).click();await expect(page.locator('.jb-looper')).toHaveAttribute('data-loop-count','0');
@@ -829,10 +837,10 @@ test('slow manual startup gives an explicit retry and a pending replay can be ca
   });
   await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();const slider=page.getByRole('slider',{name:'Image scan position',exact:true}),loop=page.locator('.jb-looper');
   await slider.fill('12');await expect(page.getByText('Audio is ready. Move again or press Hear this position.',{exact:true})).toBeVisible();await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
-  await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('13');await expect(loop).toHaveAttribute('data-loop-count','1');await loop.getByRole('button',{name:'Stop take',exact:true}).click();
+  await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('13');await expect(loop).toHaveAttribute('data-loop-count','1');await loop.getByRole('button',{name:'Finish recording',exact:true}).click();
   await page.evaluate(()=>{for(const context of (window as unknown as {slowContexts:(AudioContext&{delayed:boolean})[]}).slowContexts)context.delayed=true;});
-  await loop.getByRole('button',{name:'Replay',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','preparing');await loop.getByRole('button',{name:'Stop take',exact:true}).click();await page.waitForTimeout(450);await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
-  await loop.getByRole('button',{name:'Replay',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
+  await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','preparing');await loop.getByRole('button',{name:'Stop replay',exact:true}).click();await page.waitForTimeout(450);await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
   await expect(loop).toHaveAttribute('data-loop-phase','idle');await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await page.waitForTimeout(350);await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
 });
@@ -842,7 +850,7 @@ test('Earth Looper enforces the note limit and finishes an empty recording at th
   await loop.getByRole('button',{name:'Record',exact:true}).click();
   for(let i=0;i<64;i++){await slider.fill(String(i%47+2));await expect(loop).toHaveAttribute('data-loop-count',String(i+1));}
   await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(loop.getByRole('status')).toHaveText('64-note limit reached. Your take is ready.');
-  await loop.getByRole('button',{name:'Record again',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-phase','idle',{timeout:16_000});await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay',exact:true})).toBeDisabled();
+  await loop.getByRole('button',{name:'Record again',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-phase','idle',{timeout:16_000});await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
 });
 
 test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{

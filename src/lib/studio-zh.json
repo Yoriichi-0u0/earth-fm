@@ -737,5 +737,10 @@
   "Stop selected record": "停止所选唱片",
   "Play selected record": "播放所选唱片",
   "Hear selected position": "聆听所选位置",
-  "Play": "播放"
+  "Play": "播放",
+  "Back to playback": "返回播放模式",
+  "Finish recording": "完成录制",
+  "Stop replay": "停止重播",
+  "Replay take": "重播演奏",
+  "notes": "个音符"
 }
