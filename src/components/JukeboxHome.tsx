@@ -3,10 +3,10 @@ import type {CSSProperties,ReactNode} from 'react';
 import {ArrowDown,ArrowUpRight,AudioLines,ChevronLeft,ChevronRight,Disc3,Headphones,ImagePlus,Play,ShieldCheck,Square,Volume2} from 'lucide-react';
 import {jukeboxRecords} from '../data/jukeboxRecords';
 import type {JukeboxRecord,JukeboxRecordId} from '../data/jukeboxRecords';
-import {arcticPoints,arcticStory,mapArctic} from '../data/earthStations';
-import {storyPoints} from '../data/guidedStory';
-import {MONTHS,formatAnomaly} from '../lib/climateMapping';
-import {defaults,mapData,NOTES} from '../lib/symphony';
+import {defaults} from '../lib/symphony';
+import {measurementSequence,mapRecordPoint} from '../lib/jukeboxData';
+import type {RecordPoint} from '../lib/jukeboxData';
+import DataArtwork from './JukeboxDataArtwork';
 import {mapValueToNote} from '../lib/audio';
 import {useSequenceTransport} from '../lib/useSequenceTransport';
 import {useVisualTransport,VISUAL_SCAN_STEPS} from '../lib/useVisualTransport';
@@ -25,12 +25,7 @@ import './JukeboxHome.css';
 
 const noop=()=>{};
 const EarthGlobe=lazy(()=>import('./EarthGlobe'));
-type RecordPoint={year:number;month:number;period:string;value:number|null};
-function mapRecordPoint(point:RecordPoint,arctic:boolean){
-  if(arctic){const note=mapArctic(point);return note?{frequencyHz:note.frequencyHz,note:note.note}:null;}
-  const event=mapData({...point,anomaly:point.value});
-  return event.kind==='note'?{frequencyHz:event.frequencyHz,note:NOTES[event.bandIndex]}:null;
-}
+const MysteryRecord=lazy(()=>import('./MysteryRecord'));
 type DeckState={playing:boolean;starting:boolean;ready:boolean;completed:boolean;progress:number;note:string;frequency:string;position:string;input:string;onPlay:()=>void;signal:RecordSignal;requestAt:number;error?:string;playLabel?:string;manual?:boolean};
 type VisualRecord=Omit<JukeboxRecord,'id'|'frame'|'sourceUrl'>&{id:JukeboxRecordId|'personal';sourceUrl?:string;frame?:{imageUrl:string;videoUrl?:string;description:string}};
 type ConsoleProps=DeckState&{record:VisualRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;performanceControls?:ReactNode};
@@ -77,34 +72,11 @@ function VisualDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motion
   return <DeckConsole record={record} {...transport.state} artwork={<VisualArtwork record={record} transport={transport}/>} volume={volume} onVolume={onVolume} extra={transport.extra}/>;
 }
 
-function DataArtwork({record,current}:{record:JukeboxRecord;current:RecordPoint}){
-  const {t,date}=useStudioLanguage();
-  const arctic=record.id==='arctic';
-  const all:readonly RecordPoint[]=arctic?arcticPoints:storyPoints.map(p=>({...p,value:p.anomaly}));
-  const low=arctic?3:-1,high=arctic?8:1.5,minYear=all[0].year,maxYear=all.at(-1)!.year;
-  const x=(year:number)=>58+(year-minYear)/(maxYear-minYear)*600,y=(value:number)=>216-(value-low)/(high-low)*160;
-  const path=all.filter(p=>p.value!==null).map((p,i)=>`${i?'L':'M'}${x(p.year).toFixed(2)},${y(p.value!).toFixed(2)}`).join(' ');
-  return <div className="jb-data-art">
-    <div className="jb-art-label"><span>{t('DATA RECORD')}</span><span>{arctic?'NSIDC / ARCTIC':'NASA / GISTEMP'}</span></div>
-    <div className="jb-data-caption"><span>{t(arctic?'SEPTEMBER SEA-ICE EXTENT':'SELECTED JANUARY ANOMALIES')}</span><small>{arctic?t('million km²'):'°C · 1951–1980'}</small></div>
-    <svg viewBox="0 0 710 260" role="img" aria-label={t(arctic?'September mean Arctic sea-ice extent, 1987–2022. The highlighted point is the current observation.':'Selected January temperature anomalies, 1880–2025. Years use actual calendar spacing.')}>
-      {[low,(low+high)/2,high].map(value=><g key={value}><line x1="58" x2="658" y1={y(value)} y2={y(value)} stroke="#ffffff22" strokeDasharray="3 7"/><text x="12" y={y(value)+4}>{value.toFixed(1)}</text></g>)}
-      <path d={`${path}L658,225L58,225Z`} fill="currentColor" opacity=".06"/>
-      <path d={path} stroke="currentColor" fill="none" strokeWidth="2.5" strokeLinejoin="round"/>
-      {all.map(p=>p.value!==null&&<circle key={p.period} cx={x(p.year)} cy={y(p.value)} r="2.8" fill="currentColor" opacity=".45"/>)}
-      {current.value!==null&&<g><line x1={x(current.year)} x2={x(current.year)} y1="40" y2="225" stroke="currentColor" opacity=".5" strokeDasharray="4 6"/><circle cx={x(current.year)} cy={y(current.value)} r="7" fill="currentColor" stroke="#101e28" strokeWidth="3"/></g>}
-      <text x="58" y="249">{minYear}</text><text x="658" y="249" textAnchor="end">{maxYear}</text>
-    </svg>
-    <div className="jb-data-value"><span>{date(current.year,current.month,MONTHS[current.month-1])}</span><strong>{current.value===null?'—':arctic?current.value.toFixed(4):formatAnomaly(current.value)}{arctic&&<small>{t('million km²')}</small>}</strong></div>
-    <div className="jb-art-footer"><span>{t('EARTH FM · PLOT OF THE SOURCE VALUES')}</span><AudioLines size={16}/></div>
-  </div>;
-}
 
 function useDataRecord(record:JukeboxRecord,volume:number){
   const {t}=useStudioLanguage();const [dataOnly,setDataOnly]=useState(false),[requestAt,setRequestAt]=useState(0);
   const arctic=record.id==='arctic';
-  const points=useMemo<RecordPoint[]>(()=>arctic?[...arcticStory]:storyPoints.map(p=>({...p,value:p.anomaly})),[arctic]);
-  const pitches=useMemo(()=>points.map(p=>mapRecordPoint(p,arctic)?.frequencyHz??null),[points,arctic]);
+  const {points,pitches}=useMemo(()=>measurementSequence(arctic?'arctic':'temperature'),[arctic]);
   const audio=useSequenceTransport<RecordPoint>();
   useEffect(()=>{audio.setVolume(volume);},[volume]);
   const completed=audio.status.startsWith('Complete.'),point=audio.audible??(completed?points.at(-1)!:points[0]);
@@ -166,7 +138,7 @@ function PersonalDeck({image,motion,volume,onVolume}:{image:PersonalImage;motion
 
 export default function JukeboxHome({motion}:{motion:boolean}){
   const {t}=useStudioLanguage();
-  const [selected,setSelected]=useState<JukeboxRecordId|'personal'>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
+  const [selected,setSelected]=useState<JukeboxRecordId|'personal'|'mystery'>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
   const personal=usePersonalImage(),fileInput=useRef<HTMLInputElement>(null),player=useRef<HTMLDivElement>(null);
   const shelf=useRef<HTMLDivElement>(null),[edges,setEdges]=useState({left:false,right:false});
   useEffect(()=>{
@@ -176,14 +148,15 @@ export default function JukeboxHome({motion}:{motion:boolean}){
     return()=>{observer.disconnect();element.removeEventListener('scroll',update);};
   },[]);
   const record=jukeboxRecords.find(r=>r.id===selected)??jukeboxRecords[0],station=record.id==='arctic'?'arctic':'climate';
-  function selectRecord(id:JukeboxRecordId){personal.cancel();setSelected(id);}
+  const optional=selected==='personal'||selected==='mystery';
+  function selectRecord(id:JukeboxRecordId|'mystery'){personal.cancel();setSelected(id);}
   function selectPersonal(){setSelected('personal');player.current?.scrollIntoView({block:'start',behavior:motion?'smooth':'instant'});}
   function chooseImage(file:File){selectPersonal();void personal.choose(file);}
   function moveShelf(direction:number){const element=shelf.current;if(element)element.scrollBy({left:direction*element.clientWidth*.8,behavior:motion?'smooth':'instant'});}
   return <div className="jb-home" style={{'--record-accent':record.accent} as CSSProperties}>
     <header className="jb-intro"><div><p className="jb-eyebrow"><Disc3 size={15}/>{t('THE EARTH INFORMATION JUKEBOX')}</p><h1 tabIndex={-1}>{t('Your planet.')} <em>{t('On the record.')}</em></h1></div><p>{t('Choose an Earth story. Press Play.')}<span>{t('Sound made from NASA visuals and Earth observations.')}</span></p></header>
     <div className="jb-layout">
-      <section className="jb-library" aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><span>{selected==='personal'?t('Your Record'):String(jukeboxRecords.findIndex(item=>item.id===selected)+1).padStart(2,'0')+' / 04'}</span></div>
+      <section className="jb-library" aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>selectRecord('mystery')}><Disc3 aria-hidden="true" size={14}/>{t('Mystery Record')}</button><span>{selected==='personal'?t('Your Record'):selected==='mystery'?'? / 04':String(jukeboxRecords.findIndex(item=>item.id===selected)+1).padStart(2,'0')+' / 04'}</span></div>
         <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
           <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
             <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
@@ -196,7 +169,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
       </section>
       <div className="jb-player" ref={player}>
         {selected==='personal'&&personal.error&&<p className="jb-personal-error" role="alert">{t(personal.error)}{personal.image&&<> {t('Your previous image is still available. Its take has been cleared.')}</>}</p>}
-        {selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} volume={volume} onVolume={setVolume}/>}
+        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} volume={volume} onVolume={setVolume}/>}
       </div>
       <section className="jb-personal-panel" aria-labelledby="jb-personal-title" aria-busy={personal.loading}>
         <div className="jb-personal-heading"><span aria-hidden="true">{personal.image?<img src={personal.image.url} alt=""/>:<ImagePlus size={24}/>}</span><div><p>{t('PRESS YOUR OWN RECORD')}</p><h2 id="jb-personal-title">{t('Your image. Your sound.')}</h2></div></div>
@@ -212,7 +185,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
         {personal.loading&&<p role="status">{t('Opening your image…')}</p>}
       </section>
     </div>
-    <div className="jb-deeper"><span>{t(selected==='personal'?'Explore more of Earth FM.':'Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',selected==='personal'?'all':station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',selected==='personal'?'all':station,record.id==='motion'?'motion':undefined);}}>{t(selected==='personal'?'Browse Earth stories':'Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t(selected==='personal'?'Inspect Earth data':'Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
+    <div className="jb-deeper"><span>{t(optional?'Explore more of Earth FM.':'Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',optional?'all':station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',optional?'all':station,record.id==='motion'?'motion':undefined);}}>{t(optional?'Browse Earth stories':'Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t(optional?'Inspect Earth data':'Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
     <details className="jb-earth-extra" onToggle={e=>{setEarthOpen(e.currentTarget.open);if(!e.currentTarget.open)setEarthReady(false);}}><summary>{t('A closer look at home')} <span>{t('The Earth Observatory view')} ↗</span></summary>{earthOpen&&<div><Suspense fallback={<p role="status">{t('Loading the Earth view…')}</p>}><EarthGlobe locations={[]} selectedId="" onSelect={noop} playing={false} autoRotate={motion} photographic onSurfaceReady={setEarthReady}/></Suspense><p>{t(earthReady?'July 2004 composite. Lighting and rotation are illustrative, not live weather.':'Interactive illustration with Natural Earth boundaries. Lighting and rotation are illustrative.')} <a href={earthReady?observatoryImagery.sourcePage:'https://www.naturalearthdata.com/'} target="_blank" rel="noreferrer">{t(earthReady?'NASA Earth Observatory · Blue Marble ↗':'Interactive Earth illustration ↗')}</a></p></div>}</details>
   </div>;
 }

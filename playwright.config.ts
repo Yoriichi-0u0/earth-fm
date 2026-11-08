@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['**/e2e.spec.ts','**/appearance.e2e.spec.ts','**/personalRecord.e2e.spec.ts'],
+  testMatch: ['**/e2e.spec.ts','**/appearance.e2e.spec.ts','**/personalRecord.e2e.spec.ts','**/mysteryRecord.e2e.spec.ts'],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
