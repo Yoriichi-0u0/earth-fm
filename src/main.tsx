@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {isLegacyEntry} from './lib/entry';
 import {AppearanceProvider} from './lib/AppearanceProvider';
 import './styles.css';
+import './appearance.css';
 const App=lazy(()=>import('./App'));
 const SymphonyStudio=lazy(()=>import('./components/SymphonyStudio'));
 function Entry(){

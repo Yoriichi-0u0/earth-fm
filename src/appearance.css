@@ -1,0 +1,268 @@
+/* One palette contract for the modern listening room and the preserved Legacy UI.
+ * Scientific media stays on its original dark surface: no image filters, canvas
+ * changes or geometry changes belong in an appearance preference.
+ */
+:root {
+  --ef-bg: #090f14;
+  --ef-panel: #101d29;
+  --ef-panel-raised: #192936;
+  --ef-text: #edf3ef;
+  --ef-muted: #b0c2cc;
+  --ef-subtle: #9bafb9;
+  --ef-border: #40545b;
+  --ef-control-border: #728891;
+  --ef-accent: #d5f38b;
+  --ef-on-accent: #17251f;
+  --ef-selected: #21352e;
+  --ef-focus: #d5f38b;
+  --ef-chart-grid: #4b616e;
+  --ef-chart-text: #b0c2cc;
+  --ef-secondary: #9ed5e8;
+  --ef-warm: #f4ad81;
+  --ef-selected-warm: #352a25;
+  --ef-danger: #ffc5a9;
+  --ef-danger-panel: #30231e;
+  --ef-record: #f1b599;
+  --ef-shadow: 0 14px 42px #0003;
+  --ef-page-glow: radial-gradient(ellipse at 83% 13%, #10376370, transparent 36%), radial-gradient(ellipse at 5% 50%, #0c20372c, transparent 34%);
+  --ef-media-bg: #050b10;
+  --ef-media-text: #cbdad6;
+  --ef-media-focus: #d5f38b;
+}
+
+:root[data-theme='light'] {
+  --ef-bg: #f4f6f3;
+  --ef-panel: #ffffff;
+  --ef-panel-raised: #edf2ee;
+  --ef-text: #172a30;
+  --ef-muted: #52646b;
+  --ef-subtle: #5d6e74;
+  --ef-border: #c7d3d0;
+  --ef-control-border: #778b87;
+  --ef-accent: #315c31;
+  --ef-on-accent: #ffffff;
+  --ef-selected: #e4f0d4;
+  --ef-focus: #315c31;
+  --ef-chart-grid: #7d958d;
+  --ef-chart-text: #52646b;
+  --ef-secondary: #24677c;
+  --ef-warm: #8b4c23;
+  --ef-selected-warm: #f7eadd;
+  --ef-danger: #943f25;
+  --ef-danger-panel: #fff0e8;
+  --ef-record: #a94732;
+  --ef-shadow: 0 12px 32px #233a2910;
+  --ef-page-glow: radial-gradient(ellipse at 83% 6%, #dcebdc85, transparent 38%), radial-gradient(ellipse at 5% 50%, #e5ece840, transparent 34%);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] { color-scheme: dark; }
+:root[data-theme] {
+  --lime: var(--ef-accent);
+  --muted: var(--ef-muted);
+  --line: var(--ef-border);
+  --panel: var(--ef-panel);
+  background: var(--ef-bg);
+  color: var(--ef-text);
+}
+:root[data-theme] body { background: var(--ef-bg); color: var(--ef-text); }
+:root[data-theme] ::selection { background: var(--ef-selected); color: var(--ef-text); }
+:root[data-theme] :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--ef-focus);
+  outline-offset: 4px;
+}
+:root[data-theme] :is(select, textarea, input) { color-scheme: inherit; }
+:root[data-theme] select,
+:root[data-theme] .ss select,
+:root[data-theme] .year-inputs select,
+:root[data-theme] .climate-year-row select {
+  color: var(--ef-text);
+  background-color: var(--ef-panel-raised);
+  border-color: var(--ef-control-border);
+}
+:root[data-theme] select option { color: var(--ef-text); background: var(--ef-panel-raised); }
+:root[data-theme] input:is([type='range'], [type='checkbox'], [type='radio']),
+:root[data-theme] .ss input:is([type='range'], [type='checkbox'], [type='radio']) { accent-color: var(--ef-accent); }
+:root[data-theme] :is(textarea, .ss-feedback textarea, .st-textarea textarea) {
+  background: var(--ef-panel-raised);
+  color: var(--ef-text);
+  border-color: var(--ef-control-border);
+}
+:root[data-theme] button:disabled,
+:root[data-theme] .ss button:disabled { opacity: .6; }
+
+/* Shared listening-room surfaces and controls. The root scope deliberately
+ * outranks component CSS that arrives with a lazy-loaded page.
+ */
+:root[data-theme] .ss {
+  --mint: var(--ef-accent);
+  --muted: var(--ef-muted);
+  color: var(--ef-text);
+  background: var(--ef-page-glow), var(--ef-bg);
+}
+:root[data-theme] .ss.ss-pages.ss-observatory { background: var(--ef-page-glow), var(--ef-bg); color: var(--ef-text); }
+:root[data-theme] .ss :is(.sp-header, .sp-footer, .ss-header, .ss-foundation, .ss-engine-detail, .ss-guide-detail, .ss-guide-source, .sp-disclosure, .sp-listen-progress, .sp-note-mapping, .sp-compare-value, .sp-optional-check fieldset, .ss-lesson fieldset) { border-color: var(--ef-border); }
+:root[data-theme] .ss :is(.sp-card, .ss-panel, .ss-guide, .ss-lesson, .ss-experience-options button, .ss-proof-chain li) { background: var(--ef-panel); border-color: var(--ef-border); }
+:root[data-theme] .ss :is(.sp-card, .ss-panel, .ss-lesson) { box-shadow: var(--ef-shadow); }
+:root[data-theme] .ss :is(.ss-toggle, .ss-sound-controls, .ss-tabs, .ss-reference) { border-color: var(--ef-border); }
+:root[data-theme] .ss :is(button, .sp-secondary) { color: var(--ef-text); background-color: var(--ef-panel-raised); border-color: var(--ef-control-border); }
+:root[data-theme] .ss button:hover:not(:disabled) { background-color: var(--ef-selected); border-color: var(--ef-accent); }
+:root[data-theme] .ss button[aria-pressed='true'] { color: var(--ef-accent); background: var(--ef-selected); border-color: var(--ef-accent); }
+:root[data-theme] .ss :is(button.sp-primary, button.ss-primary, .primary-button),
+:root[data-theme] .ss :is(button.sp-primary, button.ss-primary, .primary-button):hover:not(:disabled) {
+  background: var(--ef-accent);
+  color: var(--ef-on-accent);
+  border-color: var(--ef-accent);
+}
+:root[data-theme] .ss :is(.sp-text-button, .ss-export, .ss-explain-link, .ss-guide-entry) { color: var(--ef-accent); background: transparent; }
+:root[data-theme] .ss :is(.sp-kicker, .ss-kicker, .st-action) { color: var(--ef-accent) !important; }
+:root[data-theme] .ss :is(.sp-page-heading>p:last-child, .sp-card p, .sp-field, .sp-volume, .sp-inline-volume, .sp-advanced, .sp-status, .sp-check, .sp-style-options small, .sp-data-summary>div>span, .sp-progress-top, .sp-step-heading>p:last-child, .sp-step-bottom>span, .sp-discovery-pair article>span, .sp-discovery-note, .sp-optional-check p, .ss-guide p, .ss-guide li, .ss-guide-intro, .ss-guide caption, .ss-help, .ss-status, .ss-description, .ss-volume, .ss-selects label, .ss-view-controls, .ss-foundation p, .ss-sources p, .ss-lesson p, .ss-story-readout, .ss-reference, .ss-hint, .ss-timbre small, .ss-example-buttons small, .ss-motion-choice) { color: var(--ef-muted); }
+:root[data-theme] .ss :is(.sp-bottom-note, .sp-note, .sp-status) { color: var(--ef-muted) !important; }
+:root[data-theme] .ss :is(.sp-card h2, .sp-card h3, .sp-card strong, .ss-proof-chain strong, .ss-guide li strong, .ss-story-readout strong, .ss-guide-detail summary, .sp-disclosure summary, .sp-check>span, .st-prediction legend, .st-reflection legend) { color: var(--ef-text); }
+:root[data-theme] .ss :is(.sp-note-mapping strong, .sp-preview-label span, .sp-number, .sp-legend-a, .sp-card a, .ss-proof-chain small, .ss-guide-source a, .ss-measure div, .ss-answer, .sp-optional-check .ss-answer, .ss-mix-state, .ss-lesson-callout strong, .sp-discovery-pair small) { color: var(--ef-accent); }
+:root[data-theme] .ss :is(.sp-compare-value strong, .sp-legend-b) { color: var(--ef-secondary); }
+:root[data-theme] .ss :is(.ss-guide th, .ss-guide td, .ss-guide-detail, .ss-lesson-callout, .st-proof>div, .st-table-scroll th, .st-table-scroll td, .st-reflection fieldset+fieldset) { border-color: var(--ef-border); }
+:root[data-theme] .ss .ss-guide th { color: var(--ef-text); }
+:root[data-theme] .ss :is(.ss-guide tr[aria-current='true'], .ss-lesson-callout, .ss-lesson-steps [aria-current='step']) { background: var(--ef-selected); color: var(--ef-accent); }
+:root[data-theme] .ss :is(.sp-listen-progress li, .sp-listen-progress li>span) { color: var(--ef-muted); border-color: var(--ef-control-border); }
+:root[data-theme] .ss :is(.sp-listen-progress [aria-current='step'], .sp-listen-progress .is-done>span) { color: var(--ef-accent); border-color: var(--ef-accent); }
+:root[data-theme] .ss .sp-listen-progress [aria-current='step']:after { background: var(--ef-accent); }
+:root[data-theme] .ss :is(.sp-footer, .sp-footer a, .sp-footer label, .sp-footer small, .sp-language) { color: var(--ef-muted); }
+:root[data-theme] .ss :is(.sp-brand>span:first-child, .sp-brand small) { color: var(--ef-accent); }
+:root[data-theme] .ss .sp-nav a { color: var(--ef-muted); }
+:root[data-theme] .ss .sp-nav a[aria-current='page'] { color: var(--ef-accent); }
+:root[data-theme] .ss .sp-nav a[aria-current='page']:after { background: var(--ef-accent); }
+:root[data-theme] .ss .sp-skip { color: var(--ef-on-accent) !important; background: var(--ef-accent); }
+:root[data-theme] .ss :is(.sp-wave i, .ss-meter i, .visual-spectrum i) { background: var(--ef-secondary); }
+:root[data-theme] .ss :is(.sp-wave.is-playing i, .visual-spectrum i.active) { background: var(--ef-accent); }
+:root[data-theme] .ss .sp-create-transport { background: var(--ef-panel); border-color: var(--ef-border); box-shadow: var(--ef-shadow); }
+
+/* Earth Stations, source explanations and observation charts. Color encodes UI
+ * identity here; all paths, values, scales and point coordinates are untouched.
+ */
+:root[data-theme] .ss :is(.st-station-toolbar, .st-context-select, .st-tag, .st-pair-dates>span, .st-pair-dates strong, .st-pair-values span, .st-pair-values small, .st-proof small, .st-proof span, .st-source-note, .st-inline-play>span, .st-table-scroll caption, .st-table-scroll td, .st-textarea, .st-moving-control, .st-motion-off, .st-live-proof dt, .st-live-proof p, .st-chart-unit) { color: var(--ef-muted); }
+:root[data-theme] .ss :is(.st-pair-dates strong.is-current, .st-prediction p[role='status'], .st-proof strong, .st-live-proof dd, .st-browse-link, .st-source-note a) { color: var(--ef-accent); }
+:root[data-theme] .ss .st-table-scroll th { color: var(--ef-text); }
+:root[data-theme] .ss .st-pair-values>div { border-color: var(--ef-secondary); }
+:root[data-theme] .ss .st-card-chart { background: var(--ef-panel-raised); }
+:root[data-theme] .ss :is(.sp-month-chart, .st-arctic-chart) text { fill: var(--ef-chart-text); }
+:root[data-theme] .ss :is(.sp-month-chart, .st-arctic-chart) g>line { stroke: var(--ef-chart-grid); }
+:root[data-theme] .ss .sp-month-chart path[stroke='#d5f38b'] { stroke: var(--ef-accent); }
+:root[data-theme] .ss .sp-month-chart path[stroke='#85ccdf'] { stroke: var(--ef-secondary); }
+:root[data-theme] .ss .sp-month-chart circle[fill='#d5f38b'] { fill: var(--ef-accent); }
+:root[data-theme] .ss .sp-month-chart circle[fill='#85ccdf'] { fill: var(--ef-secondary); }
+:root[data-theme] .ss .st-arctic-chart>path { stroke: var(--ef-secondary); }
+:root[data-theme] .ss .st-arctic-chart>circle { fill: var(--ef-accent); }
+:root[data-theme] .ss .st-table-scroll:focus-visible { outline-color: var(--ef-focus); }
+
+/* Observatory story chrome; the imagery itself is never recolored. */
+:root[data-theme] .ss :is(.obs-eyebrow, .obs-eyebrow>span, .obs-earth-top, .obs-earth-top>span:last-child, .obs-earth-caption, .obs-earth-caption a, .obs-earth-view .ss-scene-note, .obs-independent, .obs-record-source div>span, .obs-record-source strong small, .obs-record-years small, .obs-record-strip>a, .obs-story-steps article>span, .obs-story-steps p, .obs-cue-label, .obs-visual-cue dt, .obs-visual-cue p, .obs-measurement-label, .obs-measurement-label>span:last-child, .sp-visual-credit) { color: var(--ef-muted); }
+:root[data-theme] .ss :is(.obs-record-source strong, .obs-record-years, .obs-story-steps h3) { color: var(--ef-text); }
+:root[data-theme] .ss :is(.obs-earth-caption>span, .obs-record-years>span, .obs-visual-cue dd, .sp-visual-credit a) { color: var(--ef-accent); }
+:root[data-theme] .ss :is(.obs-record-strip, .obs-story-steps article>span, .obs-mini-orbit, .obs-mini-orbit:before) { border-color: var(--ef-border); }
+:root[data-theme] .ss .obs-story-preview figcaption { color: var(--ef-muted); background: var(--ef-panel-raised); }
+:root[data-theme] .ss .obs-story-preview figcaption a { color: var(--ef-accent); }
+:root[data-theme] .ss :is(.sp-guided-player .visual-layout, .sp-guided-player .visual-settings) { background: var(--ef-panel); border-color: var(--ef-border); }
+:root[data-theme] .ss :is(.sp-guided-player .visual-screen-header, .sp-guided-player .visual-screen-header>span:first-child, .sp-guided-player .visual-volume) { color: var(--ef-muted); }
+:root[data-theme] .ss .ss-spiral { background: var(--ef-media-bg); border-color: var(--ef-border); }
+:root[data-theme] .ss .ss-spiral :is(.ss-figure-top, .ss-view-controls, figcaption) { color: var(--ef-media-text); }
+
+/* The record sculpture, NASA images and source plots stay in the same dark
+ * media window. The surrounding deck is an intentionally themed gallery frame.
+ */
+:root[data-theme] .ss .jb-home { --jb-muted: var(--ef-muted); }
+:root[data-theme] .ss .jb-home :is(.jb-intro h1, .jb-intro>p, .jb-record-heading h2, .jb-readout dd, .jb-looper-heading strong) { color: var(--ef-text); }
+:root[data-theme] .ss .jb-home :is(.jb-intro h1 em, .jb-eyebrow svg, .jb-library-note svg) { color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home :is(.jb-eyebrow, .jb-library-heading>span, .jb-record-copy small, .jb-record-copy>span, .jb-record-indicator, .jb-library-note, .jb-catalogue, .jb-state, .jb-readout dt, .jb-note small, .jb-volume, .jb-progress-row>span, .jb-progress-row b, .jb-source>p, .jb-motion-control, .jb-data-only, .jb-motion-control>span, .jb-data-only>span, .jb-motion-control p, .jb-deeper>span, .jb-earth-extra, .jb-earth-extra summary>span, .jb-earth-extra p, .jb-looper-heading>span) { color: var(--ef-muted); }
+:root[data-theme] .ss .jb-home :is(.jb-deck, .jb-looper) { background: var(--ef-panel); border-color: var(--ef-border); box-shadow: var(--ef-shadow); }
+:root[data-theme] .ss .jb-home .jb-deck-header { background: var(--ef-panel-raised); border-color: var(--ef-border); }
+:root[data-theme] .ss .jb-home .jb-record { background: var(--ef-panel); color: var(--ef-text); border-color: var(--ef-border); }
+:root[data-theme] .ss .jb-home .jb-record:hover { background: var(--ef-panel-raised); border-color: var(--ef-control-border); }
+:root[data-theme] .ss .jb-home .jb-record.is-selected { background: var(--ef-selected); border-color: var(--ef-accent); box-shadow: inset 3px 0 var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-record.is-selected .jb-record-indicator { color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home :is(.jb-readout, .jb-side-selector, .jb-science-cue) { background: var(--ef-panel-raised); border-color: var(--ef-border); }
+:root[data-theme] .ss .jb-home :is(.jb-readout>div+div, .jb-deeper, .jb-earth-extra) { border-color: var(--ef-border); }
+:root[data-theme] .ss .jb-home :is(.jb-readout dd.jb-note, .jb-source-line>span) { color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home :is(.jb-side-selector button, .jb-looper-buttons button, .jb-manual-toggle) { color: var(--ef-text); background: var(--ef-panel); border-color: var(--ef-control-border); }
+:root[data-theme] .ss .jb-home :is(.jb-side-selector button>b, .jb-side-selector small, .jb-science-cue p) { color: var(--ef-muted); }
+:root[data-theme] .ss .jb-home .jb-side-selector button[aria-pressed='true'] { color: var(--ef-accent); background: var(--ef-selected); border-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-side-selector button[aria-pressed='true']>b { color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-side-selector button:nth-child(2)[aria-pressed='true'] { color: var(--ef-warm); background: var(--ef-selected-warm); border-color: var(--ef-warm); }
+:root[data-theme] .ss .jb-home .jb-side-selector button:nth-child(2)[aria-pressed='true']>b { color: var(--ef-warm); }
+:root[data-theme] .ss .jb-home :is(.jb-manual-toggle:hover, .jb-loop-replay:not(:disabled), .jb-loop-stop:not(:disabled)) { color: var(--ef-accent); border-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-manual-toggle[data-manual='true'] { color: var(--ef-muted); }
+:root[data-theme] .ss .jb-home .jb-looper-buttons button:hover:not(:disabled) { color: var(--ef-accent); background: var(--ef-selected); border-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-looper p { color: var(--ef-muted); }
+:root[data-theme] .ss .jb-home .jb-looper .jb-looper-status { color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-loop-record i { background: var(--ef-record); }
+:root[data-theme] .ss .jb-home .jb-looper[data-loop-phase='recording'] { border-top-color: var(--ef-record); }
+:root[data-theme] .ss .jb-home :is(.jb-play, .jb-compact-play),
+:root[data-theme] .ss .jb-home :is(.jb-play, .jb-compact-play):hover:not(:disabled) { background: var(--ef-accent); color: var(--ef-on-accent); border-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-volume input[type='range'] { accent-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-progress-row progress { background: var(--ef-border); accent-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-progress-row progress::-webkit-progress-bar { background: var(--ef-border); }
+:root[data-theme] .ss .jb-home .jb-progress-row progress::-webkit-progress-value { background: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-progress-row progress::-moz-progress-bar { background: var(--ef-accent); }
+:root[data-theme] .ss .jb-home :is(.jb-source-line>a, .jb-deeper>a, .jb-earth-extra a) { color: var(--ef-text); }
+:root[data-theme] .ss .jb-home .jb-side-provenance { color: var(--ef-muted); }
+:root[data-theme] .ss .jb-home .jb-source-line>span { border-color: var(--ef-border); }
+:root[data-theme] .ss .jb-home .jb-error { color: var(--ef-danger); }
+:root[data-theme] .ss .jb-home .jb-shelf-arrow { background: var(--ef-panel); color: var(--ef-accent); border-color: var(--ef-control-border); box-shadow: var(--ef-shadow); }
+:root[data-theme] .ss .jb-home .jb-shelf-wrap.has-next:after { background: linear-gradient(90deg, transparent, var(--ef-bg)); }
+:root[data-theme] .ss .jb-home .jb-shelf-wrap.has-previous:before { background: linear-gradient(90deg, var(--ef-bg), transparent); }
+:root[data-theme] .ss .jb-home .jb-scratch-control { background: var(--ef-selected); border-color: var(--ef-border); }
+:root[data-theme] .ss .jb-home .jb-scratch-control :is(label, label small, p) { color: var(--ef-muted); }
+:root[data-theme] .ss .jb-home .jb-scratch-control label>span { color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-scratch-control input[type='range'] { accent-color: var(--ef-accent); }
+:root[data-theme] .ss .jb-home .jb-instrument-notice { color: var(--ef-danger); border-color: var(--ef-record); }
+:root[data-theme] .ss .jb-home :is(.jb-artwork, .jb-artwork-paired) { background-color: var(--ef-media-bg); }
+:root[data-theme] .ss .jb-home .jb-data-art { color: var(--record-accent); }
+:root[data-theme] .ss .jb-home .jb-data-art>svg text { fill: var(--ef-media-text); }
+:root[data-theme] .ss .jb-home :is(.jb-vinyl-button, .jb-vinyl-button:hover, .jb-3d-toggle, .jb-3d-toggle:hover) { color: var(--ef-media-text); background: transparent; }
+:root[data-theme] .ss .jb-home .jb-vinyl-button { border: 0; }
+:root[data-theme] .ss .jb-home .jb-3d-toggle { border: 0; border-bottom: 1px solid var(--ef-media-text); }
+:root[data-theme] .ss .jb-home :is(.jb-flip-hint, .jb-record-art-caption) { color: var(--ef-media-text); }
+:root[data-theme] .ss .jb-home :is(.jb-vinyl-button, .jb-3d-toggle):focus-visible,
+:root[data-theme] .ss .ss-spiral :is(button, input):focus-visible,
+:root[data-theme] .earth-globe :is(button, input):focus-visible { outline-color: var(--ef-media-focus); }
+
+/* Legacy shares the same preference without changing its playback, controls,
+ * historical scales or source ownership. Its NASA panels remain unfiltered.
+ */
+:root[data-theme] :is(.site-header, .site-footer, .meaning-section, .meaning-card, .signal-strip, .perspective-panel, .perspective-note, .player-footnote, .card-bottom, .visual-transport, .visual-settings, .visual-mapping, .climate-layout, .climate-visual, .climate-style, .climate-sources, .modal-actions, .saved-list>div, .credit-list, .credit-list a) { border-color: var(--ef-border); }
+:root[data-theme] :is(.track-card, .listening-layout, .perspective-panel, .player-panel, .visual-layout, .visual-settings, .climate-layout, .climate-visual, .modal) { background: var(--ef-panel); border-color: var(--ef-border); }
+:root[data-theme] :is(.track-card, .listening-layout, .visual-layout, .climate-layout, .modal) { box-shadow: var(--ef-shadow); }
+:root[data-theme] .signal-strip { background: var(--ef-panel-raised); }
+:root[data-theme] :is(.site-header nav, .site-header nav button, .hero p, .hero-proof, .globe-heading, .globe-caption, .globe-caption span:first-child, .signal-inner, .signal-inner>span:first-child, .signal-inner>span:nth-child(2), .signal-inner>span:last-child, .section-note, .track-card-description, .card-bottom, .panel-label, .place-option, .perspective-note p, .perspective-note .coverage-note, .headphones-note, .player-heading .eyebrow, .player-heading p, .observation-year, .data-legend, .data-legend span, .player-data-heading strong small, .time-display, .time-display>span, .soundscape-select, .player-footnote, .player-footnote button, .source-row, .meaning-intro p, .step-number, .meaning-card p, .meaning-metric small, .meaning-metric>span, .share-banner p, .site-footer p, .site-footer>span, .site-footer>button, .modal>p, .explain-grid p, .credit-list span, .modal>.fine-print, .form-label, .mood-options span, .range-captions, .year-inputs label, .saved-list span, .empty-collection, .source-row>a, .team-credit p, .team-credit p span, .eyebrow.muted) { color: var(--ef-muted); }
+:root[data-theme] :is(.primary-button, .play-button, .primary-button:hover, .play-button:hover) { color: var(--ef-on-accent); background: var(--ef-accent); border-color: var(--ef-accent); }
+:root[data-theme] :is(.outline-button, .saved-button, .mood-options button, .soundscape-select, .observation-year, .frame-options button, .upload-button, .climate-months button) { border-color: var(--ef-control-border); }
+:root[data-theme] :is(.text-button, .icon-button, .favorite-button, .outline-button, .saved-button) { color: var(--ef-text); }
+:root[data-theme] :is(.outline-button:hover, .text-button:hover, .icon-button:hover, .site-header nav button:hover, .meaning-card .text-button, .modal .credit-list svg, .modal .explain-grid>div>span) { color: var(--ef-accent); }
+:root[data-theme] :is(.place-option.active, .mood-options button.active, .frame-options button.active) { color: var(--ef-accent); background: var(--ef-selected); border-color: var(--ef-accent); }
+:root[data-theme] :is(.place-option:hover, .frame-options button:hover) { background: var(--ef-panel-raised); }
+:root[data-theme] .share-banner { background: var(--ef-selected); border-color: var(--ef-border); }
+:root[data-theme] .toast { color: var(--ef-text); background: var(--ef-selected); border-color: var(--ef-accent); }
+:root[data-theme] .toast button { color: var(--ef-text); }
+:root[data-theme] .skip-link { color: var(--ef-on-accent); background: var(--ef-accent); }
+:root[data-theme] :is(.visual-tag, .visual-screen-header, .visual-screen-caption, .visual-screen-caption>span:last-child, .visual-note span, .visual-volume, .visual-settings>.eyebrow, .frame-options button, .frame-options small, .upload-button small, .visual-mapping p, .visual-mapping>div, .visual-mapping i, .visual-tempo, .visual-science-note, .visual-provenance, .visual-provenance a, .visual-motion, .visual-motion small) { color: var(--ef-muted); }
+:root[data-theme] :is(.visual-screen-header span:first-child, .visual-note strong, .upload-button, .visual-tempo span, .visual-announcement) { color: var(--ef-accent); }
+:root[data-theme] :is(.frame-options strong, .visual-mapping strong) { color: var(--ef-text); }
+:root[data-theme] .visual-spectrum i { background: var(--ef-secondary); }
+:root[data-theme] .visual-spectrum i.active { background: var(--ef-accent); }
+:root[data-theme] .visual-error { color: var(--ef-danger); background: var(--ef-danger-panel); border-color: var(--ef-record); }
+:root[data-theme] :is(.climate-intro h2, .climate-measurement>p, .climate-year-row label, .climate-sources strong, .climate-explanation strong, .climate-band-readout>strong) { color: var(--ef-text); }
+:root[data-theme] :is(.climate-intro>p, .climate-visual-heading, .climate-visual figcaption, .climate-visual-credit, .climate-image-error, .climate-mode-row, .climate-measurement>span, .climate-measurement>small, .climate-partial, .climate-volume, .climate-style-pending, .climate-band-readout, .climate-explanation, .climate-sources, .climate-sources summary) { color: var(--ef-muted); }
+:root[data-theme] :is(.climate-mode, .climate-visual-heading>span:last-child, .climate-visual figcaption strong, .climate-style-active, .climate-source-links a) { color: var(--ef-accent); }
+:root[data-theme] :is(.climate-intro h2 span, .climate-measurement>strong) { color: var(--ef-warm); }
+:root[data-theme] .climate-months button { color: var(--ef-text); background: var(--ef-panel-raised); }
+:root[data-theme] .climate-months button[aria-pressed='true'] { color: var(--ef-on-accent); background: var(--ef-accent); border-color: var(--ef-accent); }
+:root[data-theme] .climate-error { color: var(--ef-danger); }
+:root[data-theme] .data-chart text { fill: var(--ef-chart-text); }
+:root[data-theme] .data-chart g>line { stroke: var(--ef-chart-grid); }
+:root[data-theme='light'] :is(.card-eyebrow, .mini-wave, .card-play, .track-icon, .player-data-heading strong, .chart-wrap, .record-icon) { color: color-mix(in srgb, var(--track-color, var(--ef-accent)) 40%, #142c24); }
+:root[data-theme='light'] :is(.card-play, .track-icon, .record-icon) { background: var(--ef-panel-raised); border-color: var(--ef-border); }
+:root[data-theme='light'] .saved-list>div>svg { color: var(--ef-accent) !important; }
+
+@media (max-width: 820px) {
+  :root[data-theme] .site-header nav { background: var(--ef-panel); border-color: var(--ef-border); box-shadow: var(--ef-shadow); }
+}
