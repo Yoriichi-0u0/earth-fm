@@ -175,9 +175,17 @@ for(const theme of ['light','dark'] as const)test(`${theme} personal record fits
   const source=await page.locator('.jb-media img').getAttribute('src'),brightness=await page.locator('.jb-scratch').getAttribute('data-scratch-brightness');
   await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme==='light'?'dark':'light');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await expect(page.locator('.jb-media img')).toHaveAttribute('src',source!);await expect(page.locator('.jb-scratch')).toHaveAttribute('data-scratch-brightness',brightness!);
   await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
-  for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768}]){
+  for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900}]){
     await page.setViewportSize(viewport);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await expect.poll(()=>page.evaluate(()=>{
+      const image=document.querySelector<HTMLImageElement>('.jb-media img')!,surface=document.querySelector('.jb-scratch-surface')!,scan=document.querySelector('.jb-scan')!;
+      const imageBox=image.getBoundingClientRect(),surfaceBox=surface.getBoundingClientRect(),scanBox=scan.getBoundingClientRect();
+      const visibleWidth=Math.min(imageBox.width,imageBox.height*image.naturalWidth/image.naturalHeight),left=imageBox.left+(imageBox.width-visibleWidth)/2;
+      const index=Number(document.querySelector('.jb-scratch')!.getAttribute('data-scratch-index'));
+      return Math.max(Math.abs(surfaceBox.x-left),Math.abs(surfaceBox.width-visibleWidth),Math.abs(scanBox.x-(left+(index+.5)/48*visibleWidth)));
+    }),'scan and touch surface must align with the visible image after resizing').toBeLessThan(1);
     for(const button of await page.locator('.jb-personal-actions button').all()){const bounds=await button.boundingBox();expect(bounds!.height).toBeGreaterThanOrEqual(44);}
+    await test.info().attach(`personal-${viewport.width}-${theme}`,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
   }
   await slider(page).focus();await slider(page).press('Home');await slider(page).press('ArrowRight');await expect(slider(page)).toHaveValue('2');
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(result.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
