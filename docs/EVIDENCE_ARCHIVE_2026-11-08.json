@@ -1,0 +1,114 @@
+{
+  "tag": "earth-fm-evidence-archive-2026-11-08",
+  "releaseId": 438324812,
+  "archiveUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/tag/untagged-659d583fe0b5af2d9cfc",
+  "draft": true,
+  "allVerified": true,
+  "assetCount": 11,
+  "assets": [
+    {
+      "name": "Earth-FM-Day-Night-Review-2026-11-08.zip",
+      "bytes": 18575811,
+      "sha256": "90b5dd5717dd3130f9995a20c7f57edabdc80c1a213bbc5b5f2b9b3c2824253b",
+      "assetId": 724319420,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319420",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Day-Night-Review-2026-11-08.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Earth-Looper-Review-2026-11-07.zip",
+      "bytes": 1609880,
+      "sha256": "75b3103564b10aa4011903ccd0ac6feb7e639c60b54ff1f437e7bfaafb4ae7db",
+      "assetId": 724319448,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319448",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Earth-Looper-Review-2026-11-07.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-First-Listen-and-Design-Review-2026-11-07.zip",
+      "bytes": 2466775,
+      "sha256": "b512049b5f300e036ca5101c3e283c3eb6a92f26e23869de3d8d0b032f36d5ad",
+      "assetId": 724319418,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319418",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-First-Listen-and-Design-Review-2026-11-07.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Flip-Record-Review-2026-11-06.zip",
+      "bytes": 1575573,
+      "sha256": "d67852cb24ade672345ac6f21d0f80abb1d28b51b36205b2f84465a319aa6906",
+      "assetId": 724319423,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319423",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Flip-Record-Review-2026-11-06.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Jukebox-Local-Review-2026-11-03.zip",
+      "bytes": 922879,
+      "sha256": "8284af839c98916971ec0f3b76a4e736ee55386bece6a2ea09de11d64e78e597",
+      "assetId": 724319422,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319422",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Jukebox-Local-Review-2026-11-03.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Mystery-Record-Review-5c6a033.zip",
+      "bytes": 15571714,
+      "sha256": "a03585b20ca3ec89752a303694db1834b603688e99177208707c353ae281a651",
+      "assetId": 724319474,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319474",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Mystery-Record-Review-5c6a033.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Press-Your-Own-Record-Review-22e423e.zip",
+      "bytes": 16366656,
+      "sha256": "f3ade46ea42cf3b358aaedafa921718773b4cd5cd9cc0f8c5dd7f33ca345be34",
+      "assetId": 724319491,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319491",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Press-Your-Own-Record-Review-22e423e.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Public-Development-Evidence-2026-11-08.zip",
+      "bytes": 170035308,
+      "sha256": "e37f41951e7b318d0f39aa579ab666bb089bfd5a41bee397c68c563f179c6e17",
+      "assetId": 724319525,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319525",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Public-Development-Evidence-2026-11-08.zip",
+      "verified": true
+    },
+    {
+      "name": "Earth-FM-Scratch-the-Planet-Review-2026-11-06.zip",
+      "bytes": 1325557,
+      "sha256": "e97d40d6a3d13bdace77f830b4b7fda9689e7b1d7008f62c095f17a2a4326149",
+      "assetId": 724319532,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319532",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/Earth-FM-Scratch-the-Planet-Review-2026-11-06.zip",
+      "verified": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1102,
+      "sha256": "c2896b19f6bf10c8d4491f9693b5753ae4a179ce9d85e3082241a06b24c73042",
+      "assetId": 724319628,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319628",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/SHA256SUMS.txt",
+      "verified": true
+    },
+    {
+      "name": "archive-index.json",
+      "bytes": 2778,
+      "sha256": "d8adc431775c2629406944be3a9cbb0996de03daf4a563abe2866e6a2b8f49e4",
+      "assetId": 724319698,
+      "apiUrl": "https://api.github.com/repos/Yoriichi-0u0/earth-fm/releases/assets/724319698",
+      "downloadUrl": "https://github.com/Yoriichi-0u0/earth-fm/releases/download/untagged-659d583fe0b5af2d9cfc/archive-index.json",
+      "verified": true
+    }
+  ],
+  "downloadRoundTrip": {
+    "asset": "Earth-FM-Mystery-Record-Review-5c6a033.zip",
+    "sha256": "a03585b20ca3ec89752a303694db1834b603688e99177208707c353ae281a651",
+    "passed": true
+  }
+}
