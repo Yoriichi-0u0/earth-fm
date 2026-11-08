@@ -1,6 +1,6 @@
 import {lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react';
 import type {CSSProperties,ReactNode} from 'react';
-import {ArrowDown,ArrowUpRight,AudioLines,ChevronLeft,ChevronRight,Disc3,Headphones,Play,Square,Volume2} from 'lucide-react';
+import {ArrowDown,ArrowUpRight,AudioLines,ChevronLeft,ChevronRight,Disc3,Headphones,ImagePlus,Play,ShieldCheck,Square,Volume2} from 'lucide-react';
 import {jukeboxRecords} from '../data/jukeboxRecords';
 import type {JukeboxRecord,JukeboxRecordId} from '../data/jukeboxRecords';
 import {arcticPoints,arcticStory,mapArctic} from '../data/earthStations';
@@ -18,6 +18,8 @@ import ScratchScanner from './ScratchScanner';
 import {useFrameInstrument} from '../lib/useFrameInstrument';
 import {useEarthLooper} from '../lib/useEarthLooper';
 import EarthLooper from './EarthLooper';
+import {usePersonalImage} from '../lib/usePersonalImage';
+import type {PersonalImage} from '../lib/personalImage';
 import {observatoryImagery} from '../data/observatory';
 import './JukeboxHome.css';
 
@@ -30,7 +32,8 @@ function mapRecordPoint(point:RecordPoint,arctic:boolean){
   return event.kind==='note'?{frequencyHz:event.frequencyHz,note:NOTES[event.bandIndex]}:null;
 }
 type DeckState={playing:boolean;starting:boolean;ready:boolean;completed:boolean;progress:number;note:string;frequency:string;position:string;input:string;onPlay:()=>void;signal:RecordSignal;requestAt:number;error?:string;playLabel?:string;manual?:boolean};
-type ConsoleProps=DeckState&{record:JukeboxRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;performanceControls?:ReactNode};
+type VisualRecord=Omit<JukeboxRecord,'id'|'frame'|'sourceUrl'>&{id:JukeboxRecordId|'personal';sourceUrl?:string;frame?:{imageUrl:string;videoUrl?:string;description:string}};
+type ConsoleProps=DeckState&{record:VisualRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;performanceControls?:ReactNode};
 
 function DeckConsole({record,artwork,playing,starting,ready,completed,progress,note,frequency,position,input,onPlay,volume,onVolume,error,extra,side,sideControls,recordObject,signal,requestAt,playLabel,manual,performanceControls}:ConsoleProps){
   const {t}=useStudioLanguage();const active=playing||starting;
@@ -43,12 +46,12 @@ function DeckConsole({record,artwork,playing,starting,ready,completed,progress,n
     <div className="jb-transport"><button className="jb-play" type="button" disabled={!ready} onClick={onPlay}>{active?<Square size={17} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}<span>{t(active?'Stop':playLabel??'Play record')}</span><span className="jb-play-shortcut" aria-hidden="true">{active?'■':'▶'}</span></button><label className="jb-volume"><Volume2 size={18}/><span className="sr-only">{t('Jukebox volume')}</span><input type="range" min="0" max="1" step=".01" value={volume} onChange={e=>onVolume(Number(e.target.value))}/></label></div>
     <div className="jb-progress-row"><progress aria-label={t(manual?'Scan position':'Record progress')} max="1" value={progress}/><span>{t(completed?'Complete':record.kind==='visual'?'48 visual strips':'12 observations')}<b>{manual?t('Your pace'):<>~25 {t('seconds')}</>}</b></span></div>
     {extra}
-    <div className="jb-source"><div className="jb-source-line"><span>{t(record.kind==='visual'?'Visual sound':'Measurement sound')}</span><a href={record.sourceUrl} target="_blank" rel="noreferrer">{t(record.source)} <ArrowUpRight size={13}/></a></div><p>{t(record.meaning)}</p>{side&&<p className="jb-side-provenance">{t('Related sources, different transformations. The image and observations are not matched frame by frame.')}</p>}</div>
+    <div className="jb-source"><div className="jb-source-line"><span>{t(record.kind==='visual'?'Visual sound':'Measurement sound')}</span>{record.sourceUrl?<a href={record.sourceUrl} target="_blank" rel="noreferrer">{t(record.source)} <ArrowUpRight size={13}/></a>:<span>{t(record.source)}</span>}</div><p>{t(record.meaning)}</p>{side&&<p className="jb-side-provenance">{t('Related sources, different transformations. The image and observations are not matched frame by frame.')}</p>}</div>
     {error&&<p className="jb-error" role="alert">{t(error)}</p>}
   </article>;
 }
 
-function useVisualRecord(record:JukeboxRecord,motion:boolean,volume:number){
+function useVisualRecord(record:VisualRecord,motion:boolean,volume:number){
   const {t}=useStudioLanguage();const [animate,setAnimate]=useState(true),[requestAt,setRequestAt]=useState(0);
   const frame=record.frame!;
   const visual=useVisualTransport({imageUrl:frame.imageUrl,videoUrl:frame.videoUrl,animate,motionAllowed:motion,tempo:120,volume,onStart:noop});
@@ -59,10 +62,10 @@ function useVisualRecord(record:JukeboxRecord,motion:boolean,volume:number){
   return {visual,state,extra};
 }
 
-function VisualArtwork({record,transport,manual=false}:{record:JukeboxRecord;transport:ReturnType<typeof useVisualRecord>;manual?:boolean}){
+function VisualArtwork({record,transport,manual=false}:{record:VisualRecord;transport:ReturnType<typeof useVisualRecord>;manual?:boolean}){
   const {t}=useStudioLanguage();const {visual}=transport;const frame=record.frame!;
   return <div className={`jb-media ${record.id==='motion'?'jb-media-motion':''}`} ref={visual.screenRef} aria-label={t('Record artwork and live scan')}>
-    <div className="jb-art-label"><span>{t('Visual sound')}</span><span>{record.id==='spiral'?'NASA / 5190':'NASA / EIC'}</span></div>
+    <div className="jb-art-label"><span>{t('Visual sound')}</span><span>{record.id==='personal'?t('YOUR IMAGE'):record.id==='spiral'?'NASA / 5190':'NASA / EIC'}</span></div>
     {frame.videoUrl?<video ref={visual.videoRef} src={frame.videoUrl} poster={record.posterUrl} muted playsInline loop preload="auto" aria-label={t(frame.description)} onError={()=>{visual.stop();visual.setReady(false);visual.setError('The animation could not load. Try another frame.');}}/>:<img ref={visual.imageRef} src={frame.imageUrl} alt={t(frame.description)} onLoad={visual.prepare} onError={()=>{visual.stop();visual.setReady(false);visual.setError('The image could not load. Try another frame.');}}/>}
     {visual.ready&&<div className="jb-scan" style={{left:`${visual.frameFit.left+(visual.scanIndex+.5)/VISUAL_SCAN_STEPS*visual.frameFit.width}%`}}><span>{String(visual.scanIndex+1).padStart(2,'0')}</span></div>}
     {!visual.ready&&!visual.error&&<p className="jb-media-loading">{t('Loading the visual…')}</p>}
@@ -116,19 +119,26 @@ function DataDeck({record,volume,onVolume}:{record:JukeboxRecord;volume:number;o
   return <DeckConsole record={record} {...data.state} artwork={<DataArtwork record={record} current={data.point}/>} volume={volume} onVolume={onVolume} extra={data.extra}/>;
 }
 
-function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motion:boolean;volume:number;onVolume:(value:number)=>void}){
-  const {t}=useStudioLanguage();const [side,setSide]=useState<RecordSide>('a'),[manual,setManual]=useState(false),[requestAt,setRequestAt]=useState(0);
-  const measurementRecord=jukeboxRecords.find(item=>item.id==='temperature')!;
-  // Both adapters persist through a flip; only an explicit Play action starts an engine.
-  const visual=useVisualRecord(record,motion,volume),data=useDataRecord(measurementRecord,volume);
-  const instrument=useFrameInstrument(visual.visual.steps,volume,manual&&side==='a');
-  const looper=useEarthLooper({enabled:manual&&side==='a'&&visual.visual.ready,sourceImage:record.frame!.imageUrl,stripCount:visual.visual.steps.length,prepare:instrument.prepare,play:instrument.play,stopAudio:instrument.stop,onSelect:index=>{visual.visual.setScanIndex(index);setRequestAt(performance.now());}});
+/** Shared Scratch/Looper path; scientific adapters and renderers stay independent. */
+function useImagePerformance(visual:ReturnType<typeof useVisualRecord>,volume:number,sourceIdentity:string,enabled=true){
+  const [manual,setManual]=useState(false),[requestAt,setRequestAt]=useState(0);
+  const instrument=useFrameInstrument(visual.visual.steps,volume,manual&&enabled);
+  const looper=useEarthLooper({enabled:manual&&enabled&&visual.visual.ready,sourceImage:sourceIdentity,stripCount:visual.visual.steps.length,prepare:instrument.prepare,play:instrument.play,stopAudio:instrument.stop,onSelect:index=>{visual.visual.setScanIndex(index);setRequestAt(performance.now());}});
   const replaying=looper.phase==='replaying'||looper.phase==='preparing';
-  function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setSide(next);}
   function changeMode(){visual.visual.stop();looper.stop();setManual(value=>!value);}
   function playStrip(index:number){looper.cancelReplay();visual.visual.setScanIndex(index);setRequestAt(performance.now());void instrument.play(index).then(event=>{if(event)looper.capture(event);});}
   function cancelGesture(){looper.cancelReplay();instrument.stop();}
   const manualState:DeckState={...visual.state,manual:true,playing:instrument.playing||looper.phase==='replaying',starting:instrument.starting||looper.phase==='preparing',completed:false,progress:visual.visual.scanIndex/(VISUAL_SCAN_STEPS-1),signal:{...visual.state.signal,playing:instrument.playing||looper.phase==='replaying',event:instrument.noteEvent},requestAt,error:instrument.error||visual.state.error,playLabel:'Hear this position',onPlay:()=>{if(replaying||(looper.phase==='recording'&&(instrument.playing||instrument.starting)))looper.stop();else if(instrument.playing||instrument.starting)instrument.stop();else playStrip(visual.visual.scanIndex);}};
+  return {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture};
+}
+
+function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motion:boolean;volume:number;onVolume:(value:number)=>void}){
+  const {t}=useStudioLanguage();const [side,setSide]=useState<RecordSide>('a');
+  const measurementRecord=jukeboxRecords.find(item=>item.id==='temperature')!;
+  // Both adapters persist through a flip; only an explicit Play action starts an engine.
+  const visual=useVisualRecord(record,motion,volume),data=useDataRecord(measurementRecord,volume);
+  const {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture}=useImagePerformance(visual,volume,record.frame!.imageUrl,side==='a');
+  function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setSide(next);}
   const current=side==='a'?(manual?manualState:visual.state):data.state;
   const effective=side==='a'?record:{...measurementRecord,id:record.id,number:record.number,title:record.title};
   const controls=<><div className="jb-side-selector" role="group" aria-label={t('Choose a side of Climate Spiral')}>
@@ -142,9 +152,21 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
     volume={volume} onVolume={onVolume} extra={side==='b'?data.extra:undefined}/>;
 }
 
+function PersonalDeck({image,motion,volume,onVolume}:{image:PersonalImage;motion:boolean;volume:number;onVolume:(value:number)=>void}){
+  const {t}=useStudioLanguage();
+  const record:VisualRecord={id:'personal',number:'YOU',title:'Your Record',kind:'visual',subtitle:'Your image. Your sound.',source:'Your image · processed locally',meaning:'Image brightness makes pitch. Colour shapes timbre; position shapes stereo pan. These are your image’s pixels, not NASA imagery or scientific measurements.',accent:'#d5f38b',frame:{imageUrl:image.url,description:'Your temporary personal image'}};
+  const visual=useVisualRecord(record,motion,volume);
+  const {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture}=useImagePerformance(visual,volume,`personal:${image.id}`);
+  return <DeckConsole record={record} {...(manual?manualState:visual.state)} volume={volume} onVolume={onVolume}
+    sideControls={<div className="jb-science-cue"><p>{t('Your image. Brightness → pitch.')}</p><button className="jb-manual-toggle" type="button" data-manual={manual} disabled={!visual.visual.ready} aria-controls={manual?'earth-scratch-controls':undefined} onClick={changeMode}>{t(manual?'Back to playback':'Scratch your image')}<span aria-hidden="true">{manual?' ↗':' ↔'}</span></button></div>}
+    performanceControls={manual&&visual.visual.ready?<EarthLooper looper={looper}/>:undefined}
+    artwork={<ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}><VisualArtwork record={record} transport={visual} manual={manual}/></ScratchScanner>}/>;
+}
+
 export default function JukeboxHome({motion}:{motion:boolean}){
   const {t}=useStudioLanguage();
-  const [selected,setSelected]=useState<JukeboxRecordId>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
+  const [selected,setSelected]=useState<JukeboxRecordId|'personal'>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
+  const personal=usePersonalImage(),fileInput=useRef<HTMLInputElement>(null),player=useRef<HTMLDivElement>(null);
   const shelf=useRef<HTMLDivElement>(null),[edges,setEdges]=useState({left:false,right:false});
   useEffect(()=>{
     const element=shelf.current;if(!element)return;
@@ -152,14 +174,17 @@ export default function JukeboxHome({motion}:{motion:boolean}){
     const observer=new ResizeObserver(update);observer.observe(element);element.addEventListener('scroll',update,{passive:true});update();
     return()=>{observer.disconnect();element.removeEventListener('scroll',update);};
   },[]);
-  const record=jukeboxRecords.find(r=>r.id===selected)!,station=record.id==='arctic'?'arctic':'climate';
+  const record=jukeboxRecords.find(r=>r.id===selected)??jukeboxRecords[0],station=record.id==='arctic'?'arctic':'climate';
+  function selectRecord(id:JukeboxRecordId){personal.cancel();setSelected(id);}
+  function selectPersonal(){setSelected('personal');player.current?.scrollIntoView({block:'start',behavior:motion?'smooth':'instant'});}
+  function chooseImage(file:File){selectPersonal();void personal.choose(file);}
   function moveShelf(direction:number){const element=shelf.current;if(element)element.scrollBy({left:direction*element.clientWidth*.8,behavior:motion?'smooth':'instant'});}
   return <div className="jb-home" style={{'--record-accent':record.accent} as CSSProperties}>
     <header className="jb-intro"><div><p className="jb-eyebrow"><Disc3 size={15}/>{t('THE EARTH INFORMATION JUKEBOX')}</p><h1 tabIndex={-1}>{t('Your planet.')} <em>{t('On the record.')}</em></h1></div><p>{t('Choose an Earth story. Press Play.')}<span>{t('Sound made from NASA visuals and Earth observations.')}</span></p></header>
     <div className="jb-layout">
-      <section className="jb-library" aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><span>{String(jukeboxRecords.findIndex(item=>item.id===selected)+1).padStart(2,'0')} / 04</span></div>
+      <section className="jb-library" aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><span>{selected==='personal'?t('Your Record'):String(jukeboxRecords.findIndex(item=>item.id===selected)+1).padStart(2,'0')+' / 04'}</span></div>
         <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
-          <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>setSelected(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
+          <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
             <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
             <span className="jb-record-copy"><small>{item.number} / {t(item.id==='spiral'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
           </button>)}</div>
@@ -168,7 +193,23 @@ export default function JukeboxHome({motion}:{motion:boolean}){
         </div>
         <p className="jb-library-note"><Headphones size={15}/>{t('Four records. Sound generated as you listen.')}</p>
       </section>
-      <div className="jb-player" key={record.id}>{record.id==='spiral'?<ClimateDeck record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck record={record} volume={volume} onVolume={setVolume}/>}</div>
+      <div className="jb-player" ref={player}>
+        {selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p></section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} volume={volume} onVolume={setVolume}/>}
+      </div>
+      <section className="jb-personal-panel" aria-labelledby="jb-personal-title" aria-busy={personal.loading}>
+        <div className="jb-personal-heading"><span aria-hidden="true">{personal.image?<img src={personal.image.url} alt=""/>:<ImagePlus size={24}/>}</span><div><p>{t('PRESS YOUR OWN RECORD')}</p><h2 id="jb-personal-title">{t('Your image. Your sound.')}</h2></div></div>
+        <p>{t('Turn a picture into a playable record. Keep it here, just for you.')}</p>
+        <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={t('Choose a personal image')} hidden onChange={e=>{const file=e.currentTarget.files?.[0];e.currentTarget.value='';if(file)chooseImage(file);}}/>
+        <div className="jb-personal-actions">
+          {personal.image&&!personal.loading&&<button type="button" aria-pressed={selected==='personal'} onClick={selectPersonal}>{t('Your Record')} <Play size={14}/></button>}
+          <button type="button" onClick={()=>fileInput.current?.click()}>{t(personal.image?'Replace image':'Choose image')}<ImagePlus size={15}/></button>
+          {(personal.image||personal.loading)&&<button type="button" onClick={()=>{personal.remove();if(selected==='personal')setSelected('spiral');}}>{t('Remove')}</button>}
+        </div>
+        <p className="jb-personal-limits">{t('PNG, JPEG or WebP · up to 10 MB')}<br/>{t('4096 px per edge · 12.6 MP · up to 8:1')}</p>
+        <p className="jb-personal-privacy"><ShieldCheck size={15}/>{t('No upload. Image and take disappear when you leave Home or reload.')}</p>
+        {personal.loading&&<p role="status">{t('Opening your image…')}</p>}
+        {personal.error&&<p className="jb-personal-error" role="alert">{t(personal.error)}{personal.image&&<> {t('Your previous image is still available. Its take has been cleared.')}</>}</p>}
+      </section>
     </div>
     <div className="jb-deeper"><span>{t('Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',station,record.id==='motion'?'motion':undefined);}}>{t('Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t('Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
     <details className="jb-earth-extra" onToggle={e=>{setEarthOpen(e.currentTarget.open);if(!e.currentTarget.open)setEarthReady(false);}}><summary>{t('A closer look at home')} <span>{t('The Earth Observatory view')} ↗</span></summary>{earthOpen&&<div><Suspense fallback={<p role="status">{t('Loading the Earth view…')}</p>}><EarthGlobe locations={[]} selectedId="" onSelect={noop} playing={false} autoRotate={motion} photographic onSurfaceReady={setEarthReady}/></Suspense><p>{t(earthReady?'July 2004 composite. Lighting and rotation are illustrative, not live weather.':'Interactive illustration with Natural Earth boundaries. Lighting and rotation are illustrative.')} <a href={earthReady?observatoryImagery.sourcePage:'https://www.naturalearthdata.com/'} target="_blank" rel="noreferrer">{t(earthReady?'NASA Earth Observatory · Blue Marble ↗':'Interactive Earth illustration ↗')}</a></p></div>}</details>
