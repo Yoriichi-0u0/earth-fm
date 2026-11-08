@@ -6,7 +6,7 @@ const recordTitles=['Climate Spiral','Moving Earth','Arctic September','Temperat
 type Audit={contexts:AudioContext[];notes:number[];hold:boolean;fail:boolean;resumes:(()=>void)[]};
 declare global{interface Window{mysteryAudit:Audit}}
 const mystery=(page:Page)=>page.getByRole('region',{name:'Mystery Record',exact:true});
-const play=(page:Page)=>mystery(page).getByRole('button',{name:'Play mystery',exact:true});
+const play=(page:Page)=>mystery(page).getByRole('button',{name:/^(Play mystery|Replay)$/});
 async function setup(page:Page,draw=0){
   await page.addInitScript(draw=>{
     Math.random=()=>draw;
@@ -80,7 +80,7 @@ test('a hidden tab stops sound without resuming; appearance/language preserve th
   const contexts=await page.evaluate(()=>window.mysteryAudit.contexts.length);
   await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');await expect(mystery(page).getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();expect(await page.evaluate(()=>window.mysteryAudit.contexts.length)).toBe(contexts);
   await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');const zh=page.getByRole('region',{name:'神秘唱片',exact:true});await expect(zh.getByRole('button',{name:'停止神秘唱片',exact:true})).toBeVisible();await expect(zh.getByRole('radio',{name:'气候螺旋',exact:true})).toBeChecked();
-  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});await expect(zh.getByRole('button',{name:'播放神秘唱片',exact:true})).toBeVisible();const count=await page.evaluate(()=>window.mysteryAudit.notes.length);
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});await expect(zh.getByRole('button',{name:'重播',exact:true})).toBeVisible();const count=await page.evaluate(()=>window.mysteryAudit.notes.length);
   await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(600);expect(await page.evaluate(()=>window.mysteryAudit.notes.length)).toBe(count);await zh.getByRole('button',{name:'揭晓来源',exact:true}).click();await expect(zh).toContainText('NSIDC');
 });
 
