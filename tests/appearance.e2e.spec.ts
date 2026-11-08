@@ -127,6 +127,27 @@ for(const theme of ['light','dark'] as const)test(`${theme} theme has no automat
   expect(results.filter(r=>r.violations.length)).toEqual([]);
 });
 
+for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific explanations and disabled controls retain contrast`,async({page})=>{
+  test.setTimeout(90_000);await page.goto('/');await appearance(page).selectOption(theme);const results=[];
+  for(const route of ['/about','/create','/data','/listen']){
+    await page.goto(route);
+    if(route==='/create')await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
+    if(route==='/data')await page.getByRole('checkbox',{name:'Compare another year',exact:true}).check();
+    if(route==='/listen'){
+      await page.getByRole('button',{name:'Continue to the real data →',exact:true}).click();
+      await page.getByRole('button',{name:'Continue to the discovery →',exact:true}).click();
+    }
+    // Re-resolve after every expansion: opening a parent changes the matching
+    // collection and makes nested disclosures available.
+    for(let expanded=0;expanded<25;expanded++){
+      const summaries=page.locator('details:not([open])>summary:visible');if(!await summaries.count())break;await summaries.first().click();
+    }
+    const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
+    results.push({route,violations:scan.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),contrastIncomplete:scan.incomplete.filter(v=>v.id==='color-contrast').length});
+  }
+  await test.info().attach(`expanded-contrast-${theme}`,{body:JSON.stringify(results),contentType:'application/json'});expect(results.filter(r=>r.violations.length)).toEqual([]);
+});
+
 for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}])test(`responsive appearance and keyboard controls fit ${viewport.width} × ${viewport.height}`,async({page})=>{
   test.setTimeout(60_000);await page.setViewportSize(viewport);
   for(const theme of ['light','dark']){
