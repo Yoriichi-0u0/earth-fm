@@ -4,6 +4,7 @@ import { ArrowDown, ArrowDownToLine, ArrowRight, AudioLines, Check, ChevronDown,
 import EarthGlobe from './components/EarthGlobe';
 import FrameJukebox from './components/FrameJukebox';
 import ClimateExplore from './components/ClimateExplore';
+import AppearanceSelector from './components/AppearanceSelector';
 import { tracks } from './data/earth';
 import type { EarthTrack, Observation } from './data/earth';
 import { EarthAudio, exportWav } from './lib/audio';
@@ -151,7 +152,7 @@ export default function App() {
     <header className="site-header">
       <a className="brand" href="#" aria-label="Earth FM home"><span className="brand-mark"><Globe2 size={23}/></span><span>earth<span className="brand-fm">fm</span><sup>↗</sup></span></a>
       <nav aria-label="Main navigation" className={menuOpen ? 'nav-open' : ''}><a href="?studio=1">Symphony Studio 2.0 ↗</a><a href="#climate-spiral" onClick={() => setMenuOpen(false)}>Climate Spiral</a><a href="#visual-radio" onClick={() => setMenuOpen(false)}>Visual radio</a><a href="#tracks" onClick={() => setMenuOpen(false)}>The collection</a><button onClick={() => { setModal('about'); setMenuOpen(false); }}>Behind the sound <span>↗</span></button></nav>
-      <button className="saved-button" onClick={() => setModal('saved')}><Headphones size={16}/><span>My collection</span>{saved.length > 0 && <span className="saved-count">{saved.length}</span>}</button>
+      <div className="legacy-header-actions"><AppearanceSelector/><button className="saved-button" onClick={() => setModal('saved')}><Headphones size={16}/><span>My collection</span>{saved.length > 0 && <span className="saved-count">{saved.length}</span>}</button></div>
       <button className="mobile-menu icon-button" aria-label="Toggle navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu size={22}/></button>
     </header>
 

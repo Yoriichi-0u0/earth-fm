@@ -21,8 +21,60 @@
 .sp-visual-credit{font-size:10px;line-height:1.7;color:#94aab4;margin:13px 0 0;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
 .sp-visual-credit a{color:#badb9b;text-decoration:underline;text-underline-offset:3px}
 
+/* One in-flow transport owns Create playback; it never floats over a tone option. */
+.sp-create-transport{display:flex;justify-content:flex-end;margin:-10px 0 20px;min-width:0}
+.ss-pages .sp-create-transport>.sp-primary{width:min(100%,360px);min-height:48px;white-space:normal}
+.sp-page-create :is(button,input,select,summary){scroll-margin-block-start:100px;scroll-margin-block-end:28px}
+.sp-data-summary>div{min-width:0}
+.sp-data-summary>div>span,.sp-data-summary p,
+.sp-preview-label span,.sp-volume,.sp-inline-volume,
+.sp-check small,.sp-style-options small{font-size:12px;line-height:1.65}
+.sp-data-summary strong{overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.sp-month-chart svg text{font-size:14px}
+.sp-month-chart>p{font-size:12px;line-height:1.7;flex-wrap:wrap}
+.sp-source-links a{font-size:13px;line-height:1.7;min-height:32px}
+.sp-visual-credit{font-size:12px;line-height:1.8}
+.sp-page-data :is(button,input,select,summary),
+.sp-page-create :is(button,input,select,summary){min-height:44px}
+.sp-page-data :is(input[type=checkbox],input[type=radio]),
+.sp-page-create :is(input[type=checkbox],input[type=radio]){min-height:0}
+@media(max-width:960px){
+ .sp-create-layout{grid-template-columns:minmax(0,1fr)}
+ .sp-create-transport{position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:10;justify-content:stretch;padding:9px;margin:0 0 20px;border:1px solid var(--ef-border,#40545b);border-radius:12px;background:var(--ef-panel,#14202a);box-shadow:var(--ef-shadow,0 8px 24px #0003)}
+ .ss-pages .sp-create-transport>.sp-primary{width:100%;min-height:48px;margin:0}
+ .sp-page-create :is(button,input,select,summary){scroll-margin-block-start:calc(104px + env(safe-area-inset-top,0px))}
+ html:has(.sp-page-create){scroll-padding-top:calc(104px + env(safe-area-inset-top,0px));scroll-padding-bottom:24px}
+ .sp-page-create .sp-preview>button.sp-primary{position:static;inset:auto}
+ .sp-create-layout>.sp-card{min-width:0}
+ .sp-tone-options{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:24px}
+ .sp-style-options button{flex-direction:row;align-items:center;gap:14px}
+ .sp-style-options small{max-width:60%;text-align:right}
+}
 @media(max-width:650px){
- /* Keep Play and Stop reachable while choosing a sound on a narrow screen. */
- .sp-page-create .sp-preview>button.sp-primary{position:fixed;bottom:16px;left:20px;right:20px;width:auto;z-index:20;box-shadow:0 6px 30px #0009}
- .ss-pages:has(.sp-page-create) .sp-footer{padding-bottom:90px}
+ .sp-tone-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sp-tone-options button:last-child{grid-column:1/-1}
+ .sp-create-transport{margin-bottom:16px;padding:8px}
+ .sp-style-options button{padding:13px;gap:10px}
+ .sp-style-options small{max-width:55%;font-size:12px}
+ .ss-pages .sp-page-listen{padding-top:26px}
+ .ss-pages .sp-page-listen .sp-page-heading{margin-bottom:20px}
+ .sp-page-listen .sp-page-heading>p:last-child{line-height:1.75}
+ .sp-page-data .sp-date-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .sp-page-data .sp-date-controls>label{min-width:0}
+ .sp-page-data .sp-date-controls select{min-width:0;width:100%}
+ .sp-page-data .sp-data-summary{gap:22px;margin-top:26px}
+ .sp-page-data .sp-data-summary>div>span,.sp-page-data .sp-data-summary p{font-size:12px}
+ .sp-page-data .sp-data-transport button{min-height:48px;font-size:12px}
+ .sp-page-data .sp-inline-volume{min-width:0}
+ .sp-page-about .sp-card{padding:20px}
+ .sp-page-about .sp-source-links{gap:10px}
+}
+@media(max-width:360px){
+ .ss.ss-pages{padding-inline:16px}
+ .ss-pages .sp-card{padding:18px 15px}
+ .ss-pages .sp-page-heading h1{font-size:32px}
+ .sp-data-summary{gap:18px}
+ .sp-note-mapping{padding-left:16px}
+ .sp-data-transport{align-items:stretch}
+ .sp-data-transport button{flex:1 1 120px;white-space:normal}
 }

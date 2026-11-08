@@ -410,11 +410,23 @@ test('Climate Explore is accessible and fits a mobile screen in available and mi
 
 test('five real pages keep the homepage simple, support history and direct reloads, and preserve the original entry',async({page})=>{
   await page.goto('/');
-  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Hear Earth’s changing climate.');
-  await expect(page.getByRole('button',{name:/Start the experience/})).toBeVisible();
+  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Your planet. On the record.');
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(4);
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','data');
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');
+  await expect(page.locator('.jb-data-value')).toContainText('-0.19°C');
+  await expect(page.locator('.jb-note')).toContainText('196.00 Hz');
+  await page.getByRole('button',{name:'Side A: hear the picture',exact:true}).click();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','visual');
+
+  await page.getByRole('button',{name:'Play record',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Stop',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Stop',exact:true}).click();
   await expect(page.getByRole('group',{name:'Melody tone'})).toHaveCount(0);
   await expect(page.getByLabel('Choose a year',{exact:true})).toHaveCount(0);
-  await page.getByRole('button',{name:/Start the experience/}).click();
+  await page.getByRole('link',{name:'Discover the story',exact:true}).click();
   await expect(page).toHaveURL(/\/listen$/);
   await expect(page.getByRole('heading',{name:'First, hear the picture.'})).toBeVisible();
   await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();
@@ -579,7 +591,7 @@ test('Chinese Listen is simple and sound controls recover with blocked preferenc
   await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked');};Storage.prototype.setItem=()=>{throw Error('blocked');};});
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await page.getByRole('button',{name:/开始体验/}).click();
+  await page.getByRole('link',{name:'了解这段故事',exact:true}).click();
   await expect(page.getByRole('heading',{name:'先听听这幅画面。'})).toBeVisible();
   await page.getByRole('button',{name:/继续聆听真实数据/}).click();
   await page.getByRole('button',{name:/播放数据旋律/}).click();
@@ -637,15 +649,17 @@ test('all five melody tones retain mapped fundamentals, deterministic data-only 
 test('homepage globe rotates gently, pauses for interaction, and obeys motion preferences',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.goto('/');
-  const coordinates=page.locator('.ss-earth-scene .earth-globe__coordinates text');
+  await page.locator('.jb-earth-extra summary').click();
+  const coordinates=page.locator('.jb-earth-extra .earth-globe__coordinates text');
   const initial=await coordinates.textContent();
   await expect.poll(()=>coordinates.textContent()).not.toBe(initial);
   await page.getByRole('button',{name:'Pause rotation',exact:true}).click();
   const paused=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(paused);
   await page.getByRole('button',{name:'Resume rotation',exact:true}).click();
   await expect.poll(()=>coordinates.textContent()).not.toBe(paused);
-  const surface=page.locator('.ss-earth-scene .earth-globe__drag-surface');const box=await surface.boundingBox();
+  const surface=page.locator('.jb-earth-extra .earth-globe__drag-surface');await surface.scrollIntoViewIfNeeded();const box=await surface.boundingBox();
   await page.mouse.move(box!.x+box!.width/2,box!.y+box!.height/2);await page.mouse.down();await page.mouse.move(box!.x+box!.width/2+25,box!.y+box!.height/2);
+  await expect(page.locator('.jb-earth-extra .earth-globe')).toHaveClass(/earth-globe--dragging/);
   const held=await coordinates.textContent();await page.waitForTimeout(300);expect(await coordinates.textContent()).toBe(held);
   await page.mouse.up();await page.waitForTimeout(250);expect(await coordinates.textContent()).toBe(held);
   await expect.poll(()=>coordinates.textContent(),{timeout:3500}).not.toBe(held);
@@ -668,7 +682,7 @@ test('NASA surface renders the correct geographic texture, responds to the camer
       (window as unknown as {surfacePixel:number[]}).surfacePixel=Array.from(pixel);
     };
   });
-  await page.goto('/');await expect(page.locator('.earth-globe--photographic')).toBeVisible();
+  await page.goto('/');await page.locator('.jb-earth-extra summary').click();await expect(page.locator('.earth-globe--photographic')).toBeVisible();
   await expect(page.getByRole('link',{name:'NASA Earth Observatory · Blue Marble ↗',exact:true})).toBeVisible();
   await expect(page.getByText('July 2004 composite.',{exact:false})).toBeVisible();
   const proof=await page.evaluate(async()=>{
@@ -681,7 +695,7 @@ test('NASA surface renders the correct geographic texture, responds to the camer
   });
   expect(proof.actual[3]).toBe(255);
   for(let channel=0;channel<3;channel++)expect(Math.abs(proof.expected[channel]-proof.actual[channel])).toBeLessThan(15);
-  const globe=page.locator('.ss-earth-scene svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');
+  const globe=page.locator('.jb-earth-extra svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');
   await expect.poll(()=>page.evaluate(()=>(window as unknown as {surfacePixel:number[]}).surfacePixel)).not.toEqual(proof.actual);
   await page.evaluate(()=>{
     const gl=document.querySelector<HTMLCanvasElement>('.earth-globe__surface')!.getContext('webgl')!;
@@ -690,7 +704,7 @@ test('NASA surface renders the correct geographic texture, responds to the camer
   });
   await expect(page.locator('.earth-globe--photographic')).toHaveCount(0);
   await expect(page.locator('.earth-globe--photographic')).toBeVisible();
-  await page.getByRole('button',{name:/Start the experience/}).click();await expect(page).toHaveURL(/\/listen$/);
+  await page.getByRole('link',{name:'Discover the story',exact:true}).click();await expect(page).toHaveURL(/\/listen$/);
   await page.getByRole('button',{name:'Play visual sound',exact:true}).click();await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toBeVisible();
 });
 
@@ -705,17 +719,18 @@ for(const failure of ['graphics unavailable','image unavailable']){
     });
     else await page.route('**/blue-marble-july-2004-2048.jpg',route=>route.abort());
     await page.goto('/');
+    await page.locator('.jb-earth-extra summary').click();
     await expect(page.getByRole('link',{name:'Interactive Earth illustration ↗',exact:true})).toBeVisible();
     await expect(page.locator('.earth-globe--photographic')).toHaveCount(0);
     const coordinates=page.locator('.earth-globe__coordinates text'),initial=await coordinates.textContent();
-    const globe=page.locator('.ss-earth-scene svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');await expect(coordinates).not.toHaveText(initial!);
-    await page.getByRole('button',{name:/Start the experience/}).click();await expect(page.getByRole('button',{name:'Play visual sound',exact:true})).toBeEnabled();
+    const globe=page.locator('.jb-earth-extra svg.earth-globe__scene');await globe.focus();await globe.press('ArrowRight');await expect(coordinates).not.toHaveText(initial!);
+    await page.getByRole('link',{name:'Discover the story',exact:true}).click();await expect(page.getByRole('button',{name:'Play visual sound',exact:true})).toBeEnabled();
     expect(errors).toEqual([]);
   });
 }
 
 test('Earth Stations directory preserves the five-page layout and source-aware links',async({page})=>{
- await page.goto('/');await page.getByRole('link',{name:'Explore Earth Stations →',exact:true}).click();await expect(page).toHaveURL(/station=all/);
+ await page.goto('/');await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();await expect(page).toHaveURL(/station=all/);
  await expect(page.getByRole('heading',{name:'One planet. Listen closely.'})).toBeVisible();await expect(page.locator('.st-station-card')).toHaveCount(2);
  await page.getByRole('link',{name:'Listen to Arctic September →',exact:true}).click();await expect(page).toHaveURL(/station=arctic/);
  await page.reload();await expect(page.getByRole('heading',{name:'Listen to the ice record.'})).toBeVisible();
@@ -777,4 +792,77 @@ test('new stations and live proof remain bilingual, accessible and usable on mob
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({route,language,id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
  }
+});
+
+test('Earth Looper replays mapped positions and rhythm locally, then clears without persisting a take',async({page})=>{
+  const posts:string[]=[];page.on('request',request=>{if(request.method()==='POST')posts.push(request.url());});
+  await page.addInitScript(()=>{
+    const audit={notes:[] as {hz:number;at:number}[],contexts:[] as AudioContext[]};(window as unknown as {loopAudit:typeof audit}).loopAudit=audit;
+    const Original=AudioContext;let voices=0;window.AudioContext=class extends Original{constructor(){super();audit.contexts.push(this);}createOscillator(){const osc=super.createOscillator(),fundamental=voices++%3===0,set=osc.frequency.setValueAtTime.bind(osc.frequency);osc.frequency.setValueAtTime=(hz,at)=>{if(fundamental)audit.notes.push({hz,at:performance.now()});return set(hz,at);};return osc;}};
+  });
+  await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
+  const loop=page.getByRole('region',{name:'Earth Looper',exact:true}),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
+  const storage=await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}));
+  await loop.getByRole('button',{name:'Record',exact:true}).click();
+  for(const [index,position] of ['12','31','7'].entries()){
+    await slider.fill(position);await expect(loop).toHaveAttribute('data-loop-count',String(index+1));if(index<2)await page.waitForTimeout(index===0?140:230);
+  }
+  await loop.getByRole('button',{name:'Finish recording',exact:true}).click();
+  await expect(loop).toContainText('3 / 64 notes');
+  await expect(loop.getByRole('button',{name:'Finish recording',exact:true})).toBeDisabled();
+  const recorded=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes.splice(0));
+  expect(recorded).toHaveLength(3);await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await expect(loop.getByRole('button',{name:'Stop replay',exact:true})).toBeEnabled();await expect(loop).toHaveAttribute('data-loop-phase','idle');
+  await expect(loop.getByRole('status')).toHaveText('Your take has finished.');
+  const replayed=await page.evaluate(()=>(window as unknown as {loopAudit:{notes:{hz:number;at:number}[]}}).loopAudit.notes);
+  expect(replayed.map(n=>n.hz)).toEqual(recorded.map(n=>n.hz));
+  for(let i=1;i<3;i++)expect(Math.abs((replayed[i].at-replayed[i-1].at)-(recorded[i].at-recorded[i-1].at))).toBeLessThan(110);
+  await test.info().attach('earth-loop-replay-proof',{body:JSON.stringify({notice:'Automated fixture, not participant or acoustic-latency evidence',recorded,replayed}),contentType:'application/json'});
+  expect(await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}))).toEqual(storage);expect(posts).toEqual([]);
+  await page.getByRole('button',{name:'Back to playback',exact:true}).click();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-play-mode','automatic');
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeVisible();
+  await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
+  await expect(loop).toHaveAttribute('data-loop-count','3');
+  await loop.getByRole('button',{name:'Clear take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
+  await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('20');await expect(loop).toHaveAttribute('data-loop-count','1');
+  await page.getByRole('button',{name:'Select record: Moving Earth',exact:true}).click();await expect.poll(()=>page.evaluate(()=>(window as unknown as {loopAudit:{contexts:AudioContext[]}}).loopAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
+  await page.getByRole('button',{name:'Select record: Climate Spiral',exact:true}).click();await page.getByRole('button',{name:'Play with Earth',exact:true}).click();await expect(page.locator('.jb-looper')).toHaveAttribute('data-loop-count','0');
+});
+
+test('slow manual startup gives an explicit retry and a pending replay can be cancelled',async({page})=>{
+  await page.addInitScript(()=>{
+    const contexts:AudioContext[]=[];(window as unknown as {slowContexts:AudioContext[]}).slowContexts=contexts;
+    const Original=AudioContext;window.AudioContext=class extends Original{delayed=true;constructor(){super();contexts.push(this);}get state():AudioContextState{return this.delayed?'suspended':super.state;}async resume(){await super.resume();if(this.delayed){await new Promise(resolve=>setTimeout(resolve,350));this.delayed=false;}}};
+  });
+  await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();const slider=page.getByRole('slider',{name:'Image scan position',exact:true}),loop=page.locator('.jb-looper');
+  await slider.fill('12');await expect(page.getByText('Audio is ready. Move again or press Hear this position.',{exact:true})).toBeVisible();await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('13');await expect(loop).toHaveAttribute('data-loop-count','1');await loop.getByRole('button',{name:'Finish recording',exact:true}).click();
+  await page.evaluate(()=>{for(const context of (window as unknown as {slowContexts:(AudioContext&{delayed:boolean})[]}).slowContexts)context.delayed=true;});
+  await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','preparing');await loop.getByRole('button',{name:'Stop replay',exact:true}).click();await page.waitForTimeout(450);await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+  await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
+  await expect(loop).toHaveAttribute('data-loop-phase','idle');await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await page.waitForTimeout(350);await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
+});
+
+test('Earth Looper enforces the note limit and finishes an empty recording at the time limit',async({page})=>{
+  test.setTimeout(35_000);await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();const loop=page.locator('.jb-looper'),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
+  await loop.getByRole('button',{name:'Record',exact:true}).click();
+  for(let i=0;i<64;i++){await slider.fill(String(i%47+2));await expect(loop).toHaveAttribute('data-loop-count',String(i+1));}
+  await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(loop.getByRole('status')).toHaveText('64-note limit reached. Your take is ready.');
+  await loop.getByRole('button',{name:'Record again',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-phase','idle',{timeout:16_000});await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
+});
+
+test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:390,height:700},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
+  try{
+    await page.goto('http://127.0.0.1:5173/');const compact=page.getByRole('button',{name:'Play selected record',exact:true});await expect(compact).toBeVisible();const playBounds=await compact.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await compact.tap();await page.getByRole('button',{name:'Stop selected record',exact:true}).tap();
+    await page.getByRole('button',{name:'Play with Earth',exact:true}).tap();const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!;const cdp=await context.newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.2,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.75,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await expect(page.getByRole('slider',{name:'Image scan position',exact:true})).toHaveValue('37');
+    const scrolled=await page.evaluate(()=>scrollY);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5-110,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(scrolled);await expect.poll(()=>page.locator('.jb-deck').getAttribute('data-note-serial')).toBe('0');
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(390);await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(page.getByRole('region',{name:'地球旋律录制',exact:true})).toBeVisible();
+    const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
+  }finally{await context.close();}
 });

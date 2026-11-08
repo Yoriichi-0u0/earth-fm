@@ -2,8 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#080f14" />
+    <style>
+      :root{background:#f4f6f3;color:#172a30;color-scheme:light}
+      :root[data-theme=dark]{background:#090f14;color:#edf3ef;color-scheme:dark}
+      @media(prefers-color-scheme:dark){:root:not([data-theme=light]){background:#090f14;color:#edf3ef;color-scheme:dark}}
+    </style>
+    <script>
+      // Resolve before the module/CSS loads; the shared provider adopts the same preference.
+      (()=>{let p='auto';try{const v=localStorage.getItem('earth-fm-appearance');if(v==='light'||v==='dark')p=v;}catch{}
+        const t=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;
+        document.documentElement.dataset.appearance=p;document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;
+        document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#090f14':'#f4f6f3';})();
+    </script>
     <meta name="description" content="Explore NASA Earth visuals and real climate measurements through live-generated sound. A guided story, music studio, and transparent data lab." />
     <title>Earth FM — Hear the Data. Explore the Earth.</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230b171e'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%23bdf16d' stroke-width='3'/%3E%3Cpath d='M12 32h40M32 12c-14 12-14 28 0 40 14-12 14-28 0-40' fill='none' stroke='%23bdf16d' stroke-width='2'/%3E%3C/svg%3E" />

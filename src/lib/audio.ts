@@ -104,7 +104,7 @@ function partials(soundscape: Soundscape): Partial[] {
   ]
 }
 
-function pointPartials(soundscape: Soundscape, color?: SonificationColor): Partial[] {
+export function pointPartials(soundscape: Soundscape, color?: SonificationColor): Partial[] {
   if (!color) return partials(soundscape)
   // RGB is an artistic timbre mapping: red = warm fundamental, green = octave,
   // blue = bright third harmonic. Display colors do not imply temperatures.

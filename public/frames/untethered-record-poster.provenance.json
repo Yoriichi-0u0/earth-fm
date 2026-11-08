@@ -1,0 +1,17 @@
+{
+  "asset": "/frames/untethered-record-poster.jpg",
+  "createdOn": "2026-11-05",
+  "method": "Decoded frame 12 from the original bundled GIF using macOS ImageIO, aspect-preserving thumbnail, maximum dimension 320 pixels. No generated imagery. JPEG quality 0.82; the poster is not sampled for sonification.",
+  "sourceGif": "/frames/untethered-earth.gif",
+  "sourceGifSha256": "45329ca71deda4d7b2df92190d6f788b4bf914e1af3563735463b81a236d55e3",
+  "associatedVideo": "/frames/untethered-earth.webm",
+  "associatedVideoSha256": "c006fb8ff3e6938e63c475eaffd9bd2a9528c042cd21c88587c0086982dd4ae9",
+  "posterSha256": "c067cd09f8421ceb0c7ea7f39ce7192cc72962e4c00b7f131ecc1ab195911934",
+  "dimensions": [
+    320,
+    180
+  ],
+  "credit": "NASA / Earth Information Center, as identified by the attributed earth.gov asset mirror. Full production credits and animation date not supplied.",
+  "provenanceReference": "/frames/provenance.json",
+  "interpretation": "A still from the original archived animation that underlies the bundled WebM; not a live satellite observation or a new scientific measurement. It is not claimed to be a byte-exact decoded VP9 frame."
+}
