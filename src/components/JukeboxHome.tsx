@@ -3,10 +3,10 @@ import type {CSSProperties,ReactNode} from 'react';
 import {ArrowDown,ArrowUpRight,AudioLines,ChevronLeft,ChevronRight,Disc3,Headphones,Play,Square,Volume2} from 'lucide-react';
 import {jukeboxRecords} from '../data/jukeboxRecords';
 import type {JukeboxRecord,JukeboxRecordId} from '../data/jukeboxRecords';
-import {arcticPoints,arcticStory,mapArctic} from '../data/earthStations';
-import {storyPoints} from '../data/guidedStory';
-import {MONTHS,formatAnomaly} from '../lib/climateMapping';
-import {defaults,mapData,NOTES} from '../lib/symphony';
+import {defaults} from '../lib/symphony';
+import {measurementSequence,mapRecordPoint} from '../lib/jukeboxData';
+import type {RecordPoint} from '../lib/jukeboxData';
+import DataArtwork from './JukeboxDataArtwork';
 import {mapValueToNote} from '../lib/audio';
 import {useSequenceTransport} from '../lib/useSequenceTransport';
 import {useVisualTransport,VISUAL_SCAN_STEPS} from '../lib/useVisualTransport';
@@ -23,12 +23,6 @@ import './JukeboxHome.css';
 
 const noop=()=>{};
 const EarthGlobe=lazy(()=>import('./EarthGlobe'));
-type RecordPoint={year:number;month:number;period:string;value:number|null};
-function mapRecordPoint(point:RecordPoint,arctic:boolean){
-  if(arctic){const note=mapArctic(point);return note?{frequencyHz:note.frequencyHz,note:note.note}:null;}
-  const event=mapData({...point,anomaly:point.value});
-  return event.kind==='note'?{frequencyHz:event.frequencyHz,note:NOTES[event.bandIndex]}:null;
-}
 type DeckState={playing:boolean;starting:boolean;ready:boolean;completed:boolean;progress:number;note:string;frequency:string;position:string;input:string;onPlay:()=>void;signal:RecordSignal;requestAt:number;error?:string;playLabel?:string;manual?:boolean};
 type ConsoleProps=DeckState&{record:JukeboxRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;performanceControls?:ReactNode};
 
@@ -74,34 +68,11 @@ function VisualDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motion
   return <DeckConsole record={record} {...transport.state} artwork={<VisualArtwork record={record} transport={transport}/>} volume={volume} onVolume={onVolume} extra={transport.extra}/>;
 }
 
-function DataArtwork({record,current}:{record:JukeboxRecord;current:RecordPoint}){
-  const {t,date}=useStudioLanguage();
-  const arctic=record.id==='arctic';
-  const all:readonly RecordPoint[]=arctic?arcticPoints:storyPoints.map(p=>({...p,value:p.anomaly}));
-  const low=arctic?3:-1,high=arctic?8:1.5,minYear=all[0].year,maxYear=all.at(-1)!.year;
-  const x=(year:number)=>58+(year-minYear)/(maxYear-minYear)*600,y=(value:number)=>216-(value-low)/(high-low)*160;
-  const path=all.filter(p=>p.value!==null).map((p,i)=>`${i?'L':'M'}${x(p.year).toFixed(2)},${y(p.value!).toFixed(2)}`).join(' ');
-  return <div className="jb-data-art">
-    <div className="jb-art-label"><span>{t('DATA RECORD')}</span><span>{arctic?'NSIDC / ARCTIC':'NASA / GISTEMP'}</span></div>
-    <div className="jb-data-caption"><span>{t(arctic?'SEPTEMBER SEA-ICE EXTENT':'SELECTED JANUARY ANOMALIES')}</span><small>{arctic?t('million km²'):'°C · 1951–1980'}</small></div>
-    <svg viewBox="0 0 710 260" role="img" aria-label={t(arctic?'September mean Arctic sea-ice extent, 1987–2022. The highlighted point is the current observation.':'Selected January temperature anomalies, 1880–2025. Years use actual calendar spacing.')}>
-      {[low,(low+high)/2,high].map(value=><g key={value}><line x1="58" x2="658" y1={y(value)} y2={y(value)} stroke="#ffffff22" strokeDasharray="3 7"/><text x="12" y={y(value)+4}>{value.toFixed(1)}</text></g>)}
-      <path d={`${path}L658,225L58,225Z`} fill="currentColor" opacity=".06"/>
-      <path d={path} stroke="currentColor" fill="none" strokeWidth="2.5" strokeLinejoin="round"/>
-      {all.map(p=>p.value!==null&&<circle key={p.period} cx={x(p.year)} cy={y(p.value)} r="2.8" fill="currentColor" opacity=".45"/>)}
-      {current.value!==null&&<g><line x1={x(current.year)} x2={x(current.year)} y1="40" y2="225" stroke="currentColor" opacity=".5" strokeDasharray="4 6"/><circle cx={x(current.year)} cy={y(current.value)} r="7" fill="currentColor" stroke="#101e28" strokeWidth="3"/></g>}
-      <text x="58" y="249">{minYear}</text><text x="658" y="249" textAnchor="end">{maxYear}</text>
-    </svg>
-    <div className="jb-data-value"><span>{date(current.year,current.month,MONTHS[current.month-1])}</span><strong>{current.value===null?'—':arctic?current.value.toFixed(4):formatAnomaly(current.value)}{arctic&&<small>{t('million km²')}</small>}</strong></div>
-    <div className="jb-art-footer"><span>{t('EARTH FM · PLOT OF THE SOURCE VALUES')}</span><AudioLines size={16}/></div>
-  </div>;
-}
 
 function useDataRecord(record:JukeboxRecord,volume:number){
   const {t}=useStudioLanguage();const [dataOnly,setDataOnly]=useState(false),[requestAt,setRequestAt]=useState(0);
   const arctic=record.id==='arctic';
-  const points=useMemo<RecordPoint[]>(()=>arctic?[...arcticStory]:storyPoints.map(p=>({...p,value:p.anomaly})),[arctic]);
-  const pitches=useMemo(()=>points.map(p=>mapRecordPoint(p,arctic)?.frequencyHz??null),[points,arctic]);
+  const {points,pitches}=useMemo(()=>measurementSequence(arctic?'arctic':'temperature'),[arctic]);
   const audio=useSequenceTransport<RecordPoint>();
   useEffect(()=>{audio.setVolume(volume);},[volume]);
   const completed=audio.status.startsWith('Complete.'),point=audio.audible??(completed?points.at(-1)!:points[0]);
