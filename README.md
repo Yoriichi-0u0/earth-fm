@@ -66,3 +66,7 @@ Publish only after the user approves that release. The current five-page and NAS
 The official challenge text was supplied by the team because the challenge website was blocked by the cloud network policy. The implemented target is the supplied summary: pair EIC visual frames with dynamic real-time sonification. Full judging criteria or later challenge resources have not been independently retrieved.
 
 EIC visuals were retrieved from a clearly attributed, pinned earth.gov asset mirror, not downloaded directly from an official NASA endpoint. Missing image dates and production credits are disclosed. This independent project does not imply NASA endorsement. Original data licenses and visual credits are recorded in the provenance documents; no generated or fictional scientific observations are used.
+
+## Workspace and backups
+
+Use this repository as the single local Earth FM workspace. Keep source history and review checkpoints on GitHub, and retain only current summaries and necessary private inputs locally. See [workspace and retention conventions](docs/WORKSPACE.md). The ignored `project-library/README.md` provides local navigation; large public review packages belong in the verified GitHub evidence archive.
