@@ -1,4 +1,4 @@
-/* Observatory record deck: artwork, one transport, four truthful inputs. */
+/* Observatory record deck: four curated inputs and an optional personal record. */
 .jb-home{--record-accent:#d5f38b;--jb-muted:#a8bbc4;padding:32px 0 28px}
 .jb-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:26px}
 .jb-eyebrow{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:500;letter-spacing:1.8px;color:#b8c7cb;margin:0 0 13px}
@@ -209,3 +209,23 @@
  .ss .jb-home .jb-volume input[type=range]{width:54px}
  .jb-artwork-paired{grid-template-columns:28% minmax(0,1fr)}
 }
+/* Personal records have their own sleeve, outside the scientific collection. */
+.jb-layout>.jb-player{grid-row:1 / span 2;scroll-margin-top:20px}
+.jb-personal-panel{grid-column:2;grid-row:2;min-width:0;padding:19px;border:1px dashed var(--ef-control-border);border-radius:12px;background:var(--ef-panel);color:var(--ef-text)}
+.jb-personal-heading{display:flex;align-items:center;gap:13px}
+.jb-personal-heading>span{display:grid;place-items:center;flex-shrink:0;width:48px;height:48px;border:1px solid var(--ef-border);border-radius:50%;background:var(--ef-panel-raised);color:var(--ef-accent);overflow:hidden}
+.jb-personal-heading img{width:100%;height:100%;object-fit:cover}
+.ss .jb-home .jb-personal-heading p{font-size:10px;line-height:1.6;letter-spacing:1px;margin:0 0 3px;color:var(--ef-muted)}
+.ss .jb-home .jb-personal-heading h2{font-size:17px;line-height:1.35;margin:0;color:var(--ef-text);font-weight:500;letter-spacing:-.2px}
+.ss .jb-home .jb-personal-panel>p{font-size:12px;line-height:1.7;color:var(--ef-muted);margin:12px 0 0}
+.jb-personal-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:15px}
+.ss .jb-home .jb-personal-actions button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 12px;border:1px solid var(--ef-control-border);border-radius:7px;background:var(--ef-panel-raised);color:var(--ef-text);font-size:12px;line-height:1.4;white-space:normal}
+.ss .jb-home .jb-personal-actions button:hover,.ss .jb-home .jb-personal-actions button[aria-pressed=true]{background:var(--ef-selected);border-color:var(--ef-accent);color:var(--ef-accent)}
+.ss .jb-home .jb-personal-actions button:only-child{background:var(--ef-accent);color:var(--ef-on-accent);border-color:var(--ef-accent)}
+.jb-personal-privacy{display:flex;gap:7px;align-items:flex-start}
+.jb-personal-privacy svg{flex-shrink:0;margin-top:3px}
+.ss .jb-home .jb-personal-error{color:var(--ef-danger);background:var(--ef-danger-panel);border-radius:6px;padding:13px;font-size:13px;line-height:1.7;margin:0 0 12px}
+.jb-personal-loading{display:grid;justify-items:center;align-content:center;min-height:330px;gap:14px;text-align:center;padding:25px;border:1px solid var(--ef-border);border-radius:16px;background:var(--ef-panel);color:var(--ef-text)}
+.ss .jb-home .jb-personal-loading h2{font-size:24px;margin:0}.ss .jb-home .jb-personal-loading p{font-size:13px;color:var(--ef-muted);margin:0;line-height:1.8}
+.ss .jb-home .jb-personal-loading button{min-height:44px;padding:10px 15px;background:var(--ef-accent);color:var(--ef-on-accent);border:1px solid var(--ef-accent);border-radius:7px}
+@media(max-width:960px){.jb-personal-panel{order:2;width:100%}.jb-layout>.jb-player{order:1}.jb-layout>.jb-library{order:0}.jb-personal-actions{margin-top:12px}}
