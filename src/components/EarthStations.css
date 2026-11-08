@@ -4,3 +4,30 @@
 @media(prefers-reduced-motion:reduce){.st-pair-dates strong{transition:none}}
 
 .st-about-stations{margin-top:26px}.st-chart-unit{color:#a8cbdc;font-size:10px;line-height:1.6}.st-card-chart{grid-template-rows:auto minmax(0,1fr)}.st-card-chart .st-arctic-chart{height:100%;max-height:100%}.st-volume{max-width:260px;margin:20px auto}.st-table-scroll:focus-visible{outline:2px solid #d9f397;outline-offset:4px}
+
+/* Readable scientific context and compact discovery cards on narrow screens. */
+.st-tag,.st-chart-unit,.st-pair-values small,.st-source-note,
+.st-inline-play>span,.st-live-proof dl>div,.ss .st-live-proof p{font-size:12px;line-height:1.75}
+.st-action,.st-browse-link{min-height:44px;align-items:center;padding-block:8px}
+.st-browse-link{display:inline-flex}
+.st-context-select{min-width:0}
+.ss .st-context-select select{min-height:44px}
+.st-pair-values>div{min-width:0}
+.st-pair-values strong{overflow-wrap:anywhere}
+.st-table-scroll th,.st-table-scroll td{font-variant-numeric:tabular-nums}
+@media(max-width:650px){
+ .st-library{gap:16px}
+ .st-station-card>img,.st-card-chart{height:175px}
+ .st-station-card>div:not(.st-card-chart){padding:18px}
+ .ss .st-station-card h2{margin-bottom:12px}
+ .st-station-card p:not(.ss-kicker){line-height:1.75;min-height:0}
+ .st-station-card .st-action{margin-top:12px}
+ .st-motion-invite{margin-top:18px;gap:8px}
+ .ss .st-motion-invite{padding:20px}
+ .st-motion-invite .st-action{margin-top:4px}
+ .st-context-select{flex-wrap:wrap;gap:8px 14px;margin-bottom:20px}
+ .ss .st-context-select select{max-width:100%;flex:0 1 200px}
+ .st-proof span,.st-pair-values small,.st-live-proof dl>div{font-size:12px}
+ .st-moving-control,.st-motion-off{font-size:12px;line-height:1.7}
+ .st-live-proof dl{gap:18px 12px}
+}
