@@ -209,3 +209,9 @@
  .ss .jb-home .jb-volume input[type=range]{width:54px}
  .jb-artwork-paired{grid-template-columns:28% minmax(0,1fr)}
 }
+
+/* The optional game entry is styled before its component is lazy-loaded. */
+.ss .jb-home .jb-mystery-entry{font-size:11px;min-height:44px;padding:7px 9px;margin-left:auto}.jb-library-heading{gap:10px}.ss .jb-home .jb-mystery-entry[aria-pressed=true]{border-color:var(--ef-accent);background:var(--ef-selected);color:var(--ef-accent)}
+.ss .jb-home .jb-mystery-entry{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:500;line-height:1.4;border:1px solid var(--ef-control-border);border-radius:7px;color:var(--ef-text);background:var(--ef-panel-raised);white-space:normal}
+.ss .jb-home .jb-mystery-entry:hover{background:var(--ef-selected);color:var(--ef-accent);border-color:var(--ef-accent)}
+@media(max-width:650px){.jb-library-heading{gap:7px}.ss .jb-home .jb-mystery-entry{font-size:10px;padding-inline:7px}}

@@ -23,6 +23,7 @@ import './JukeboxHome.css';
 
 const noop=()=>{};
 const EarthGlobe=lazy(()=>import('./EarthGlobe'));
+const MysteryRecord=lazy(()=>import('./MysteryRecord'));
 type DeckState={playing:boolean;starting:boolean;ready:boolean;completed:boolean;progress:number;note:string;frequency:string;position:string;input:string;onPlay:()=>void;signal:RecordSignal;requestAt:number;error?:string;playLabel?:string;manual?:boolean};
 type ConsoleProps=DeckState&{record:JukeboxRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;performanceControls?:ReactNode};
 
@@ -115,7 +116,7 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
 
 export default function JukeboxHome({motion}:{motion:boolean}){
   const {t}=useStudioLanguage();
-  const [selected,setSelected]=useState<JukeboxRecordId>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
+  const [selected,setSelected]=useState<JukeboxRecordId|'mystery'>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
   const shelf=useRef<HTMLDivElement>(null),[edges,setEdges]=useState({left:false,right:false});
   useEffect(()=>{
     const element=shelf.current;if(!element)return;
@@ -123,12 +124,12 @@ export default function JukeboxHome({motion}:{motion:boolean}){
     const observer=new ResizeObserver(update);observer.observe(element);element.addEventListener('scroll',update,{passive:true});update();
     return()=>{observer.disconnect();element.removeEventListener('scroll',update);};
   },[]);
-  const record=jukeboxRecords.find(r=>r.id===selected)!,station=record.id==='arctic'?'arctic':'climate';
+  const record=jukeboxRecords.find(r=>r.id===selected)??jukeboxRecords[0],station=record.id==='arctic'?'arctic':'climate';
   function moveShelf(direction:number){const element=shelf.current;if(element)element.scrollBy({left:direction*element.clientWidth*.8,behavior:motion?'smooth':'instant'});}
   return <div className="jb-home" style={{'--record-accent':record.accent} as CSSProperties}>
     <header className="jb-intro"><div><p className="jb-eyebrow"><Disc3 size={15}/>{t('THE EARTH INFORMATION JUKEBOX')}</p><h1 tabIndex={-1}>{t('Your planet.')} <em>{t('On the record.')}</em></h1></div><p>{t('Choose an Earth story. Press Play.')}<span>{t('Sound made from NASA visuals and Earth observations.')}</span></p></header>
     <div className="jb-layout">
-      <section className="jb-library" aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><span>{String(jukeboxRecords.findIndex(item=>item.id===selected)+1).padStart(2,'0')} / 04</span></div>
+      <section className="jb-library" aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>setSelected('mystery')}><Disc3 size={14}/>{t('Mystery Record')}</button><span>{selected==='mystery'?'?':String(jukeboxRecords.findIndex(item=>item.id===selected)+1).padStart(2,'0')} / 04</span></div>
         <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
           <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>setSelected(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
             <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
@@ -139,9 +140,9 @@ export default function JukeboxHome({motion}:{motion:boolean}){
         </div>
         <p className="jb-library-note"><Headphones size={15}/>{t('Four records. Sound generated as you listen.')}</p>
       </section>
-      <div className="jb-player" key={record.id}>{record.id==='spiral'?<ClimateDeck record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck record={record} volume={volume} onVolume={setVolume}/>}</div>
+      <div className="jb-player" key={selected}>{selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={setSelected}/></Suspense>:record.id==='spiral'?<ClimateDeck record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck record={record} volume={volume} onVolume={setVolume}/>}</div>
     </div>
-    <div className="jb-deeper"><span>{t('Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',station,record.id==='motion'?'motion':undefined);}}>{t('Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t('Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
+    <div className="jb-deeper"><span>{t(selected==='mystery'?'Explore more of Earth FM.':'Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',selected==='mystery'?'all':station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',selected==='mystery'?'all':station,record.id==='motion'?'motion':undefined);}}>{t(selected==='mystery'?'Browse Earth stories':'Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t(selected==='mystery'?'Inspect Earth data':'Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
     <details className="jb-earth-extra" onToggle={e=>{setEarthOpen(e.currentTarget.open);if(!e.currentTarget.open)setEarthReady(false);}}><summary>{t('A closer look at home')} <span>{t('The Earth Observatory view')} ↗</span></summary>{earthOpen&&<div><Suspense fallback={<p role="status">{t('Loading the Earth view…')}</p>}><EarthGlobe locations={[]} selectedId="" onSelect={noop} playing={false} autoRotate={motion} photographic onSurfaceReady={setEarthReady}/></Suspense><p>{t(earthReady?'July 2004 composite. Lighting and rotation are illustrative, not live weather.':'Interactive illustration with Natural Earth boundaries. Lighting and rotation are illustrative.')} <a href={earthReady?observatoryImagery.sourcePage:'https://www.naturalearthdata.com/'} target="_blank" rel="noreferrer">{t(earthReady?'NASA Earth Observatory · Blue Marble ↗':'Interactive Earth illustration ↗')}</a></p></div>}</details>
   </div>;
 }
