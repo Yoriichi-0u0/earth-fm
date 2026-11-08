@@ -72,6 +72,21 @@ test('bad signatures, size, geometry, animation and native decode errors recover
   await page.getByRole('button',{name:'Remove',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
 });
 
+test('a first-image error has a direct retry; empty MIME is sniffed and the new record receives keyboard focus',async({page})=>{
+  await page.goto('/');await input(page).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('broken')});
+  await expect(page.locator('.jb-player').getByRole('alert')).toContainText('Choose a PNG');await expect(page.getByRole('button',{name:'Choose another image',exact:true})).toBeVisible();
+  const chooser=page.waitForEvent('filechooser');await page.getByRole('button',{name:'Choose another image',exact:true}).click();await (await chooser).setFiles(fixture());
+  await expect(page.getByRole('heading',{name:'Your Record',exact:true})).toBeFocused();await expect(page.getByRole('alert')).toHaveCount(0);
+  await input(page).setInputFiles({name:'no-mime',mimeType:'',buffer:readFileSync(fixture())});await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  await expect(page.getByRole('link',{name:'Browse Earth stories',exact:true})).toHaveAttribute('href','/listen?station=all');
+});
+
+test('a failed replacement preserves the image but deliberately clears the old take',async({page})=>{
+  await page.goto('/');await upload(page);const source=await page.locator('.jb-media img').getAttribute('src');await scratch(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('20');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
+  await input(page).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('broken')});await expect(page.getByRole('alert')).toContainText('Its take has been cleared.');await expect(page.locator('.jb-media img')).toHaveAttribute('src',source!);
+  await scratch(page);await expect(loop(page)).toHaveAttribute('data-loop-count','0');await expect(loop(page).getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
+});
+
 test('record and replay use the same notes; replacing even the same file cancels the take and closes the old audio',async({page})=>{
   await audit(page);await page.goto('/');await upload(page);await scratch(page);
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();

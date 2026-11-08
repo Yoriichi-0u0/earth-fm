@@ -15,19 +15,22 @@ export const imageMessages:Record<ImageProblem,string>={
 export function usePersonalImage(){
   const [selection]=useState(()=>new ImageSelection());
   const [image,setImage]=useState<PersonalImage|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
-  const owned=useRef(new Set<string>());
-  useEffect(()=>()=>{selection.cancel();for(const url of owned.current)URL.revokeObjectURL(url);owned.current.clear();},[selection]);
+  const owned=useRef(new Set<string>()),request=useRef(0);
+  useEffect(()=>()=>{request.current++;selection.cancel();for(const url of owned.current)URL.revokeObjectURL(url);owned.current.clear();},[selection]);
   // Release replaced URLs after React has detached their old media elements.
   useEffect(()=>{for(const url of owned.current)if(url!==image?.url){URL.revokeObjectURL(url);owned.current.delete(url);}},[image]);
   async function choose(file:File){
+    const token=++request.current;
     setLoading(true);setError('');
     try{
       const next=await selection.load(signal=>decodePersonalImage(file,signal),value=>URL.revokeObjectURL(value.url));
       if(!next)return;
+      // Cancellation can also happen between the loader's resolution and this continuation.
+      if(token!==request.current){URL.revokeObjectURL(next.url);return;}
       owned.current.add(next.url);setImage(next);setLoading(false);
-    }catch(cause){setLoading(false);setError(imageMessages[cause instanceof PersonalImageError?cause.problem:'decode']);}
+    }catch(cause){if(token===request.current){setLoading(false);setError(imageMessages[cause instanceof PersonalImageError?cause.problem:'decode']);}}
   }
-  function cancel(){selection.cancel();setLoading(false);setError('');}
+  function cancel(){request.current++;selection.cancel();setLoading(false);setError('');}
   function remove(){cancel();setImage(null);}
   return {image,loading,error,choose,cancel,remove};
 }
