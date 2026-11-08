@@ -40,9 +40,13 @@ function MeasurementRound(props:RoundProps){
   const {record,volume}=props;
   const sequence=useMemo(()=>measurementSequence(record.id==='arctic'?'arctic':'temperature'),[record.id]);
   const audio=useSequenceTransport<(typeof sequence.points)[number]>();
+  // Stop clears the transport readout. Keep only committed observations for reveal.
+  const [lastHeard,setLastHeard]=useState<(typeof sequence.points)[number]|null>(null);
+  useEffect(()=>{if(audio.audible)setLastHeard(audio.audible);},[audio.audible]);
+  const {t}=useStudioLanguage();
   useEffect(()=>{audio.setVolume(volume);},[volume]);
-  const playback:Playback={ready:true,active:audio.playing,starting:audio.status==='Starting audio…',error:audio.status.startsWith('Audio could not'),event:audio.noteEvent,start:()=>void audio.play(sequence.points,sequence.pitches,{...defaults,tempo:60,volume}),stop:audio.stop};
-  return <MysteryRound {...props} playback={playback} source={revealed=>revealed?<DataArtwork record={record} current={audio.audible??sequence.points[0]}/>:null}/>;
+  const playback:Playback={ready:true,active:audio.playing,starting:audio.status==='Starting audio…',error:audio.status.startsWith('Audio could not'),event:audio.noteEvent,start:()=>{setLastHeard(null);void audio.play(sequence.points,sequence.pitches,{...defaults,tempo:60,volume});},stop:audio.stop};
+  return <MysteryRound {...props} playback={playback} source={revealed=>revealed?<><p className="mr-observation-label">{t(audio.audible?'Current observation':lastHeard?'Last heard observation':'Starting observation · no note heard yet')}</p><DataArtwork record={record} current={audio.audible??lastHeard??sequence.points[0]}/></>:null}/>;
 }
 
 function MysteryRound({record,motion,volume,onVolume,onOpen,onNext,playback,source}:RoundProps&{playback:Playback;source:(revealed:boolean)=>ReactNode}){

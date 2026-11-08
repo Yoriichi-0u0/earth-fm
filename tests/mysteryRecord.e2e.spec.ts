@@ -95,6 +95,7 @@ test('a stalled initialization is bounded by the 30-second guard and late resolu
 
 test('the generated measurement performance ends naturally and can be replayed',async({page})=>{
   test.setTimeout(35_000);await setup(page,.9);await open(page);await play(page).click();await expect(mystery(page).getByRole('status')).toContainText('Ready to replay',{timeout:27_000});await expect(mystery(page).getByRole('button',{name:'Replay',exact:true})).toBeEnabled();
+  await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await expect(mystery(page).locator('.mr-observation-label')).toHaveText('Last heard observation');await expect(mystery(page).locator('.jb-data-value>span')).toHaveText('January 2025');
 });
 
 test('guesses, rerolls and reveals stay in session memory without score or network writes',async({page})=>{
