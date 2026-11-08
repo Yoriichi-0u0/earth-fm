@@ -28,4 +28,3 @@ export default function DataArtwork({record,current}:{record:JukeboxRecord;curre
     <div className="jb-art-footer"><span>{t('EARTH FM · PLOT OF THE SOURCE VALUES')}</span><AudioLines size={16}/></div>
   </div>;
 }
-
