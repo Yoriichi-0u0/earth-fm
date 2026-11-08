@@ -188,7 +188,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} integrated Home keep
         }
         if(language==='en'&&[390,768,1440].includes(viewport.width)){
           const path=test.info().outputPath(`integrated-${mode}-${viewport.width}-${theme}.png`);
-          await page.screenshot({path,fullPage:true});await test.info().attach(`integrated-${mode}-${viewport.width}-${theme}`,{path,contentType:'image/png'});
+          await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path,fullPage:true});await test.info().attach(`integrated-${mode}-${viewport.width}-${theme}`,{path,contentType:'image/png'});
         }
       }
       if(language==='zh')await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');

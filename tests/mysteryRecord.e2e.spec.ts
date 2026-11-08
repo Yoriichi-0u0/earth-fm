@@ -111,7 +111,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} mystery is accessibl
     for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}]){
       await page.setViewportSize(viewport);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       for(const b of await mystery(page).getByRole('button').all()){const bounds=await b.boundingBox();expect(bounds!.height).toBeGreaterThanOrEqual(44);}
-      if([390,768,1440].includes(viewport.width))await test.info().attach(`mystery-${phase}-${viewport.width}-${theme}`,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
+      if([390,768,1440].includes(viewport.width)){await page.evaluate(()=>window.scrollTo(0,0));await test.info().attach(`mystery-${phase}-${viewport.width}-${theme}`,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});}
     }
     const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
     await test.info().attach(`mystery-axe-${phase}-${theme}`,{body:JSON.stringify({violations:scan.violations,contrastIncomplete:scan.incomplete.filter(v=>v.id==='color-contrast').map(v=>v.nodes.map(n=>n.target))}),contentType:'application/json'});

@@ -185,6 +185,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} personal record fits
       return Math.max(Math.abs(surfaceBox.x-left),Math.abs(surfaceBox.width-visibleWidth),Math.abs(scanBox.x-(left+(index+.5)/48*visibleWidth)));
     }),'scan and touch surface must align with the visible image after resizing').toBeLessThan(1);
     for(const button of await page.locator('.jb-personal-actions button').all()){const bounds=await button.boundingBox();expect(bounds!.height).toBeGreaterThanOrEqual(44);}
+    await page.evaluate(()=>window.scrollTo(0,0));
     await test.info().attach(`personal-${viewport.width}-${theme}`,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
   }
   await slider(page).focus();await slider(page).press('Home');await slider(page).press('ArrowRight');await expect(slider(page)).toHaveValue('2');
