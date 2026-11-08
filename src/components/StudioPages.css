@@ -23,6 +23,7 @@
 
 /* One in-flow transport owns Create playback; it never floats over a tone option. */
 .sp-create-transport{display:flex;justify-content:flex-end;margin:-10px 0 20px;min-width:0}
+.sp-page-about>section.sp-card+section.sp-card{margin-top:24px}
 .ss-pages .sp-create-transport>.sp-primary{width:min(100%,360px);min-height:48px;white-space:normal}
 .sp-page-create :is(button,input,select,summary){scroll-margin-block-start:100px;scroll-margin-block-end:28px}
 .sp-data-summary>div{min-width:0}

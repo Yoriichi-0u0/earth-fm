@@ -5,6 +5,8 @@
 .ss .sp-preferences .sp-language{display:flex;flex-direction:column;align-items:stretch;gap:5px;font-size:12px;min-width:94px;order:initial}
 .ss .sp-preferences .sp-language>span{display:block;font-size:11px;line-height:1.3}
 .legacy-header-actions{display:flex;align-items:center;gap:16px}
+:root[data-theme] .ss .sp-preferences select{min-height:44px;line-height:1.3;padding-block:9px}
+:root[data-theme] .ss .sp-preferences :is(.sp-language>span,.appearance-selector>span){font-size:11px;line-height:1.3}
 @media(max-width:1050px){.ss .sp-header{gap:16px;flex-wrap:wrap}.ss .sp-nav{gap:15px}.sp-preferences{gap:8px}.legacy-header-actions{gap:10px}}
 @media(max-width:650px){
  .ss .sp-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 10px;align-items:center}

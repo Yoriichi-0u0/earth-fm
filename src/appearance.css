@@ -135,7 +135,8 @@
 :root[data-theme] .ss .sp-skip { color: var(--ef-on-accent) !important; background: var(--ef-accent); }
 :root[data-theme] .ss :is(.sp-wave i, .ss-meter i, .visual-spectrum i) { background: var(--ef-secondary); }
 :root[data-theme] .ss :is(.sp-wave.is-playing i, .visual-spectrum i.active) { background: var(--ef-accent); }
-:root[data-theme] .ss .sp-create-transport { background: var(--ef-panel); border-color: var(--ef-border); box-shadow: var(--ef-shadow); }
+:root[data-theme] .ss .sp-create-transport { background: transparent; }
+@media(max-width:960px){:root[data-theme] .ss .sp-create-transport { background: var(--ef-panel); border-color: var(--ef-border); box-shadow: var(--ef-shadow); }}
 
 /* Earth Stations, source explanations and observation charts. Color encodes UI
  * identity here; all paths, values, scales and point coordinates are untouched.
@@ -166,6 +167,8 @@
 :root[data-theme] .ss :is(.sp-guided-player .visual-screen-header, .sp-guided-player .visual-screen-header>span:first-child, .sp-guided-player .visual-volume) { color: var(--ef-muted); }
 :root[data-theme] .ss .ss-spiral { background: var(--ef-media-bg); border-color: var(--ef-border); }
 :root[data-theme] .ss .ss-spiral :is(.ss-figure-top, .ss-view-controls, figcaption) { color: var(--ef-media-text); }
+:root[data-theme] .ss .ss-spiral :is(.ss-reference>summary, .ss-reference>p, .ss-view-controls>label) { color: var(--ef-media-text); }
+:root[data-theme] .ss .ss-spiral .ss-reference a { color: var(--ef-media-focus); }
 
 /* The record sculpture, NASA images and source plots stay in the same dark
  * media window. The surrounding deck is an intentionally themed gallery frame.
