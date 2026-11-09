@@ -8,12 +8,14 @@ const print=(page:Page)=>page.locator('.jb-vinyl-fallback>.jb-grooveprint');
 const loop=(page:Page)=>page.getByRole('region',{name:'Earth Looper',exact:true});
 
 for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refinement comparison`,async({page})=>{
+  const layouts:unknown[]=[];
   await page.goto('/');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
-  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();await page.locator('.jb-groove-key summary').click();
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();await page.locator('.jb-groove-key>details>summary').click();
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
     await page.setViewportSize(viewport);
     for(const side of ['a','b']){
       await page.getByRole('button',{name:side==='a'?'Side A: hear the picture':'Side B: hear the measurements',exact:true}).click();
+      layouts.push(await page.locator('.jb-groove-key').evaluate((element,context)=>({theme:context.theme,width:innerWidth,side:context.side,panelHeight:element.getBoundingClientRect().height,visibleWords:(element as HTMLElement).innerText.split(/\s+/).length,readingHeight:element.querySelector('.jb-groove-reading')!.getBoundingClientRect().height}),{theme,side}));
       for(const detail of ['panel','page']){
         const path=test.info().outputPath(`refinement-${theme}-${viewport.width}-${side}-${detail}.png`);
         if(detail==='panel')await page.locator('.jb-groove-key').screenshot({path});else{await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path,fullPage:true});}
@@ -21,6 +23,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refin
       }
     }
   }
+  await test.info().attach(`experience-layout-${theme}`,{body:JSON.stringify(layouts),contentType:'application/json'});
 });
 async function setup(page:Page){
   await page.addInitScript(()=>{
@@ -73,7 +76,7 @@ test('both patterns reuse the source values and fixed sound mapping without extr
   const actual=await print(page).locator('[data-groove-sector]').evaluateAll(nodes=>nodes.map(n=>({value:Number(n.getAttribute('data-groove-value')),band:Number(n.getAttribute('data-groove-band'))})));
   const sequence=await page.evaluate(async()=>{const path='/src/lib/jukeboxData.ts',mapping='/src/lib/symphony.ts';const {points,pitches}=(await import(path)).measurementSequence('temperature');const {mapData}=await import(mapping);return{pitches,values:points.map((p:{value:number})=>p.value),bands:points.map((p:{value:number})=>mapData({...p,anomaly:p.value}).bandIndex)};});
   expect(actual.map(p=>p.value)).toEqual(sequence.values);expect(actual.map(p=>p.band)).toEqual(sequence.bands);
-  await page.locator('.jb-groove-key summary').click();await expect(page.getByRole('img',{name:'Enlarged measurement grooveprint',exact:true})).toBeVisible();
+  await page.locator('.jb-groove-key>details>summary').click();await expect(page.getByRole('img',{name:'Enlarged measurement grooveprint',exact:true})).toBeVisible();
   expect(await page.evaluate(()=>window.grooveAudit.reads)).toBe(reads);
   await page.getByRole('checkbox',{name:'Hear Data Only',exact:true}).check();await page.evaluate(()=>{window.grooveAudit.notes=[];});
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.grooveAudit.notes.length)).toBeGreaterThan(0);
@@ -128,7 +131,7 @@ test('an unavailable image has no invented grooves while Side B keeps real obser
 
 for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves remain bilingual, keyboard usable and accessible at six viewports`,async({page})=>{
   test.setTimeout(60_000);await setup(page);await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
-  await page.locator('.jb-groove-key summary').focus();await page.keyboard.press('Enter');await expect(page.locator('.jb-groove-key details')).toHaveAttribute('open','');
+  await page.locator('.jb-groove-key>details>summary').focus();await page.keyboard.press('Enter');await expect(page.locator('.jb-groove-key>details')).toHaveAttribute('open','');
   await page.getByRole('slider',{name:'Inspect sector (silent)',exact:true}).press('End');
   const imageValues=await page.locator('.jb-groove-selected dl dd').allTextContents();
   const paths=await print(page).locator('.gg-mark').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('d'))),reads=await page.evaluate(()=>window.grooveAudit.reads);
@@ -172,7 +175,7 @@ const inspect=(page:Page)=>page.getByRole('slider',{name:'Inspect sector (silent
 const selectedValues=(page:Page)=>page.locator('.jb-groove-selected dl dd').allTextContents();
 
 test('silent inspection keeps every image/January input and mapped note consistent without starting audio',async({page})=>{
-  test.setTimeout(45_000);await setup(page);await page.locator('.jb-groove-key summary').click();
+  test.setTimeout(45_000);await setup(page);await page.locator('.jb-groove-key>details>summary').click();
   const brightness=await print(page).locator('[data-groove-sector]').evaluateAll(nodes=>nodes.map(n=>Number(n.getAttribute('data-groove-value'))));
   const expected=await page.evaluate(async values=>{const path='/src/lib/audio.ts';const {mapValueToNote}=await import(path);return values.map(value=>mapValueToNote(value,0,1));},brightness);
   const reads=await page.evaluate(()=>window.grooveAudit.reads);
@@ -195,7 +198,7 @@ test('silent inspection keeps every image/January input and mapped note consiste
 });
 
 test('inspection cancels pending/active playback, and explicit Play resumes the original start',async({page})=>{
-  await setup(page);await page.locator('.jb-groove-key summary').click();
+  await setup(page);await page.locator('.jb-groove-key>details>summary').click();
   await page.evaluate(()=>{window.grooveAudit.hold=true;});await page.getByRole('button',{name:'Play record',exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>window.grooveAudit.resumes.length)).toBe(1);await inspect(page).fill('20');
   await page.evaluate(()=>{window.grooveAudit.hold=false;window.grooveAudit.resumes.splice(0).forEach(resolve=>resolve());});
@@ -212,7 +215,7 @@ test('inspection cancels pending/active playback, and explicit Play resumes the 
 });
 
 test('both CSS-flipped faces keep clockwise screen order and the same selected source index',async({page})=>{
-  await setup(page);await page.locator('.jb-groove-key summary').click();const evidence=[];
+  await setup(page);await page.locator('.jb-groove-key>details>summary').click();const evidence=[];
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
     await page.setViewportSize(viewport);
     for(const side of ['a','b','a']){
@@ -233,4 +236,34 @@ test('both CSS-flipped faces keep clockwise screen order and the same selected s
     }
   }
   await test.info().attach('grooveprint-orientation',{body:JSON.stringify({notice:'Chromium projected SVG coordinates; top/right/bottom/left must retain positive clockwise area in screen coordinates',evidence}),contentType:'application/json'});
+});
+
+for(const theme of ['light','dark'] as const)test(`${theme} mapping disclosure preserves selected values, science context and active playback`,async({page})=>{
+  await setup(page);await page.setViewportSize({width:390,height:844});await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await page.locator('.jb-groove-key>details>summary').press('Enter');await inspect(page).fill('13');
+  const values=await selectedValues(page),reads=await page.evaluate(()=>window.grooveAudit.reads);
+  await expect(page.locator('.jb-groove-context')).toBeVisible();await expect(page.locator('.jb-groove-context')).toContainText('Image brightness, not temperature');
+  const detail=page.locator('.jb-groove-mapping'),summary=detail.locator('summary');
+  await expect(detail).not.toHaveAttribute('open','');await expect(detail.locator('p').first()).not.toBeVisible();
+  await summary.press('Enter');await expect(detail.locator('p').first()).toBeVisible();await expect(detail).toContainText('without rescaling this image');
+  expect(await selectedValues(page)).toEqual(values);expect(await page.evaluate(()=>window.grooveAudit.reads)).toBe(reads);
+  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(detail).toHaveAttribute('open','');await expect(summary).toHaveText('映射细节与局限');
+  expect(await selectedValues(page)).toEqual(values);await summary.press('Enter');
+  await page.getByRole('button',{name:'翻到 B 面：聆听科学测量',exact:true}).press('Enter');
+  await expect(page.locator('.jb-groove-context')).toBeVisible();await expect(page.locator('.jb-groove-context')).toContainText('不代表年份间隔');
+  await page.getByRole('slider',{name:'静音查看扇区',exact:true}).press('End');await expect(page.locator('.jb-groove-selected dl dd').first()).toHaveText('2025');
+  await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');
+  for(const expanded of [false,true]){
+    if(expanded)await summary.press('Enter');
+    const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
+    await test.info().attach(`experience-axe-${theme}-${expanded?'detailed':'brief'}`,{body:JSON.stringify({violations:scan.violations,incomplete:scan.incomplete.filter(v=>v.id==='color-contrast').map(v=>v.nodes.map(n=>n.target))}),contentType:'application/json'});
+  }
+  await expect(detail).toContainText('0.25 °C');await expect(detail).toContainText('not mean sound is playing');
+  expect(await page.evaluate(()=>window.grooveAudit.contexts.length)).toBe(0);
+  await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
+  const request=await page.locator('.jb-deck').getAttribute('data-play-request-at'),contexts=await page.evaluate(()=>window.grooveAudit.contexts.length);
+  await summary.press('Enter');await summary.press('Enter');
+  await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);await expect(page.locator('.jb-deck')).toHaveAttribute('data-play-request-at',request!);
+  expect(await page.evaluate(()=>window.grooveAudit.contexts.length)).toBe(contexts);
+  await page.getByRole('button',{name:'Stop',exact:true}).click();
 });

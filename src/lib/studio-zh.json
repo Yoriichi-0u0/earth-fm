@@ -842,5 +842,8 @@
   "Rest": "休止",
   "Inspecting is silent and stops playback. Play uses the original sequence; Hear uses the selected strip. Frequencies are rounded to 2 decimals.": "查看扇区不会发声，并会停止播放。“播放”从原始序列开始，“聆听”演奏所选条带。频率显示保留两位小数。",
   "Missing value · no mapped note.": "数据缺失 · 无映射音符。",
-  "Outside mapping · no mapped note.": "超出映射范围 · 无映射音符。"
+  "Outside mapping · no mapped note.": "超出映射范围 · 无映射音符。",
+  "Image brightness, not temperature. Clockwise sectors follow the image strips from left to right.": "声音来自图像亮度，并非气温。扇区按图像条带从左到右的顺序，顺时针排列。",
+  "January temperature anomalies (°C, relative to 1951–1980). Equal angles show selected observation order, not elapsed years.": "一月气温距平（°C，相对于 1951–1980 年）。等角扇区表示所选观测的顺序，不代表年份间隔。",
+  "Mapping details and limitations": "映射细节与局限"
 }
