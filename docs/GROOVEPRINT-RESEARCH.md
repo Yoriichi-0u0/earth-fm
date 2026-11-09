@@ -8,3 +8,11 @@ Based on PR #8 at `c301527`. This is a passive 2D visualization experiment, not 
 - Preserve the vinyl artwork, NASA imagery, datasets, audio transports, fixed profiles, optional 3D implementation, themes, languages and other experiences. The engraving is 2D only; 3D remains illustrative. An optional enlarged diagram makes the sectors inspectable on phones. The key follows the transport only, and does not encode musical accompaniment.
 
 Acceptance: deterministic fixture geometry, truthful gaps, correct side/source/position, unchanged audio output and cancellation, accessible explanation and keyboard controls, usable phone layouts and no continuous animation loop introduced by the engraving. Capture before/after views before deciding whether to retain it. Physical-device, perceptual and learning results must be reported separately from automated checks.
+
+## Research result — 9 November 2026
+
+Retain as a research candidate. Desktop comparison shows a distinct source-derived pattern while the Earth artwork stays visible. The small phone vinyl is a summary, not a precise reading surface; the optional enlarged diagram is needed to inspect sectors. No claim of improved understanding has been established with participants.
+
+`npm run check` passed 61 unit tests, the production build and all 105 Chromium scenarios. Nine new browser scenarios cover source values, original frequencies, Scratch/Looper highlighting, delayed startup cancellation, hidden tabs/navigation, unavailable imagery, bilingual keyboard/reduced-motion use, six viewports and a pure-transform benchmark. SHA-256 verification found no changes in 49 protected source/data/audio/3D/configuration files. Optional 3D retains the original illustrative record.
+
+Next: BoboMimi should compare before/after images and try reading a few sectors in the enlarged view on physical phones. Keep real-device/listening checks in Issue #7 open. PR #9 is based on unmerged PR #8; neither PR nor production is authorized for merge/deployment by this experiment.
