@@ -16,3 +16,13 @@ Retain as a research candidate. Desktop comparison shows a distinct source-deriv
 `npm run check` passed 61 unit tests, the production build and all 105 Chromium scenarios. Nine new browser scenarios cover source values, original frequencies, Scratch/Looper highlighting, delayed startup cancellation, hidden tabs/navigation, unavailable imagery, bilingual keyboard/reduced-motion use, six viewports and a pure-transform benchmark. SHA-256 verification found no changes in 49 protected source/data/audio/3D/configuration files. Optional 3D retains the original illustrative record.
 
 Next: BoboMimi should compare before/after images and try reading a few sectors in the enlarged view on physical phones. Keep real-device/listening checks in Issue #7 open. PR #9 is based on unmerged PR #8; neither PR nor production is authorized for merge/deployment by this experiment.
+
+## Refinement: selected values and silent inspection
+
+The optional enlarged panel now shows the selected strip/raw brightness or January year/anomaly, plus the existing mapped note/band and frequency. Image notes use the unchanged `mapValueToNote(value,0,1)` helper. Measurement note metadata comes from the same `mapData` event already used to draw the band. Raw brightness is displayed without rounding; anomaly formatting uses the existing helper; frequencies are explicitly rounded to two decimal places. Human-facing band and sector numbers start at one; underlying indices still start at zero.
+
+The panel's inspection slider never starts sound. It stops pending/active playback or replay, then updates both groove outlines and the image/chart and readouts together. Image inspection reuses the existing scan index; measurement inspection adds one local presentation index. Play clears measurement inspection and starts the unchanged original sequence. The existing manual Hear action plays the selected image strip. Flip clears inspection and returns to the first position; theme/language changes preserve the selection. There is no new clock, data scale, engine, stored state or sector-click behavior.
+
+Projected SVG top/right/bottom/left coordinates retain clockwise order through both CSS flip transforms. The Side B child rotation compensates for the parent face rotation; neither it nor the artwork/3D implementation needed modification. Silent selection, orientation, source/CSV consistency and cancellation have focused regression coverage.
+
+See [STACK-INTEGRATION.md](STACK-INTEGRATION.md) for future, explicitly authorized release paths that preserve the PR #8/#9 histories without applying the shared feature stack twice. This documentation does not authorize or perform any merge, PR retargeting or deployment.

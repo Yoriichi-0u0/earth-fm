@@ -829,5 +829,18 @@
   "Enlarged measurement grooveprint": "放大的观测纹谱",
   "Selected sector": "选中扇区",
   "From the top, clockwise: one sector per decoded strip, in left-to-right image order. Length follows absolute strip brightness from 0 to 100%, without rescaling this image. These are pixels, not temperatures. Pitch is rounded to the existing notes, so different lengths may share a note. Colour and stereo still follow the original sound mapping.": "从顶部顺时针排列：每个扇区对应一个已解码条带，按图像从左到右的顺序。纹路长度对应 0–100% 的绝对条带亮度，不随此图像重新缩放。这些是像素，并非温度。音高会取整到原有音符，因此不同长度也可能对应同一音符。音色和立体声仍遵循原有声音映射。",
-  "A dashed gap means missing or outside the mapping, never zero. The outline follows the selected position, including when paused; it does not mean sound is playing. Side colour adds no measurement. The illustration may rotate; the indexed grooves stay in place. The optional 3D record stays illustrative. Grooves do not encode musical accompaniment.": "虚线空缺代表数据缺失或超出映射范围，绝非零值。描边跟随选中位置，暂停时也会保留；并不表示正在发声。唱片面的颜色不代表额外测量。底图可以旋转，纹谱的索引位置保持不动。可选 3D 唱片仍是示意图。纹谱不编码音乐伴奏。"
+  "A dashed gap means missing or outside the mapping, never zero. The outline follows the selected position, including when paused; it does not mean sound is playing. Side colour adds no measurement. The illustration may rotate; the indexed grooves stay in place. The optional 3D record stays illustrative. Grooves do not encode musical accompaniment.": "虚线空缺代表数据缺失或超出映射范围，绝非零值。描边跟随选中位置，暂停时也会保留；并不表示正在发声。唱片面的颜色不代表额外测量。底图可以旋转，纹谱的索引位置保持不动。可选 3D 唱片仍是示意图。纹谱不编码音乐伴奏。",
+  "Inspect sector (silent)": "静音查看扇区",
+  "Selected groove values": "选中纹路的数值",
+  "January observation": "一月观测年份",
+  "Image strip": "图像条带",
+  "Anomaly": "距平",
+  "Brightness (0–1)": "亮度（0–1）",
+  "Note band / note": "音高档位 / 音符",
+  "Mapped note": "映射音符",
+  "Frequency (Hz)": "频率（Hz）",
+  "Rest": "休止",
+  "Inspecting is silent and stops playback. Play uses the original sequence; Hear uses the selected strip. Frequencies are rounded to 2 decimals.": "查看扇区不会发声，并会停止播放。“播放”从原始序列开始，“聆听”演奏所选条带。频率显示保留两位小数。",
+  "Missing value · no mapped note.": "数据缺失 · 无映射音符。",
+  "Outside mapping · no mapped note.": "超出映射范围 · 无映射音符。"
 }

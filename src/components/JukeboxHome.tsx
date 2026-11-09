@@ -109,6 +109,7 @@ function useImagePerformance(visual:ReturnType<typeof useVisualRecord>,volume:nu
 
 function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motion:boolean;volume:number;onVolume:(value:number)=>void}){
   const {t}=useStudioLanguage();const [side,setSide]=useState<RecordSide>('a');
+  const [inspectedObservation,setInspectedObservation]=useState<number|null>(null);
   const measurementRecord=jukeboxRecords.find(item=>item.id==='temperature')!;
   // Both adapters persist through a flip; only an explicit Play action starts an engine.
   const visual=useVisualRecord(record,motion,volume),data=useDataRecord(measurementRecord,volume);
@@ -116,18 +117,27 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   const dataGrooves=useMemo(()=>measurementGrooveprint(data.points),[data.points]);
   const grooveDescription=useId();
   const {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture}=useImagePerformance(visual,volume,record.frame!.imageUrl,side==='a');
-  function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setSide(next);}
+  function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setInspectedObservation(null);setSide(next);}
+  function inspectGroove(index:number){
+    const segments=side==='a'?visualGrooves:dataGrooves;
+    if(!Number.isInteger(index)||index<0||index>=segments.length)return;
+    visual.visual.stop();data.audio.stop();looper.stop();instrument.stop();
+    if(side==='a')visual.visual.setScanIndex(index);else setInspectedObservation(index);
+  }
   const current=side==='a'?(manual?manualState:visual.state):data.state;
+  const grooveIndex=side==='a'?visual.visual.scanIndex:inspectedObservation??data.index;
+  const inspected=side==='b'&&inspectedObservation!==null?dataGrooves[inspectedObservation]:null;
+  const shown=inspected?{...current,progress:grooveIndex/data.points.length,position:`${String(grooveIndex+1).padStart(2,'0')} / 12`,note:inspected.note??'—',frequency:inspected.frequencyHz===null?'—':`${inspected.frequencyHz.toFixed(2)} Hz`,signal:{...current.signal,note:inspected.note??'—',frequency:inspected.frequencyHz}}:current;
   const effective=side==='a'?record:{...measurementRecord,id:record.id,number:record.number,title:record.title};
   const controls=<><div className="jb-side-selector" role="group" aria-label={t('Choose a side of Climate Spiral')}>
     <button type="button" aria-label={t('Side A: hear the picture')} aria-pressed={side==='a'} onClick={()=>changeSide('a')}><b>A</b><span>{t('Hear the picture')}<small>{t('Visual sound')}</small></span></button>
     <button type="button" aria-label={t('Side B: hear the measurements')} aria-pressed={side==='b'} onClick={()=>changeSide('b')}><b>B</b><span>{t('Hear the measurements')}<small>{t('Measurement sound')}</small></span></button>
   </div><div className="jb-science-cue"><p>{t(side==='a'?'Brightness → pitch. Not temperature.':'January anomaly (°C) · relative to 1951–1980.')}</p>{side==='a'&&<button className="jb-manual-toggle" type="button" data-manual={manual} disabled={!visual.visual.ready} aria-controls={manual?'earth-scratch-controls':undefined} onClick={changeMode}>{t(manual?'Back to playback':'Play with Earth')}<span aria-hidden="true">{manual?' ↗':' ↔'}</span></button>}</div></>;
   const picture=<VisualArtwork record={record} transport={visual} manual={manual}/>;
-  return <DeckConsole record={effective} {...current} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={current.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')} grooves={side==='a'?visualGrooves:dataGrooves} position={side==='a'?visual.visual.scanIndex:data.index} descriptionId={grooveDescription}/>}
-    recordNote={<GrooveprintKey side={side} id={grooveDescription} ready={side==='b'||visual.visual.ready} segments={side==='a'?visualGrooves:dataGrooves} index={side==='a'?visual.visual.scanIndex:data.index}/>}
+  return <DeckConsole record={effective} {...shown} onPlay={()=>{setInspectedObservation(null);current.onPlay();}} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={shown.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')} grooves={side==='a'?visualGrooves:dataGrooves} position={grooveIndex} descriptionId={grooveDescription}/>}
+    recordNote={<GrooveprintKey side={side} id={grooveDescription} ready={side==='b'||visual.visual.ready} segments={side==='a'?visualGrooves:dataGrooves} index={grooveIndex} onInspect={inspectGroove}/>}
     performanceControls={side==='a'&&manual&&visual.visual.ready?<EarthLooper looper={looper}/>:undefined}
-    artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={data.point}/></div></>}
+    artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={side==='b'?(data.points[grooveIndex]??data.point):data.point}/></div></>}
     volume={volume} onVolume={onVolume} extra={side==='b'?data.extra:undefined}/>;
 }
 

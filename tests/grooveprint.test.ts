@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import {imageGrooveprint,measurementGrooveprint} from '../src/lib/grooveprint';
 import {mapData,PROFILE} from '../src/lib/symphony';
 import type {RecordPoint} from '../src/lib/jukeboxData';
+import {measurementSequence} from '../src/lib/jukeboxData';
+import {mapValueToNote} from '../src/lib/audio';
+import {NOTES} from '../src/lib/symphony';
+import {parseGistempMonthlyCsv} from '../src/lib/climateMapping';
+import {readFileSync} from 'node:fs';
 const observation=(value:number|null,year=2000):RecordPoint=>({year,month:1,period:`${year}-01`,value});
 
 test('image grooves are deterministic absolute geometry with clockwise equal sectors',()=>{
@@ -45,4 +50,19 @@ test('unavailable image values cannot become zero-brightness marks; empty source
   const s=imageGrooveprint([{brightness:NaN},{brightness:Infinity},{brightness:-.1},{brightness:1.01},{brightness:0}]);
   assert.ok(s.slice(0,4).every(x=>x.path===null&&x.status==='outside-mapping'));assert.equal(s[4].radius,26);
   assert.deepEqual(imageGrooveprint([]),[]);assert.deepEqual(measurementGrooveprint([]),[]);
+});
+
+test('image readout retains raw brightness and the original pixel note/frequency',()=>{
+  const fixture=[0,.123456789012345,1].map(brightness=>({brightness})),segments=imageGrooveprint(fixture);
+  fixture.forEach((p,i)=>{const mapped=mapValueToNote(p.brightness,0,1);assert.equal(segments[i].value,p.brightness);assert.equal(segments[i].note,mapped.note);assert.equal(segments[i].frequencyHz,mapped.frequency);assert.equal(segments[i].year,null);});
+});
+test('each selected January readout matches the existing observation, band and compiled audio frequency',()=>{
+  const {points,pitches}=measurementSequence('temperature'),segments=measurementGrooveprint(points);
+  const source=parseGistempMonthlyCsv(readFileSync('public/data/sources/gistemp-global-monthly-2026-10-18.csv','utf8'));
+  points.forEach((p,i)=>assert.equal(segments[i].value,source.find(row=>row.year===p.year&&row.month===1)!.anomaly));
+  points.forEach((p,i)=>{const event=mapData({...p,anomaly:p.value});assert.equal(segments[i].year,p.year);assert.equal(segments[i].value,p.value);assert.equal(segments[i].frequencyHz,pitches[i]);if(event.kind==='note'){assert.equal(segments[i].band,event.bandIndex);assert.equal(segments[i].note,NOTES[event.bandIndex]);}});
+});
+test('readout metadata never invents a note for missing, invalid or outside-range input',()=>{
+  const segments=[...imageGrooveprint([{brightness:NaN},{brightness:-.1}]),...measurementGrooveprint([observation(null),observation(1.51)])];
+  assert.ok(segments.every(s=>s.note===null&&s.frequencyHz===null));assert.equal(segments[2].year,2000);assert.equal(segments[2].value,null);
 });
