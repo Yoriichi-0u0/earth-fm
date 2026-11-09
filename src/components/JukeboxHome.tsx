@@ -1,4 +1,4 @@
-import {lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react';
+import {lazy,Suspense,useEffect,useId,useMemo,useRef,useState} from 'react';
 import type {CSSProperties,ReactNode} from 'react';
 import {ArrowDown,ArrowUpRight,AudioLines,ChevronLeft,ChevronRight,Disc3,Headphones,ImagePlus,Play,ShieldCheck,Square,Volume2} from 'lucide-react';
 import {jukeboxRecords} from '../data/jukeboxRecords';
@@ -14,6 +14,8 @@ import {useStudioLanguage} from '../lib/studioLanguage';
 import {goToPage,pageUrl} from '../lib/studioRouter';
 import type {RecordSide,RecordSignal} from '../lib/recordSignal';
 import EarthRecord from './EarthRecord';
+import {GrooveprintKey} from './Grooveprint';
+import {imageGrooveprint,measurementGrooveprint} from '../lib/grooveprint';
 import ScratchScanner from './ScratchScanner';
 import {useFrameInstrument} from '../lib/useFrameInstrument';
 import {useEarthLooper} from '../lib/useEarthLooper';
@@ -28,9 +30,9 @@ const EarthGlobe=lazy(()=>import('./EarthGlobe'));
 const MysteryRecord=lazy(()=>import('./MysteryRecord'));
 type DeckState={playing:boolean;starting:boolean;ready:boolean;completed:boolean;progress:number;note:string;frequency:string;position:string;input:string;onPlay:()=>void;signal:RecordSignal;requestAt:number;error?:string;playLabel?:string;manual?:boolean};
 type VisualRecord=Omit<JukeboxRecord,'id'|'frame'|'sourceUrl'>&{id:JukeboxRecordId|'personal';sourceUrl?:string;frame?:{imageUrl:string;videoUrl?:string;description:string}};
-type ConsoleProps=DeckState&{record:VisualRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;performanceControls?:ReactNode};
+type ConsoleProps=DeckState&{record:VisualRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;recordNote?:ReactNode;performanceControls?:ReactNode};
 
-function DeckConsole({record,artwork,playing,starting,ready,completed,progress,note,frequency,position,input,onPlay,volume,onVolume,error,extra,side,sideControls,recordObject,signal,requestAt,playLabel,manual,performanceControls}:ConsoleProps){
+function DeckConsole({record,artwork,playing,starting,ready,completed,progress,note,frequency,position,input,onPlay,volume,onVolume,error,extra,side,sideControls,recordObject,recordNote,signal,requestAt,playLabel,manual,performanceControls}:ConsoleProps){
   const {t}=useStudioLanguage();const active=playing||starting;
   return <article className={`jb-deck ${active?'is-playing':''}${side?' jb-two-sided':''}${manual?' jb-manual':''}`} aria-labelledby="jb-record-title" data-record-kind={record.kind} data-record-side={side} data-play-mode={manual?'manual':'automatic'} data-note-serial={signal.event?.serial??0} data-note-at={signal.event?.at??0} data-play-request-at={requestAt} data-frequency={signal.frequency??''}>
     <header className="jb-deck-header"><div className="jb-record-heading"><span className="jb-catalogue">EARTH FM / {record.number}</span><h2 id="jb-record-title" tabIndex={-1}>{t(record.title)}</h2></div><div className="jb-deck-actions"><span className="jb-state" role="status"><i className={active?'is-on':''}/>{t(!ready?(error?'Visual unavailable':'Loading…'):starting?'Starting…':playing?'Now playing':completed?'Finished':'Ready to play')}</span><button className="jb-compact-play" type="button" disabled={!ready} aria-label={t(active?'Stop selected record':manual?'Hear selected position':'Play selected record')} onClick={onPlay}>{t(active?'Stop':manual?'Hear':'Play')}</button></div></header>
@@ -40,6 +42,7 @@ function DeckConsole({record,artwork,playing,starting,ready,completed,progress,n
     <dl className="jb-readout"><div><dt>{t(record.kind==='visual'?'PIXEL INPUT':'OBSERVATION')}</dt><dd>{input}</dd></div><div><dt>{t('GENERATED NOTE')}</dt><dd className="jb-note">{note}<small>{frequency}</small></dd></div><div><dt>{t(record.kind==='visual'?'SCAN POSITION':'RECORD POSITION')}</dt><dd>{position}</dd></div></dl>
     <div className="jb-transport"><button className="jb-play" type="button" disabled={!ready} onClick={onPlay}>{active?<Square size={17} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}<span>{t(active?'Stop':playLabel??'Play record')}</span><span className="jb-play-shortcut" aria-hidden="true">{active?'■':'▶'}</span></button><label className="jb-volume"><Volume2 size={18}/><span className="sr-only">{t('Jukebox volume')}</span><input type="range" min="0" max="1" step=".01" value={volume} onChange={e=>onVolume(Number(e.target.value))}/></label></div>
     <div className="jb-progress-row"><progress aria-label={t(manual?'Scan position':'Record progress')} max="1" value={progress}/><span>{t(completed?'Complete':record.kind==='visual'?'48 visual strips':'12 observations')}<b>{manual?t('Your pace'):<>~25 {t('seconds')}</>}</b></span></div>
+    {recordNote}
     {extra}
     <div className="jb-source"><div className="jb-source-line"><span>{t(record.kind==='visual'?'Visual sound':'Measurement sound')}</span>{record.sourceUrl?<a href={record.sourceUrl} target="_blank" rel="noreferrer">{t(record.source)} <ArrowUpRight size={13}/></a>:<span>{t(record.source)}</span>}</div><p>{t(record.meaning)}</p>{side&&<p className="jb-side-provenance">{t('Related sources, different transformations. The image and observations are not matched frame by frame.')}</p>}</div>
     {error&&<p className="jb-error" role="alert">{t(error)}</p>}
@@ -84,7 +87,7 @@ function useDataRecord(record:JukeboxRecord,volume:number){
   const signal:RecordSignal={playing:audio.playing,note:note?.note??'—',frequency:note?.frequencyHz??null,event:audio.noteEvent};
   const state:DeckState={playing:audio.playing,starting:audio.status==='Starting audio…',ready:true,completed,progress:completed?1:index/points.length,note:signal.note,frequency:note?`${note.frequencyHz.toFixed(2)} Hz`:'—',position:`${String(index+1).padStart(2,'0')} / 12`,input:t(arctic?'September mean extent':'January global anomaly'),onPlay:()=>{if(audio.playing)audio.stop();else{setRequestAt(performance.now());void audio.play(points,pitches,{...defaults,tempo:60,volume,dataOnly});}},signal,requestAt,error:audio.status.startsWith('Audio could not')?audio.status:undefined};
   const extra=<div className="jb-data-only"><label><input type="checkbox" checked={dataOnly} onChange={e=>{audio.stop();setDataOnly(e.target.checked);}}/>{t('Hear Data Only')}</label><span>{t(dataOnly?'One observation. One note.':'Data melody + musical arrangement')}</span></div>;
-  return {audio,point,state,extra};
+  return {audio,point,state,extra,points,index};
 }
 function DataDeck({record,volume,onVolume}:{record:JukeboxRecord;volume:number;onVolume:(value:number)=>void}){
   const data=useDataRecord(record,volume);
@@ -109,6 +112,9 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   const measurementRecord=jukeboxRecords.find(item=>item.id==='temperature')!;
   // Both adapters persist through a flip; only an explicit Play action starts an engine.
   const visual=useVisualRecord(record,motion,volume),data=useDataRecord(measurementRecord,volume);
+  const visualGrooves=useMemo(()=>imageGrooveprint(visual.visual.steps),[visual.visual.steps]);
+  const dataGrooves=useMemo(()=>measurementGrooveprint(data.points),[data.points]);
+  const grooveDescription=useId();
   const {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture}=useImagePerformance(visual,volume,record.frame!.imageUrl,side==='a');
   function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setSide(next);}
   const current=side==='a'?(manual?manualState:visual.state):data.state;
@@ -118,7 +124,8 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
     <button type="button" aria-label={t('Side B: hear the measurements')} aria-pressed={side==='b'} onClick={()=>changeSide('b')}><b>B</b><span>{t('Hear the measurements')}<small>{t('Measurement sound')}</small></span></button>
   </div><div className="jb-science-cue"><p>{t(side==='a'?'Brightness → pitch. Not temperature.':'January anomaly (°C) · relative to 1951–1980.')}</p>{side==='a'&&<button className="jb-manual-toggle" type="button" data-manual={manual} disabled={!visual.visual.ready} aria-controls={manual?'earth-scratch-controls':undefined} onClick={changeMode}>{t(manual?'Back to playback':'Play with Earth')}<span aria-hidden="true">{manual?' ↗':' ↔'}</span></button>}</div></>;
   const picture=<VisualArtwork record={record} transport={visual} manual={manual}/>;
-  return <DeckConsole record={effective} {...current} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={current.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')}/>}
+  return <DeckConsole record={effective} {...current} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={current.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')} grooves={side==='a'?visualGrooves:dataGrooves} position={side==='a'?visual.visual.scanIndex:data.index} descriptionId={grooveDescription}/>}
+    recordNote={<GrooveprintKey side={side} id={grooveDescription} ready={side==='b'||visual.visual.ready} segments={side==='a'?visualGrooves:dataGrooves} index={side==='a'?visual.visual.scanIndex:data.index}/>}
     performanceControls={side==='a'&&manual&&visual.visual.ready?<EarthLooper looper={looper}/>:undefined}
     artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={data.point}/></div></>}
     volume={volume} onVolume={onVolume} extra={side==='b'?data.extra:undefined}/>;
