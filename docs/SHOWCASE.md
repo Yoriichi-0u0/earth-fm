@@ -4,6 +4,13 @@ Showcase research, 10 November 2026. Application checkpoint: `c17301ad99cd0b1b49
 
 For future videos, shortlist candidates from [MotionGit](https://motiongit.com/), recommend the strongest fit and begin production after BoboMimi selects a template. The [November 11 audit](NASA-RESOURCE-DISCOVERY-2026-11.md#showcase-source-and-disclosure-audit) covers the finished 29.6-second and 88-second films.
 
+## Publication checklist
+
+- [ ] Credit NASA SVS 5190, Mark SubbaRao and Ed Hawkins for the pinned Climate Spiral image. Give its October 18, 2026 retrieval date and link the [frozen visual and GISTEMP provenance](../public/data/climate-spiral-provenance.json).
+- [ ] Credit NASA GISS GISTEMP v4 and identify the selected January observations, snapshot date and 1951–1980 January reference.
+- [ ] Identify Microsoft SoniaNeural synthetic narration and the AI-generated illustrative vinyl in the publication description. Describe the app footage as a capture and the sound as Earth FM’s browser synthesis.
+- [ ] Check the current submission instructions for the applicable duration and disclosure placement before selecting a competition cut. See the [source and disclosure audit](NASA-RESOURCE-DISCOVERY-2026-11.md#showcase-source-and-disclosure-audit).
+
 ## The 85-second demonstration
 
 Let people hear something before explaining everything. The strongest proposed moments are the change of meaning on Flip, personal control through Scratch, and one exact source-to-note reading. These are design judgments from a browser walkthrough, not participant preferences or proof of learning.
