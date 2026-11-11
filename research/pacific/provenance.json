@@ -1,0 +1,43 @@
+{
+  "version": "svs5688-globe-circles-v1",
+  "source": {
+    "svs": 5688,
+    "mediaId": 1206154,
+    "page": "https://svs.gsfc.nasa.gov/5688/",
+    "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_wLegend_1670x835_latest.jpg",
+    "retrievedAt": "2026-11-11T21:43:43.575605+08:00",
+    "file": "svs5688-original.jpg",
+    "width": 1670,
+    "height": 835,
+    "bytes": 475811,
+    "sha256": "f6a7fad2dcf92096e8f7d8393f8ae97c9821a563aeb5834861c0c5a83fee4634",
+    "credit": "NASA Scientific Visualization Studio / Kel Elkins (Science and Technology Corporation)",
+    "dataset": "NASA JPL MUR Sea Surface Temperature Analysis, seven-day running average",
+    "renderClimatologyAndGranulesVerified": false,
+    "decodedRgbSha256": "596bc2513bb921387008efe1e248549bd0e0c8dd9d8655b1228fdb75fccbe9ce"
+  },
+  "panels": {
+    "2025": {
+      "displayedDate": "2025-11-09",
+      "file": "svs5688-2025-circle-v1.png",
+      "x": 93,
+      "y": 113,
+      "size": 609,
+      "bytes": 658855,
+      "sha256": "8bde0680d908af814c1751c852dc3f265f94692300760a3efde6bc5f352ef8bf",
+      "rgbSha256": "e6c6e039eefc9121e2c24266ca2c46083a435f2185f328ad64aceb2d7a7c43c5"
+    },
+    "2026": {
+      "displayedDate": "2026-11-09",
+      "file": "svs5688-2026-circle-v1.png",
+      "x": 774,
+      "y": 36,
+      "size": 762,
+      "bytes": 986026,
+      "sha256": "2f0f847dd7a0fa440c7c40456f91f7e3fa6fae1b603c0d83ce04560c115287b9",
+      "rgbSha256": "4667249e2f58cbeffd9ea389934b9132af207ec43de38835817ff0053bc941c3"
+    }
+  },
+  "geometry": "Each square bounds one displayed globe. Keep source RGB pixels whose centers lie within its inscribed circle. Set the remaining pixels to opaque black. No resize, rotation, palette conversion or geographic reprojection after decoding the source to RGB24.",
+  "sampling": "The existing browser transport samples both square derivatives at 384 × 384 using 48 vertical strips, absolute luma and the existing RGB and pan mappings."
+}
