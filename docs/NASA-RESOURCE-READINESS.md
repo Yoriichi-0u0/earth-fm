@@ -2,6 +2,8 @@
 
 Exploratory source and adapter review, **10 November 2026**. Application inspected: `c17301a`; no new asset is ingested and no dataset/mapping is changed. An available NASA download, EIC association, technical compatibility, asset reuse rights and challenge eligibility are separate claims. Unknown challenge details do not block this research.
 
+The [November 11 follow-up](NASA-RESOURCE-DISCOVERY-2026-11.md) verifies the challenge Resources notice, compares the newer EIC visuals and documents the local 5688 audition.
+
 ## What the existing architecture actually supports
 
 | Boundary | Existing implementation | Consequence for another supplied visual |

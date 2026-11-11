@@ -2,6 +2,8 @@
 
 Showcase research, 10 November 2026. Application checkpoint: `c17301ad99cd0b1b49f6ce09c99db6b1544d58f7` on stacked [draft PR #9](https://github.com/Yoriichi-0u0/earth-fm/pull/9), including [PR #8](https://github.com/Yoriichi-0u0/earth-fm/pull/8). This is a presenter/capture plan, not a new guided interface, completed demo video or competition-compliance claim. The timing below is a target, not a measured end-to-end rehearsal.
 
+For future videos, shortlist candidates from [MotionGit](https://motiongit.com/), recommend the strongest fit and begin production after BoboMimi selects a template. The [November 11 audit](NASA-RESOURCE-DISCOVERY-2026-11.md#showcase-source-and-disclosure-audit) covers the finished 29.6-second and 88-second films.
+
 ## The 85-second demonstration
 
 Let people hear something before explaining everything. The strongest proposed moments are the change of meaning on Flip, personal control through Scratch, and one exact source-to-note reading. These are design judgments from a browser walkthrough, not participant preferences or proof of learning.
