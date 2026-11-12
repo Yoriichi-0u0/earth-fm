@@ -37,7 +37,7 @@ export default function EarthRecord({side,signal,motion,onFlip,grooves,position,
     <button type="button" className="jb-vinyl-button" aria-describedby={descriptionId} aria-label={t(side==='a'?'Flip to Side B: hear the measurements':'Flip to Side A: hear the picture')} onClick={onFlip}
       onPointerMove={e=>{if(!motion||e.pointerType==='touch')return;const bounds=e.currentTarget.getBoundingClientRect();pointer.current={x:(e.clientX-bounds.left)/bounds.width*2-1,y:(e.clientY-bounds.top)/bounds.height*2-1};if(rendering)requestRender.current();}}
       onPointerLeave={()=>{pointer.current={x:0,y:0};if(rendering)requestRender.current();}}>
-      <span className={`jb-vinyl-fallback side-${side}`} aria-hidden="true"><span className="jb-vinyl-disc"><span className="jb-vinyl-label"><small>EARTH FM</small><i>◉</i><b>{side.toUpperCase()}</b></span><span className="jb-spindle"/></span><Grooveprint segments={grooves} index={position} side={side}/></span>
+      <span className={`jb-vinyl-fallback side-${side}`} aria-hidden="true"><span className="jb-vinyl-disc"><span className="jb-vinyl-label"><small>TerraJuke</small><i>◉</i><b>{side.toUpperCase()}</b></span><span className="jb-spindle"/></span><Grooveprint segments={grooves} index={position} side={side}/></span>
       {rendering&&<span className="jb-three-canvas" aria-hidden="true"><SceneBoundary onUnavailable={unavailable}><Suspense fallback={null}><Scene side={side} signal={signal} motion={motion} pointer={pointer} onReady={sceneReady} onUnavailable={unavailable}/></Suspense></SceneBoundary></span>}
       <span className="jb-flip-hint"><Rotate3D size={13}/>{t('Flip the record')}</span>
     </button>

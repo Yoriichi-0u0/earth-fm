@@ -856,7 +856,7 @@ test('Earth Looper enforces the note limit and finishes an empty recording at th
 test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:700},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
-    await page.goto('http://127.0.0.1:5173/');const compact=page.getByRole('button',{name:'Play selected record',exact:true});await expect(compact).toBeVisible();const playBounds=await compact.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await compact.tap();await page.getByRole('button',{name:'Stop selected record',exact:true}).tap();
+    await page.goto('http://127.0.0.1:5173/');const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const playBounds=await play.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await play.tap();await page.getByRole('button',{name:'Stop',exact:true}).tap();
     await page.getByRole('button',{name:'Play with Earth',exact:true}).tap();const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!;const cdp=await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.2,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.75,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await expect(page.getByRole('slider',{name:'Image scan position',exact:true})).toHaveValue('37');

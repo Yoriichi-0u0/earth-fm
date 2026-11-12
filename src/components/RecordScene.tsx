@@ -16,7 +16,7 @@ function makeTexture(side:RecordSide|'grooves'){
     for(let radius=75;radius<256;radius+=2){ctx.strokeStyle=radius%4?'#444':'#aaa';ctx.lineWidth=.8;ctx.beginPath();ctx.arc(256,256,radius,0,Math.PI*2);ctx.stroke();}
   }else{
     ctx.clearRect(0,0,512,512);ctx.shadowColor='#041118';ctx.shadowBlur=8;
-    ctx.fillStyle=side==='a'?'#eff8d7':'#ffe0c5';ctx.textAlign='center';ctx.font='500 25px sans-serif';ctx.fillText('E A R T H  F M',256,92);
+    ctx.fillStyle=side==='a'?'#eff8d7':'#ffe0c5';ctx.textAlign='center';ctx.font='500 25px sans-serif';ctx.fillText('T E R R A J U K E',256,92);
     ctx.font='500 72px sans-serif';ctx.fillText(side.toUpperCase(),256,378);
     ctx.font='19px sans-serif';ctx.fillText('CLIMATE SPIRAL / 01',256,432);
   }

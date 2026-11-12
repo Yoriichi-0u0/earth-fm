@@ -162,7 +162,7 @@ for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,
       }
       const bounds=await appearance(page).boundingBox();expect(bounds!.x).toBeGreaterThanOrEqual(0);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(viewport.width);
       if(route==='/'&&[320,390,768].includes(viewport.width)){
-        const play=page.getByRole('button',{name:'Play selected record',exact:true});await expect(play).toBeVisible();const box=await play.boundingBox();expect(box!.y+box!.height).toBeLessThanOrEqual(viewport.height);
+        const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const box=await play.boundingBox();expect(box!.y+box!.height).toBeLessThanOrEqual(viewport.height);
       }
       if(route==='/create'){
         const play=page.getByRole('button',{name:/Play my mix/});await expect(play).toHaveCount(1);await expect(page.locator('.sp-create-transport')).toBeVisible();
@@ -192,4 +192,33 @@ test('Chinese appearance names, reduced motion and enlarged-text stress preserve
   await page.getByRole('button',{name:'Mellow Reed',exact:true}).focus();await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:'Soft Glass',exact:true})).toBeFocused();
   const tone=await page.getByRole('button',{name:'Soft Glass',exact:true}).boundingBox(),dock=await page.locator('.sp-create-transport').boundingBox();expect(tone!.y).toBeGreaterThanOrEqual(dock!.y+dock!.height);expect(tone!.y+tone!.height).toBeLessThanOrEqual(1024);
   await test.info().attach('enlarged-text-Chromium-fixture',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
+});
+
+test('provisional identity and the primary Play action work at phone width', async({page})=>{
+  await page.setViewportSize({width:320,height:568});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await expect(page).toHaveTitle('TerraJuke — The Earth Information Jukebox');
+  const brand=page.getByRole('link',{name:'TerraJuke home',exact:true});
+  await expect(brand).toBeVisible();
+  await expect.poll(()=>brand.locator('img').evaluate(img=>(img as HTMLImageElement).naturalWidth)).toBe(128);
+
+  const player=page.getByRole('region',{name:'Record player',exact:true});
+  const play=page.getByRole('button',{name:'Play record',exact:true});
+  await expect(play).toHaveCount(1);
+  await expect(play).toBeEnabled();
+  expect((await play.boundingBox())!.y+(await play.boundingBox())!.height).toBeLessThanOrEqual(568);
+  await page.getByRole('link',{name:'Browse records',exact:true}).press('Enter');
+  await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).press('Enter');
+  await expect(player).toBeFocused();
+  await expect(player.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
+  await expect(player.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+
+  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
+  await expect(page).toHaveTitle('TerraJuke — 地球信息点唱机');
+  await page.getByRole('navigation').getByRole('link',{name:'关于',exact:true}).press('Enter');
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.getByRole('link',{name:'关于',exact:true})).toHaveAttribute('aria-current','page');
+  await page.goto('/?legacy=1');
+  await expect(page.getByRole('link',{name:'TerraJuke home',exact:true})).toBeVisible();
 });

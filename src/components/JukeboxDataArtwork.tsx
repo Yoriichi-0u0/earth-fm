@@ -25,6 +25,6 @@ export default function DataArtwork({record,current}:{record:JukeboxRecord;curre
       <text x="58" y="249">{minYear}</text><text x="658" y="249" textAnchor="end">{maxYear}</text>
     </svg>
     <div className="jb-data-value"><span>{date(current.year,current.month,MONTHS[current.month-1])}</span><strong>{current.value===null?'—':arctic?current.value.toFixed(4):formatAnomaly(current.value)}{arctic&&<small>{t('million km²')}</small>}</strong></div>
-    <div className="jb-art-footer"><span>{t('EARTH FM · PLOT OF THE SOURCE VALUES')}</span><AudioLines size={16}/></div>
+    <div className="jb-art-footer"><span>{t('TerraJuke · PLOT OF THE SOURCE VALUES')}</span><AudioLines size={16}/></div>
   </div>;
 }
