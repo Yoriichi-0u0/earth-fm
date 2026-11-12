@@ -10,7 +10,7 @@ npm run dev -- --host 127.0.0.1 --port 5182 --strictPort
 
 [Open the local Pacific Listening Lab](http://127.0.0.1:5182/research/pacific/)
 
-The two dated globes share one strip marker. Choose a year, hear the selected strip, or listen to its left-to-right scan. The slider is silent and preserves the same relative position when switching years. Stop and source switching cancel the previous audio. The original image and legend open below the comparison. Earth FM’s existing appearance and language controls also work in this 2D lab. Its separate entry lives outside the application’s normal navigation and production build.
+The two dated globes share one strip marker. **Hear 2025** and **Hear 2026** audition that strip in one action each and select the year for the next full scan. This removes the separate radio-selection step when comparing notes. The slider stays silent, and switching years keeps the same relative position. Stop and source switching cancel the previous audio. The original image and legend open below the comparison. Earth FM’s existing appearance and language controls also work in this 2D lab. Its separate entry lives outside the application’s normal navigation and production build.
 
 ## What the comparison measures
 
@@ -39,7 +39,11 @@ FFmpeg decoded the full derivative. Earth FM’s existing local video upload pla
 
 ## Official resources
 
-The [official challenge Resources tab](https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/?tab=resources) returned HTTP 200 on November 11 with the November 13 availability notice and zero published entries. The November 13 check is scheduled for 10:00 p.m. Asia/Kuching. The [prior source inventory](../../docs/NASA-RESOURCE-DISCOVERY-2026-11.md) provides the comparison baseline. Keep this 5688 experiment as research evidence when assessing the published list.
+The [official challenge Resources tab](https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/?tab=resources) returned HTTP 200 on November 11 and 12. Both responses showed the November 13 notice and zero resource links in `resourcesTabContent`. The existing November 13 check is scheduled for 10:00 p.m. Asia/Kuching. NASA identifies SVS 5688 as EIC-related public material. Challenge inclusion remains unconfirmed. [NASA SVS 5688](https://svs.gsfc.nasa.gov/5688/)
+
+When the list appears, record every published title, URL and explicit requirement. Follow any collection links to the supplied frames or datasets, then match their identifiers and versions to the [existing Earth FM source inventory](../../docs/NASA-RESOURCE-DISCOVERY-2026-11.md). Keep the asset’s published credit, terms and render date with the exact bytes selected for the lab. Verify whether a listed collection actually contains 5688 before treating it as an official match. Record an official replacement or newer version separately from the frozen image.
+
+Retain the Pacific Lab as research. The dated SVS 5688 still remains the strongest public candidate for a future Pacific station because its two panels support a repeatable listening comparison with the existing engine. Prefer the still for a first integration if the supplied resources support this use. Keep the original legend and pixel interpretation visible. Check source-specific credits and derivative terms before adding an official asset. [NASA media guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/)
 
 ## Verification and evidence
 
@@ -53,9 +57,9 @@ git diff --exit-code a99cb1d -- src public index.html package.json package-lock.
 test ! -e dist/research
 ```
 
-Place the review clip at `project-library/pacific-listening-lab/evidence/svs5688-motion-10s-15s-v1.mp4` for `--motion`. Omit that option to run the still checks alone. The script starts a loopback Vite server on port 5182 and closes it after testing. It writes screenshots, raw strip values, oscillator timings and stereo WAV exports to the evidence folder.
+Place the review clip at `project-library/pacific-listening-lab/evidence/svs5688-motion-10s-15s-v1.mp4` for `--motion`. Omit that option to run the still checks alone. The script starts Vite on a free loopback port and closes it after testing. It writes screenshots, raw strip values, oscillator timings and stereo WAV exports to the evidence folder. Set `PACIFIC_EVIDENCE_DIR` to keep a new run separate and place the clip in that directory for the motion check.
 
-- Chromium 156 verified silent keyboard inspection, paired auditions, a complete 48-note 2026 scan, Stop and cancellation on year switch. Live oscillator frequencies and timing matched the fixed mapping.
+- Chromium 156 verified silent keyboard inspection, direct year auditions, a complete 48-note 2026 scan, Stop and cancellation on year switch. A direct audition interrupts a running scan and keeps its current strip. Live oscillator frequencies and timing matched the fixed mapping.
 - At the 390 × 664 iPhone 13 emulated viewport, the measured pixel values matched desktop exactly. Light and Simplified Chinese rendered without horizontal overflow. Both captured themes passed the automated axe WCAG A/AA rules used in the script. Median local canvas sampling was 0.8–0.9 ms for the square panels. The estimated single RGBA buffers are 1.42 and 2.22 MiB before analysis and browser overhead. These results are desktop Chromium and emulation evidence. Physical mobile playback, GPU memory, battery and human listening remain untested.
 - `npm run check` passed 64 unit tests, the production build and 112 Chromium tests. The lab type check, source hash checks and production tree diff passed. The generated production output excludes the research entry.
 - The [showcase publication checklist](../../docs/SHOWCASE.md#publication-checklist) records source attribution and generated-content disclosures. Both finished masters match their prior verified SHA-256 hashes.

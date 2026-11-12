@@ -112,6 +112,7 @@ a:hover { text-decoration-thickness: 2px; }
   flex-wrap: wrap;
   gap: 8px;
 }
+.lab-auditions { display: flex; flex-wrap: wrap; gap: 8px; }
 .lab-buttons button {
   display: inline-flex;
   align-items: center;

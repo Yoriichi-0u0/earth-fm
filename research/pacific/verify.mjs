@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium, devices, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { createServer } from 'vite'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
-const output = join(root, 'project-library/pacific-listening-lab/evidence')
-const origin = 'http://127.0.0.1:5182'
+const output = resolve(root, process.env.PACIFIC_EVIDENCE_DIR ?? 'project-library/pacific-listening-lab/evidence')
+let origin
 const route = '/research/pacific/'
 const manifest = JSON.parse(await readFile(new URL('./provenance.json', import.meta.url), 'utf8'))
 await mkdir(output, { recursive: true })
@@ -17,7 +17,7 @@ for (const asset of [manifest.source, ...Object.values(manifest.panels)]) {
   const bytes = await readFile(new URL('./assets/' + asset.file, import.meta.url))
   assert.equal(createHash('sha256').update(bytes).digest('hex'), asset.sha256)
 }
-const server = await createServer({ root, server: { host: '127.0.0.1', port: 5182, strictPort: true } })
+const server = await createServer({ root, server: { host: '127.0.0.1', port: 0 } })
 let browser
 const report = { checks: [], pageErrors: [], externalRequests: [] }
 
@@ -110,7 +110,8 @@ async function desktopCheck() {
     const started = performance.now()
     await page.goto(origin + route)
     const play = page.getByRole('button', { name: 'Listen to scan', exact: true })
-    const hear = page.getByRole('button', { name: 'Hear this strip', exact: true })
+    const hear2025 = page.getByRole('button', { name: 'Hear 2025', exact: true })
+    const hear2026 = page.getByRole('button', { name: 'Hear 2026', exact: true })
     const stop = page.getByRole('button', { name: 'Stop', exact: true })
     const strip = page.getByRole('slider', { name: 'Image strip', exact: true })
     await expect(play).toBeEnabled()
@@ -134,18 +135,19 @@ async function desktopCheck() {
     assert.equal(await page.locator('.lab-strip').evaluateAll(markers =>
       new Set(markers.map(marker => marker.style.left)).size), 1)
     await page.screenshot({ path: join(output, 'pacific-desktop-dark.png'), fullPage: true })
-    await hear.click()
+    await expect(strip).toHaveAccessibleDescription(/same relative position.*cannot measure ocean temperature/)
+    await hear2026.click()
     await expect.poll(() => notes(page).then(events => events.length)).toBe(3)
-    assertNoteGroup(await notes(page), panels['2025'].strips[index])
-    await page.getByRole('radio', { name: /2026/ }).check()
+    assertNoteGroup(await notes(page), panels['2026'].strips[index])
+    await expect(page.getByRole('radio', { name: /2026/ })).toBeChecked()
     await expect(strip).toHaveValue(String(index + 1))
-    await expect.poll(() => rms(page)).toBeLessThan(.0001)
-    await hear.click()
+    await hear2025.press('Enter')
     await expect.poll(() => notes(page).then(events => events.length)).toBe(6)
-    assertNoteGroup((await notes(page)).slice(3), panels['2026'].strips[index])
-    check('Silent keyboard strip inspection, synchronized markers and correctly tuned A/B auditions')
+    assertNoteGroup((await notes(page)).slice(3), panels['2025'].strips[index])
+    await expect(page.getByRole('radio', { name: /2025/ })).toBeChecked()
+    await expect(strip).toHaveValue(String(index + 1))
+    check('Direct A/B buttons and keyboard activation audition the same strip with the correct tuning')
 
-    await page.getByRole('radio', { name: /2025/ }).check()
     let before = (await notes(page)).length
     await play.click()
     await expect.poll(() => rms(page)).toBeGreaterThan(.001)
@@ -158,6 +160,20 @@ async function desktopCheck() {
     assert.equal((await notes(page)).length, cancelledCount)
     assert.ok(cancelledCount > before)
     check('Year selection cancels the active scan without starting the other year')
+
+    await play.click()
+    await expect.poll(() => rms(page)).toBeGreaterThan(.001)
+    await expect.poll(async () => Number(await strip.inputValue())).toBeGreaterThan(1)
+    await hear2025.click()
+    await expect(page.getByRole('status')).toContainText('Playing the selected strip')
+    const auditionIndex = Number(await strip.inputValue()) - 1
+    const auditionNotes = await notes(page)
+    assertNoteGroup(auditionNotes.slice(-3), panels['2025'].strips[auditionIndex])
+    await expect.poll(() => rms(page)).toBeLessThan(.0001)
+    await page.waitForTimeout(650)
+    assert.equal((await notes(page)).length, auditionNotes.length)
+    await page.getByRole('radio', { name: /2026/ }).check()
+    check('A direct audition stops the scan and leaves no scheduled notes behind')
 
     before = (await notes(page)).length
     await play.click()
@@ -210,6 +226,10 @@ async function phoneCheck() {
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hans')
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0)
     await page.getByRole('slider', { name: '图像条带', exact: true }).fill(String(report.comparedStrip))
+    await page.getByRole('button', { name: '试听 2026', exact: true }).tap()
+    await expect(page.getByRole('radio', { name: /2026/ })).toBeChecked()
+    await expect(page.getByRole('slider', { name: '图像条带', exact: true })).toHaveValue(String(report.comparedStrip))
+    await expect.poll(() => rms(page)).toBeLessThan(.0001)
     await page.screenshot({ path: join(output, 'pacific-phone-light-zh.png'), fullPage: true })
     await page.getByRole('button', { name: '聆听扫描' }).click()
     await expect.poll(() => rms(page)).toBeGreaterThan(.001)
@@ -265,6 +285,7 @@ async function motionCheck() {
 
 try {
   await server.listen()
+  origin = `http://127.0.0.1:${server.httpServer.address().port}`
   browser = await chromium.launch()
   report.browser = browser.version()
   await desktopCheck()

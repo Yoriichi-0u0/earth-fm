@@ -42,8 +42,8 @@ function PacificLab() {
   const panel2026 = usePanel(globe2026, volume)
   const panels = { '2025': panel2025, '2026': panel2026 }
   const selected = panels[year]
-  const audition = useFrameInstrument(selected.steps, volume, selected.ready)
   const ready = panel2025.ready && panel2026.ready
+  const audition = useFrameInstrument(panel2025.steps.concat(panel2026.steps), volume, ready)
   const playing = selected.playing || selected.starting || audition.playing || audition.starting
   const strip = selected.playing || selected.completed ? selected.scanIndex : position
   const displayDate = new Intl.DateTimeFormat(language === 'zh' ? 'zh-Hans' : 'en-GB', {
@@ -69,9 +69,11 @@ function PacificLab() {
     void selected.start()
   }
 
-  function hearStrip() {
+  function hearStrip(next: Year) {
     stop()
-    void audition.play(strip)
+    setYear(next)
+    const offset = next === '2025' ? 0 : panel2025.steps.length
+    void audition.play(offset + strip)
   }
 
   function seek(next: number) {
@@ -107,7 +109,7 @@ function PacificLab() {
 
       <div className="lab-intro">
         <h1>{t('Pacific Listening Lab')}</h1>
-        <p>{t('Compare the same strip in two Pacific images. Move the marker, choose a year and listen.')}</p>
+        <p>{t('Move the shared strip marker, then hear either year.')}</p>
       </div>
 
       <fieldset className="lab-comparison">
@@ -154,24 +156,27 @@ function PacificLab() {
         </div>
         <input
           id="lab-strip" type="range" min={1} max={VISUAL_SCAN_STEPS} value={strip + 1}
-          disabled={!ready} onChange={event => seek(Number(event.target.value) - 1)}
+          aria-describedby="lab-meaning" disabled={!ready} onChange={event => seek(Number(event.target.value) - 1)}
         />
         <div className="lab-buttons">
           <button className="lab-primary" type="button" disabled={!ready} onClick={listen}>
             <Play size={17} aria-hidden="true" /> {t('Listen to scan')}
           </button>
-          <button type="button" disabled={!ready} onClick={hearStrip}>{t('Hear this strip')}</button>
+          <div className="lab-auditions" role="group" aria-label={t('Hear this strip')}>
+            <button type="button" disabled={!ready} onClick={() => hearStrip('2025')}>{t('Hear 2025')}</button>
+            <button type="button" disabled={!ready} onClick={() => hearStrip('2026')}>{t('Hear 2026')}</button>
+          </div>
           <button type="button" disabled={!playing} onClick={stop}><Square size={16} aria-hidden="true" /> {t('Stop')}</button>
           <label className="lab-volume">
             <Volume2 size={19} aria-hidden="true" />
             <input aria-label={t('Volume')} type="range" min={0} max={1} step={.01} value={volume} onChange={event => setVolume(Number(event.target.value))} />
           </label>
         </div>
-        <p className="lab-status" role="status">{year} · {audition.notice ? t('Audio is ready. Press Hear this strip again.') : status}</p>
+        <p className="lab-status" role="status">{year} · {audition.notice ? t('Audio is ready. Press the year button again.') : status}</p>
         {error && <p className="lab-error" role="alert">{error}</p>}
       </section>
 
-      <p className="lab-note">{t('The scan turns pixel brightness into pitch. A higher note cannot tell you which ocean is warmer.')}</p>
+      <p className="lab-note" id="lab-meaning">{t('The marker shows the same relative position in each image. The strips can cover different places. Pitch follows pixel brightness and cannot measure ocean temperature.')}</p>
 
       <details className="lab-source">
         <summary>{t('Original NASA image and legend')}</summary>
