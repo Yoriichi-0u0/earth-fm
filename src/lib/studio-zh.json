@@ -844,6 +844,8 @@
   "Hear selected strip": "试听选中的条带",
   "Hear selected January": "试听选中的一月观测",
   "Stop audition": "停止试听",
+  "The strip could not play. Try Hear selected strip again.": "无法播放条带。请再次按“试听选中的条带”。",
+  "Audio is ready. Press Hear selected strip again.": "音频已就绪。请再次按“试听选中的条带”。",
   "Missing value · no mapped note.": "数据缺失 · 无映射音符。",
   "Outside mapping · no mapped note.": "超出映射范围 · 无映射音符。",
   "Image brightness, not temperature. Clockwise sectors follow the image strips from left to right.": "声音来自图像亮度，并非气温。扇区按图像条带从左到右的顺序，顺时针排列。",

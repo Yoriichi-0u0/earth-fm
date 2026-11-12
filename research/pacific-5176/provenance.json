@@ -1,0 +1,43 @@
+{
+  "size": [
+    1024,
+    512
+  ],
+  "frames": {
+    "20251010": {
+      "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005100/a005176/frames/4096x2048_2x1_30p/sst_mur_anomaly_pacific/sst_mur_anomaly_pacific_20251010.exr",
+      "sourceBytes": 21532081,
+      "sourceSha256": "d8e8f082a9d4a822a2383cd2c7ce9e997ba28b6a00bf6a682b7610ba50e9a230",
+      "pngSha256": "7e58880406729b92e3a39693b8a84ac7c9867222355abf928d28c5700ebd1e95",
+      "rgbSha256": "532696f872bb3602a3eef422359d718f9819e94667b5bf0a1e4889acef4a80be",
+      "coastlineFit": {
+        "points": 2945,
+        "bestShiftPx": 0,
+        "best": 2767,
+        "zero": 2767,
+        "halfTurn": 919
+      }
+    },
+    "20261010": {
+      "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005100/a005176/frames/4096x2048_2x1_30p/sst_mur_anomaly_pacific/sst_mur_anomaly_pacific_20261010.exr",
+      "sourceBytes": 21472510,
+      "sourceSha256": "58cf8e8c16255dcefc44e653c4aea8284b3a93d2f5a55cb7b642d45eba423e56",
+      "pngSha256": "92e148b1488115e2f7de1cd0c4acdd0fd75512c64ae57ec3a60ea0c8cd187a7c",
+      "rgbSha256": "97fe2820b6f3f94bab3cc4b9bfe3992869c5b3590dafcff2d19d9d9c098ff41c",
+      "coastlineFit": {
+        "points": 2945,
+        "bestShiftPx": -1,
+        "best": 2771,
+        "zero": 2766,
+        "halfTurn": 705
+      }
+    }
+  },
+  "registration": {
+    "0,0": 221820,
+    "-1,0": 146388,
+    "1,0": 146341,
+    "0,-1": 125561,
+    "0,1": 125978
+  }
+}
