@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-type GrooveAudit={contexts:AudioContext[];notes:number[];reads:number;hold:boolean;resumes:(()=>void)[];replayed:number[]};
+type GrooveAudit={contexts:AudioContext[];notes:number[];latestStartAt:number;oscillatorStops:number;reads:number;hold:boolean;resumes:(()=>void)[];replayed:number[]};
 declare global{interface Window{grooveAudit:GrooveAudit}}
 const print=(page:Page)=>page.locator('.jb-vinyl-fallback>.jb-grooveprint');
 const loop=(page:Page)=>page.getByRole('region',{name:'Earth Looper',exact:true});
@@ -27,13 +27,22 @@ for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refin
 });
 async function setup(page:Page){
   await page.addInitScript(()=>{
-    const audit:GrooveAudit={contexts:[],notes:[],reads:0,hold:false,resumes:[],replayed:[]};window.grooveAudit=audit;
+    const audit:GrooveAudit={contexts:[],notes:[],latestStartAt:0,oscillatorStops:0,reads:0,hold:false,resumes:[],replayed:[]};window.grooveAudit=audit;
     const Context=AudioContext;
     window.AudioContext=class extends Context{
       constructor(){super();audit.contexts.push(this);}
       get state():AudioContextState{return audit.hold&&super.state!=='closed'?'suspended':super.state;}
       async resume(){await super.resume();if(audit.hold)await new Promise<void>(resolve=>audit.resumes.push(resolve));}
-      createOscillator(){const oscillator=super.createOscillator(),set=oscillator.frequency.setValueAtTime.bind(oscillator.frequency),start=oscillator.start.bind(oscillator);let mapped:number|undefined;oscillator.frequency.setValueAtTime=(hz,at)=>{mapped=hz;return set(hz,at);};oscillator.start=when=>{audit.notes.push(mapped??oscillator.frequency.value);start(when);};return oscillator;}
+      createOscillator(){
+        const oscillator=super.createOscillator();
+        const set=oscillator.frequency.setValueAtTime.bind(oscillator.frequency);
+        const start=oscillator.start.bind(oscillator),stop=oscillator.stop.bind(oscillator);
+        let mapped:number|undefined;
+        oscillator.frequency.setValueAtTime=(hz,at)=>{mapped=hz;return set(hz,at);};
+        oscillator.start=when=>{start(when);audit.latestStartAt=when??this.currentTime;audit.notes.push(mapped??oscillator.frequency.value);};
+        oscillator.stop=when=>{stop(when);audit.oscillatorStops++;};
+        return oscillator;
+      }
     };
     const read=CanvasRenderingContext2D.prototype.getImageData;
     CanvasRenderingContext2D.prototype.getImageData=function(...args:Parameters<typeof read>){audit.reads++;return read.apply(this,args);};
@@ -295,4 +304,39 @@ test('keyboard inspection describes and auditions the selected source on either 
   await slider.press('ArrowLeft');
   await expect(page.getByRole('button',{name:'Hear selected January',exact:true})).toBeEnabled();
   await expect(slider).toHaveValue('11');
+});
+
+for(const {side,hear,voices} of [
+  {side:'A',hear:'Hear selected strip',voices:3},
+  {side:'B',hear:'Hear selected January',voices:4},
+])test(`Side ${side} Stop audition cancels the active selected note`,async({page})=>{
+  await setup(page);
+  if(side==='B')await page.getByRole('button',{name:/^Flip to Side B/}).press('Enter');
+  await page.getByText('Read the grooves',{exact:true}).press('Enter');
+  const slider=page.getByRole('slider',{name:'Inspect sector (silent)',exact:true});
+  await slider.press('End');
+  const position=await slider.inputValue();
+  const expectedPitch=Number(await page.locator('.jb-groove-selected dd').last().textContent());
+  expect(await page.evaluate(()=>window.grooveAudit.notes)).toEqual([]);
+
+  // Hold the short Side A auto-release so a slow test runner cannot mistake it for Stop.
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now()+1000));
+  await page.getByRole('button',{name:hear,exact:true}).press('Enter');
+  await expect.poll(()=>page.evaluate(()=>window.grooveAudit.notes.length)).toBe(voices);
+  const active=await page.evaluate(()=>({pitch:window.grooveAudit.notes[0],stops:window.grooveAudit.oscillatorStops}));
+  expect(active.pitch).toBeCloseTo(expectedPitch,2);
+  // Side B schedules each harmonic's natural stop at creation time.
+  expect(active.stops).toBe(side==='A'?0:voices);
+  await expect.poll(()=>page.evaluate(()=>{
+    const audit=window.grooveAudit;
+    return audit.contexts[0].currentTime>=audit.latestStartAt;
+  }),{intervals:[10]}).toBe(true);
+  await page.getByRole('button',{name:'Stop audition',exact:true}).press('Enter');
+  await page.clock.runFor(75);
+  expect(await page.evaluate(()=>window.grooveAudit.oscillatorStops)).toBeGreaterThanOrEqual(active.stops+voices);
+  await expect(page.getByRole('button',{name:hear,exact:true})).toBeFocused();
+  await expect(slider).toHaveValue(position);
+  await page.clock.runFor(3000);
+  expect(await page.evaluate(()=>window.grooveAudit.notes.length)).toBe(voices);
 });
