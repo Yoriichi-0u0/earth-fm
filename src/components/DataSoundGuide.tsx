@@ -28,7 +28,7 @@ export default function DataSoundGuide({ current, onHear }: Props) {
   return <section id="data-to-sound" className="ss-guide" aria-labelledby="ss-guide-title">
     <p className="ss-kicker">{t("FOLLOW THE MEASUREMENT")}</p>
     <h2 id="ss-guide-title">{t("How does data become sound?")}</h2>
-    <p className="ss-guide-intro">{t("Each monthly NASA temperature anomaly selects a fixed band, which determines the melody’s fundamental pitch. Higher anomalies produce higher or equal notes. Tone, rhythm and harmony are musical choices, not additional climate data. This is an TerraJuke musical mapping, not a recording of Earth or a NASA measurement of sound.")}</p>
+    <p className="ss-guide-intro">{t("Each monthly NASA temperature anomaly selects a fixed band, which determines the melody’s fundamental pitch. Higher anomalies produce higher or equal notes. Tone, rhythm and harmony are musical choices, not additional climate data. This is a TerraJuke musical mapping, not a recording of Earth or a NASA measurement of sound.")}</p>
     <ol className="ss-proof-chain" aria-label={t("Current data to sound mapping")}>
       <li><small>{t("01 / NASA DATA")}</small><strong>{current.anomaly === null ? t('Not available') : formatAnomaly(current.anomaly)}</strong><span>{date(current.year,current.month,MONTHS[current.month-1])} {t("· global")}</span></li>
       <li><small>{t("02 / FIXED BAND")}</small><strong>{event.kind === 'note' ? `${t('Band')} ${event.bandIndex + 1} / ${NOTES.length}` : t('No mapped band')}</strong><span>{event.kind === 'note' ? bandLabel(event.bandIndex) : event.reason === 'missing' ? t('Missing data is never treated as zero.') : t('Outside the fixed range; no clipping.')}</span></li>

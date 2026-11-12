@@ -5,7 +5,7 @@
 .jb-eyebrow svg{color:#d5f38b}.jb-intro h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(34px,3.5vw,50px);font-weight:500;letter-spacing:-2px;line-height:1.12;margin:0;color:#f2eee5}
 .jb-intro h1 em{font-style:normal;color:#d5f38b}.jb-intro>p{font-size:14px;color:#e3ebe6;line-height:1.7;margin:0 0 2px;max-width:370px}.jb-intro>p span{display:block;font-size:12px;color:var(--jb-muted);margin-top:3px}
 .jb-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.85fr);gap:28px;align-items:start}
-.jb-player{grid-column:1;grid-row:1;min-width:0}.jb-library{grid-column:2;grid-row:1;min-width:0;padding:4px 0 0}
+.jb-player,.jb-record-shelf{min-width:0}.jb-library{min-width:0;padding:4px 0 0}
 .jb-library-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.jb-library-heading h2{font-size:15px;font-weight:500;letter-spacing:-.2px;margin:0}.jb-library-heading>span{font-size:11px;color:#9bb0b7;font-variant-numeric:tabular-nums}
 .jb-records{display:grid;gap:10px}.jb-record{display:flex;gap:14px;align-items:center;position:relative;padding:17px 15px;min-height:112px;width:100%;border:1px solid #ffffff19;border-radius:12px;background:#101a22;text-align:left;color:#e4ecea;font:inherit;cursor:pointer;transition:border-color .18s,background .18s,transform .18s}
 .jb-record:hover{background:#162630;border-color:#b8ceba66;transform:translateY(-2px)}.jb-record.is-selected{background:linear-gradient(115deg,#d5f38b0c,#19302e66);border-color:var(--record-accent);box-shadow:inset 3px 0 var(--record-accent)}
@@ -204,8 +204,8 @@
  .jb-artwork-paired{grid-template-columns:28% minmax(0,1fr)}
 }
 /* Personal records have their own sleeve, outside the scientific collection. */
-.jb-layout>.jb-player{grid-row:1 / span 2;scroll-margin-top:20px}
-.jb-personal-panel{grid-column:2;grid-row:2;min-width:0;padding:19px;border:1px dashed var(--ef-control-border);border-radius:12px;background:var(--ef-panel);color:var(--ef-text)}
+.jb-player{scroll-margin-top:20px}
+.jb-personal-panel{min-width:0;padding:19px;border:1px dashed var(--ef-control-border);border-radius:12px;background:var(--ef-panel);color:var(--ef-text)}
 .jb-personal-heading{display:flex;align-items:center;gap:13px}
 .jb-personal-heading>span{display:grid;place-items:center;flex-shrink:0;width:48px;height:48px;border:1px solid var(--ef-border);border-radius:50%;background:var(--ef-panel-raised);color:var(--ef-accent);overflow:hidden}
 .jb-personal-heading img{width:100%;height:100%;object-fit:cover}
@@ -222,7 +222,7 @@
 .jb-personal-loading{display:grid;justify-items:center;align-content:center;min-height:330px;gap:14px;text-align:center;padding:25px;border:1px solid var(--ef-border);border-radius:16px;background:var(--ef-panel);color:var(--ef-text)}
 .ss .jb-home .jb-personal-loading h2{font-size:24px;margin:0}.ss .jb-home .jb-personal-loading p{font-size:13px;color:var(--ef-muted);margin:0;line-height:1.8}
 .ss .jb-home .jb-personal-loading button{min-height:44px;padding:10px 15px;background:var(--ef-accent);color:var(--ef-on-accent);border:1px solid var(--ef-accent);border-radius:7px}
-@media(max-width:960px){.jb-personal-panel{order:2;width:100%}.jb-personal-actions{margin-top:12px}}
+@media(max-width:960px){.jb-personal-panel{width:100%}.jb-personal-actions{margin-top:12px}}
 
 /* The optional game entry is styled before its component is lazy-loaded. */
 .ss .jb-home .jb-mystery-entry{font-size:11px;min-height:44px;padding:7px 9px;margin-left:auto}.jb-library-heading{gap:10px}.ss .jb-home .jb-mystery-entry[aria-pressed=true]{border-color:var(--ef-accent);background:var(--ef-selected);color:var(--ef-accent)}

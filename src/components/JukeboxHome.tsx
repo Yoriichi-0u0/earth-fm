@@ -184,7 +184,6 @@ export default function JukeboxHome({motion}:{motion:boolean}){
   const optional=selected==='personal'||selected==='mystery';
   function selectRecord(id:JukeboxRecordId|'mystery'){
     personal.cancel();
-    if(id===selected)return;
     setSelected(id);
     player.current?.focus({preventScroll:true});
     if(player.current&&player.current.getBoundingClientRect().top<0){
@@ -201,29 +200,31 @@ export default function JukeboxHome({motion}:{motion:boolean}){
         {selected==='personal'&&personal.error&&<p className="jb-personal-error" role="alert">{t(personal.error)}{personal.image&&<> {t('Your previous image is still available. Its take has been cleared.')}</>}</p>}
         {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} volume={volume} onVolume={setVolume}/>}
       </div>
-      <section className="jb-library" id="record-shelf" tabIndex={-1} aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>selectRecord('mystery')}><Disc3 aria-hidden="true" size={14}/>{t('Mystery Record')}</button></div>
-        <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
-          <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
-            <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
-            <span className="jb-record-copy"><small>{t(item.id==='spiral'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
-          </button>)}</div>
-          {edges.left&&<button className="jb-shelf-arrow jb-shelf-previous" type="button" aria-label={t('Previous records')} onClick={()=>moveShelf(-1)}><ChevronLeft size={17}/></button>}
-          {edges.right&&<button className="jb-shelf-arrow jb-shelf-next" type="button" aria-label={t('More records')} onClick={()=>moveShelf(1)}><ChevronRight size={17}/></button>}
-        </div>
-      </section>
-      <section className="jb-personal-panel" aria-labelledby="jb-personal-title" aria-busy={personal.loading}>
-        <div className="jb-personal-heading"><span aria-hidden="true">{personal.image?<img src={personal.image.url} alt=""/>:<ImagePlus size={24}/>}</span><div><p>{t('PRESS YOUR OWN RECORD')}</p><h2 id="jb-personal-title">{t('Your image. Your sound.')}</h2></div></div>
-        <p>{t('Turn a picture into a playable record. Keep it here, just for you.')}</p>
-        <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={t('Choose a personal image')} hidden onChange={e=>{const file=e.currentTarget.files?.[0];e.currentTarget.value='';if(file)chooseImage(file);}}/>
-        <div className="jb-personal-actions">
-          {personal.image&&!personal.loading&&<button type="button" aria-pressed={selected==='personal'} onClick={selectPersonal}>{t('Your Record')} <Disc3 size={14}/></button>}
-          <button type="button" onClick={()=>fileInput.current?.click()}>{t(personal.image?'Replace image':'Choose image')}<ImagePlus size={15}/></button>
-          {(personal.image||personal.loading)&&<button type="button" onClick={()=>{personal.remove();if(selected==='personal')setSelected('spiral');}}>{t('Remove')}</button>}
-        </div>
-        <p className="jb-personal-limits">{t('PNG, JPEG or WebP · up to 10 MB')}</p><details className="jb-personal-specs"><summary>{t('Image requirements')}</summary><p>{t('4096 px per edge · 12.6 MP · up to 8:1')}</p></details>
-        <p className="jb-personal-privacy"><ShieldCheck size={15}/>{t('No upload. Image and take disappear when you leave Home or reload.')}</p>
-        {personal.loading&&<p role="status">{t('Opening your image…')}</p>}
-      </section>
+      <div className="jb-record-shelf">
+        <section className="jb-library" id="record-shelf" tabIndex={-1} aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>selectRecord('mystery')}><Disc3 aria-hidden="true" size={14}/>{t('Mystery Record')}</button></div>
+          <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
+            <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
+              <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
+              <span className="jb-record-copy"><small>{t(item.id==='spiral'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
+            </button>)}</div>
+            {edges.left&&<button className="jb-shelf-arrow jb-shelf-previous" type="button" aria-label={t('Previous records')} onClick={()=>moveShelf(-1)}><ChevronLeft size={17}/></button>}
+            {edges.right&&<button className="jb-shelf-arrow jb-shelf-next" type="button" aria-label={t('More records')} onClick={()=>moveShelf(1)}><ChevronRight size={17}/></button>}
+          </div>
+        </section>
+        <section className="jb-personal-panel" aria-labelledby="jb-personal-title" aria-busy={personal.loading}>
+          <div className="jb-personal-heading"><span aria-hidden="true">{personal.image?<img src={personal.image.url} alt=""/>:<ImagePlus size={24}/>}</span><div><p>{t('PRESS YOUR OWN RECORD')}</p><h2 id="jb-personal-title">{t('Your image. Your sound.')}</h2></div></div>
+          <p>{t('Turn a picture into a playable record. Keep it here, just for you.')}</p>
+          <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={t('Choose a personal image')} hidden onChange={e=>{const file=e.currentTarget.files?.[0];e.currentTarget.value='';if(file)chooseImage(file);}}/>
+          <div className="jb-personal-actions">
+            {personal.image&&!personal.loading&&<button type="button" aria-pressed={selected==='personal'} onClick={selectPersonal}>{t('Your Record')} <Disc3 size={14}/></button>}
+            <button type="button" onClick={()=>fileInput.current?.click()}>{t(personal.image?'Replace image':'Choose image')}<ImagePlus size={15}/></button>
+            {(personal.image||personal.loading)&&<button type="button" onClick={()=>{personal.remove();if(selected==='personal')setSelected('spiral');}}>{t('Remove')}</button>}
+          </div>
+          <p className="jb-personal-limits">{t('PNG, JPEG or WebP · up to 10 MB')}</p><details className="jb-personal-specs"><summary>{t('Image requirements')}</summary><p>{t('4096 px per edge · 12.6 MP · up to 8:1')}</p></details>
+          <p className="jb-personal-privacy"><ShieldCheck size={15}/>{t('No upload. Image and take disappear when you leave Home or reload.')}</p>
+          {personal.loading&&<p role="status">{t('Opening your image…')}</p>}
+        </section>
+      </div>
     </div>
     <div className="jb-deeper"><span>{t(optional?'Explore more of TerraJuke.':'Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',optional?'all':station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',optional?'all':station,record.id==='motion'?'motion':undefined);}}>{t(optional?'Browse Earth stories':'Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t(optional?'Inspect Earth data':'Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
     <details className="jb-earth-extra" onToggle={e=>{setEarthOpen(e.currentTarget.open);if(!e.currentTarget.open)setEarthReady(false);}}><summary>{t('A closer look at home')} <span>{t('The Earth Observatory view')} ↗</span></summary>{earthOpen&&<div><Suspense fallback={<p role="status">{t('Loading the Earth view…')}</p>}><EarthGlobe locations={[]} selectedId="" onSelect={noop} playing={false} autoRotate={motion} photographic onSurfaceReady={setEarthReady}/></Suspense><p>{t(earthReady?'July 2004 composite. Lighting and rotation are illustrative, not live weather.':'Interactive illustration with Natural Earth boundaries. Lighting and rotation are illustrative.')} <a href={earthReady?observatoryImagery.sourcePage:'https://www.naturalearthdata.com/'} target="_blank" rel="noreferrer">{t(earthReady?'NASA Earth Observatory · Blue Marble ↗':'Interactive Earth illustration ↗')}</a></p></div>}</details>

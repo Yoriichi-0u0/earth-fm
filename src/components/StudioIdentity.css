@@ -1,5 +1,11 @@
 /* The mineral palette frames the app. Scientific media keeps its own surface. */
 :root[data-theme] .ss.ss-pages.ss-observatory {
+  --ef-panel: #19251f;
+  --ef-panel-raised: #223128;
+  --ef-border: #43584a;
+  --ef-control-border: #789181;
+  --ef-muted: #b6c8bb;
+  --ef-subtle: #a6b9ad;
   --tj-canvas: #101914;
   --tj-header: #17221b;
   --tj-glow: radial-gradient(ellipse at 78% 0, #294235, transparent 50rem);
@@ -10,6 +16,12 @@
 }
 
 :root[data-theme='light'] .ss.ss-pages.ss-observatory {
+  --ef-panel: #fffefa;
+  --ef-panel-raised: #eeefe6;
+  --ef-border: #cbd4c5;
+  --ef-control-border: #748974;
+  --ef-muted: #485d50;
+  --ef-subtle: #526456;
   --tj-canvas: #f7f6ee;
   --tj-header: #f0f0e5;
   --tj-glow: radial-gradient(ellipse at 78% 0, #e2ead7, transparent 50rem);
@@ -111,6 +123,11 @@
 
 .ss.ss-pages .jb-layout { gap: clamp(16px, 2vw, 28px); }
 .ss.ss-pages .jb-library { scroll-margin-top: 12px; }
+.ss.ss-pages .jb-record-shelf {
+  display: grid;
+  width: 100%;
+  gap: clamp(16px, 2vw, 24px);
+}
 
 :root[data-theme] .ss.ss-pages .jb-home :is(.jb-deck, .jb-personal-panel, .jb-mystery-card) {
   border-radius: 19px;
@@ -182,6 +199,7 @@
 .ss.ss-pages .jb-home .jb-source>p { font-size: .82rem; }
 
 .ss.ss-pages .jb-home .jb-library-heading { margin-bottom: 9px; flex-wrap: wrap; }
+.ss.ss-pages .jb-home .jb-library-heading button { margin-left: 0; }
 .ss.ss-pages .jb-home .jb-library-heading h2 { font-size: 1.12rem; font-weight: 600; }
 .ss.ss-pages .jb-home .jb-record {
   gap: 12px;
