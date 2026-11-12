@@ -87,7 +87,11 @@ function useDataRecord(record:JukeboxRecord,volume:number){
   const signal:RecordSignal={playing:audio.playing,note:note?.note??'—',frequency:note?.frequencyHz??null,event:audio.noteEvent};
   const state:DeckState={playing:audio.playing,starting:audio.status==='Starting audio…',ready:true,completed,progress:completed?1:index/points.length,note:signal.note,frequency:note?`${note.frequencyHz.toFixed(2)} Hz`:'—',position:`${String(index+1).padStart(2,'0')} / 12`,input:t(arctic?'September mean extent':'January global anomaly'),onPlay:()=>{if(audio.playing)audio.stop();else{setRequestAt(performance.now());void audio.play(points,pitches,{...defaults,tempo:60,volume,dataOnly});}},signal,requestAt,error:audio.status.startsWith('Audio could not')?audio.status:undefined};
   const extra=<div className="jb-data-only"><label><input type="checkbox" checked={dataOnly} onChange={e=>{audio.stop();setDataOnly(e.target.checked);}}/>{t('Hear Data Only')}</label><span>{t(dataOnly?'One observation. One note.':'Data melody + musical arrangement')}</span></div>;
-  return {audio,point,state,extra,points,index};
+  function audition(index:number){
+    const pitch=pitches[index];
+    if(pitch!=null)void audio.play([points[index]],[pitch],{...defaults,tempo:60,volume,dataOnly:true});
+  }
+  return {audio,point,state,extra,points,index,audition};
 }
 function DataDeck({record,volume,onVolume}:{record:JukeboxRecord;volume:number;onVolume:(value:number)=>void}){
   const data=useDataRecord(record,volume);
@@ -95,9 +99,9 @@ function DataDeck({record,volume,onVolume}:{record:JukeboxRecord;volume:number;o
 }
 
 /** Shared Scratch/Looper path; scientific adapters and renderers stay independent. */
-function useImagePerformance(visual:ReturnType<typeof useVisualRecord>,volume:number,sourceIdentity:string,enabled=true){
+function useImagePerformance(visual:ReturnType<typeof useVisualRecord>,volume:number,sourceIdentity:string,enabled=true,canAudition=false){
   const [manual,setManual]=useState(false),[requestAt,setRequestAt]=useState(0);
-  const instrument=useFrameInstrument(visual.visual.steps,volume,manual&&enabled);
+  const instrument=useFrameInstrument(visual.visual.steps,volume,enabled&&(manual||canAudition));
   const looper=useEarthLooper({enabled:manual&&enabled&&visual.visual.ready,sourceImage:sourceIdentity,stripCount:visual.visual.steps.length,prepare:instrument.prepare,play:instrument.play,stopAudio:instrument.stop,onSelect:index=>{visual.visual.setScanIndex(index);setRequestAt(performance.now());}});
   const replaying=looper.phase==='replaying'||looper.phase==='preparing';
   function changeMode(){visual.visual.stop();looper.stop();setManual(value=>!value);}
@@ -116,7 +120,7 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   const visualGrooves=useMemo(()=>imageGrooveprint(visual.visual.steps),[visual.visual.steps]);
   const dataGrooves=useMemo(()=>measurementGrooveprint(data.points),[data.points]);
   const grooveDescription=useId();
-  const {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture}=useImagePerformance(visual,volume,record.frame!.imageUrl,side==='a');
+  const {manual,manualState,instrument,looper,changeMode,playStrip,cancelGesture}=useImagePerformance(visual,volume,record.frame!.imageUrl,side==='a',true);
   function changeSide(next:RecordSide){if(next===side)return;visual.visual.stop();visual.visual.setScanIndex(0);data.audio.stop();looper.stop();setInspectedObservation(null);setSide(next);}
   function inspectGroove(index:number){
     const segments=side==='a'?visualGrooves:dataGrooves;
@@ -126,6 +130,14 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   }
   const current=side==='a'?(manual?manualState:visual.state):data.state;
   const grooveIndex=side==='a'?visual.visual.scanIndex:inspectedObservation??data.index;
+  const auditioning=side==='a'?instrument.playing||instrument.starting:inspectedObservation!==null&&data.audio.playing;
+  function auditionGroove(){
+    if(side==='a'){
+      visual.visual.stop();looper.stop();
+      if(!auditioning)void instrument.play(grooveIndex);
+    }else if(auditioning)data.audio.stop();
+    else{setInspectedObservation(grooveIndex);data.audition(grooveIndex);}
+  }
   const inspected=side==='b'&&inspectedObservation!==null?dataGrooves[inspectedObservation]:null;
   const shown=inspected?{...current,progress:grooveIndex/data.points.length,position:`${String(grooveIndex+1).padStart(2,'0')} / 12`,note:inspected.note??'—',frequency:inspected.frequencyHz===null?'—':`${inspected.frequencyHz.toFixed(2)} Hz`,signal:{...current.signal,note:inspected.note??'—',frequency:inspected.frequencyHz}}:current;
   const effective=side==='a'?record:{...measurementRecord,id:record.id,number:record.number,title:record.title};
@@ -134,8 +146,8 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
     <button type="button" aria-label={t('Side B: hear the measurements')} aria-pressed={side==='b'} onClick={()=>changeSide('b')}><b>B</b><span>{t('Hear the measurements')}<small>{t('Measurement sound')}</small></span></button>
   </div><div className="jb-science-cue"><p>{t(side==='a'?'Brightness → pitch. Not temperature.':'January anomaly (°C) · relative to 1951–1980.')}</p>{side==='a'&&<button className="jb-manual-toggle" type="button" data-manual={manual} disabled={!visual.visual.ready} aria-controls={manual?'earth-scratch-controls':undefined} onClick={changeMode}>{t(manual?'Back to playback':'Play with Earth')}<span aria-hidden="true">{manual?' ↗':' ↔'}</span></button>}</div></>;
   const picture=<VisualArtwork record={record} transport={visual} manual={manual}/>;
-  return <DeckConsole record={effective} {...shown} onPlay={()=>{setInspectedObservation(null);current.onPlay();}} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={shown.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')} grooves={side==='a'?visualGrooves:dataGrooves} position={grooveIndex} descriptionId={grooveDescription}/>}
-    recordNote={<GrooveprintKey side={side} id={grooveDescription} ready={side==='b'||visual.visual.ready} segments={side==='a'?visualGrooves:dataGrooves} index={grooveIndex} onInspect={inspectGroove}/>}
+  return <DeckConsole record={effective} {...shown} error={shown.error||(side==='a'?instrument.error||instrument.notice:undefined)} onPlay={()=>{setInspectedObservation(null);if(side==='a'&&!manual)instrument.stop();current.onPlay();}} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={shown.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')} grooves={side==='a'?visualGrooves:dataGrooves} position={grooveIndex} descriptionId={grooveDescription}/>}
+    recordNote={<GrooveprintKey side={side} id={grooveDescription} ready={side==='b'||visual.visual.ready} segments={side==='a'?visualGrooves:dataGrooves} index={grooveIndex} onInspect={inspectGroove} onAudition={auditionGroove} auditioning={auditioning}/>}
     performanceControls={side==='a'&&manual&&visual.visual.ready?<EarthLooper looper={looper}/>:undefined}
     artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={side==='b'?(data.points[grooveIndex]??data.point):data.point}/></div></>}
     volume={volume} onVolume={onVolume} extra={side==='b'?data.extra:undefined}/>;

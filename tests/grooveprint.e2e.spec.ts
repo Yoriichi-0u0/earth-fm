@@ -267,3 +267,32 @@ for(const theme of ['light','dark'] as const)test(`${theme} mapping disclosure p
   expect(await page.evaluate(()=>window.grooveAudit.contexts.length)).toBe(contexts);
   await page.getByRole('button',{name:'Stop',exact:true}).click();
 });
+
+test('keyboard inspection describes and auditions the selected source on either side',async({page})=>{
+  await setup(page);
+  await page.locator('.jb-groove-key summary').first().press('Enter');
+  const slider=page.getByRole('slider',{name:'Inspect sector (silent)',exact:true});
+  const readout=page.locator('.jb-groove-selected');
+  await slider.press('End');
+  await expect(slider).toHaveAttribute('aria-valuetext',/Image strip 48 \/ 48, .+% brightness, .+ Hz/);
+  await expect(slider).toHaveAccessibleDescription(/Image brightness/);
+  expect(await page.evaluate(()=>window.grooveAudit.notes)).toEqual([]);
+  const imagePitch=Number(await readout.locator('dd').last().textContent());
+  await page.getByRole('button',{name:'Hear selected strip',exact:true}).press('Enter');
+  await expect.poll(()=>page.evaluate(()=>window.grooveAudit.notes.length)).toBeGreaterThan(0);
+  expect(await page.evaluate(()=>window.grooveAudit.notes[0])).toBeCloseTo(imagePitch,2);
+  const flip=page.getByRole('button',{name:/^Flip to Side B/});
+  await flip.press('Enter');
+  await expect(page.getByRole('button',{name:/^Flip to Side A/})).toBeFocused();
+  await slider.press('End');
+  await expect(slider).toHaveAttribute('aria-valuetext',/January 2025, .+°C, .+ Hz/);
+  await expect(slider).toHaveAccessibleDescription(/1951–1980/);
+  const dataPitch=Number(await readout.locator('dd').last().textContent());
+  await page.evaluate(()=>{window.grooveAudit.notes=[];});
+  await page.getByRole('button',{name:'Hear selected January',exact:true}).press('Enter');
+  await expect.poll(()=>page.evaluate(()=>window.grooveAudit.notes.length)).toBeGreaterThan(0);
+  expect(await page.evaluate(()=>window.grooveAudit.notes[0])).toBeCloseTo(dataPitch,2);
+  await slider.press('ArrowLeft');
+  await expect(page.getByRole('button',{name:'Hear selected January',exact:true})).toBeEnabled();
+  await expect(slider).toHaveValue('11');
+});

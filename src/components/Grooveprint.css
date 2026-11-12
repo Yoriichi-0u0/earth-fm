@@ -28,5 +28,6 @@
 .jb-groove-selected dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 18px;margin:2px 0 10px}
 .jb-groove-selected dt{font-size:11px;line-height:1.5;color:var(--ef-muted)}
 .jb-groove-selected dd{margin:3px 0 0;font-size:14px;line-height:1.5;color:var(--ef-text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ss .jb-home .jb-groove-audition{min-height:44px;padding:6px 12px;border:1px solid var(--ef-border);border-radius:6px;background:var(--ef-panel);color:var(--ef-text);font:inherit;font-size:13px}
 .ss .jb-home .jb-groove-selected .jb-groove-precision{font-size:11px;line-height:1.6}
 @media(max-width:650px){.jb-groove-key{padding:11px 12px}.jb-groove-reading{grid-template-columns:minmax(0,1fr);gap:12px}.jb-groove-detail{width:min(100%,240px);justify-self:center}}
