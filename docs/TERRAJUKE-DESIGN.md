@@ -15,6 +15,31 @@ BoboMimi asked to drop the pine-green dark theme in favour of an Apple-like desi
 
 Scientific imagery keeps its original colours and dark media surfaces. Legacy keeps its own preserved styling.
 
+## Experience 2.0 — 13 November 2026
+
+An audit of 120 rendered screenshots covered five devices (desktop, iPad, iPhone, iPhone landscape, Pixel), both themes, English and Chinese, and every modern route and Home state. Ranked by impact, it found:
+
+1. **High — phones squeezed the science.** The vinyl column took about 30% of the width beside the NASA visual or the coil. Its text wrapped and the visual shrank.
+2. **High — the phone header cost about 120 px.** The labelled selectors were large and "Explore Data" wrapped onto two lines.
+3. **Medium — Play scrolled away.** Grooveprint inspection and Scratch sit far below the transport.
+4. **Medium — the coil was small and passive.** On desktop it was 127 px tall, and on phones the "2026" label overlapped the newest turns.
+
+Decisions:
+
+- **Phones (≤640 px):**
+  - the visual or coil takes the full width, and the record becomes a compact row beneath it with a flat disc, Flip, Try 3D and the caption;
+  - the transport is sticky inside the deck, so Play or "Hear this position" stays in reach while inspecting or scratching;
+  - the preference labels are visually hidden but keep their accessible names, and navigation is one line of 44 px targets;
+  - the A/B buttons drop their redundant sublabels.
+- **Interactive Climate Coil (the one Three.js investment):**
+  - tap or click any January bead to select it silently through the existing inspector, so the slider, Grooveprint, readout and coil stay in agreement;
+  - hovering shows the date, anomaly and mapped note;
+  - a blue time-cursor ring glides to the current observation, and jumps instead when reduced motion is on;
+  - the year axis sits below the canvas, and the coil is about 185–220 px tall;
+  - a drag rotates the coil, and a tap only counts after less than 6 px of movement;
+  - it keeps demand rendering, pauses off-screen, falls back to 2D, adds no new data and keeps the fixed scale.
+- **Rejected:** a second sticky Play button. The design deliberately keeps a single Play control. A full-screen 3D observatory was also rejected because of battery cost on phones and duplication of the coil.
+
 ## Design direction (original study, 13 November 2026)
 
 | Study | Distinguishing idea | Decision |
