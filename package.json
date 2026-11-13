@@ -10,6 +10,7 @@
     "data:refresh": "node scripts/refresh-data.mjs",
     "test": "tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
+    "test:safari": "node scripts/safari-first-visit.mjs",
     "check": "npm run test && npm run build && npm run test:e2e"
   },
   "allowScripts": {
