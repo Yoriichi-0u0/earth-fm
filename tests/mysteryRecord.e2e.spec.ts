@@ -46,7 +46,7 @@ for(const [index,title] of recordTitles.entries())test(`${title} stays concealed
   await expect(mystery(page)).toHaveAttribute('data-mystery-phase','revealed');await expect(mystery(page).getByRole('heading',{name:record.title,exact:true})).toBeFocused();
   await expect(mystery(page)).toContainText('Your pick matched this round.');await expect(mystery(page)).toContainText(record.kind==='visual'?'Visual sound':'Measurement sound');
   await expect(mystery(page).getByRole('link',{name:record.source,exact:false})).toHaveAttribute('href',record.sourceUrl);
-  await expect(mystery(page)).toContainText(record.meaning);await expect(mystery(page).locator('.mr-media img,.mr-media video,.jb-data-art>svg[role=img]')).toBeVisible();await expect(mystery(page).getByRole('status')).toContainText('Ready to replay');
+  await expect(mystery(page)).toContainText(record.meaning);await expect(mystery(page).locator('.mr-media img,.mr-media video,.jb-data-art>[role=img]')).toBeVisible();await expect(mystery(page).getByRole('status')).toContainText('Ready to replay');
   const count=await page.evaluate(()=>window.mysteryAudit.notes.length);await page.waitForTimeout(650);expect(await page.evaluate(()=>window.mysteryAudit.notes.length)).toBe(count);
   await mystery(page).getByRole('button',{name:'Open full record',exact:true}).click();await expect(page.getByRole('heading',{name:record.title,exact:true})).toBeVisible();await expect(page.locator('.mr-record')).toHaveCount(0);await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
 });

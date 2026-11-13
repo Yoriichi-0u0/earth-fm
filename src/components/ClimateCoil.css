@@ -1,0 +1,18 @@
+.jb-data-art.has-coil{display:flex;flex-direction:column}
+.jb-coil{position:relative;height:clamp(190px,24vw,262px);margin:2px -6px 4px;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b2433 0,#0b0d12 72%);touch-action:pan-y;cursor:grab}
+.jb-coil:active{cursor:grabbing}
+.jb-coil canvas{display:block}
+.jb-coil-axis{position:absolute;inset:auto 12px 8px;display:flex;justify-content:space-between;font-size:11px;color:#c7c7cc;pointer-events:none;font-variant-numeric:tabular-nums}
+.jb-coil-key{position:absolute;top:8px;right:10px;display:flex;gap:10px;margin:0;padding:4px 8px;list-style:none;font-size:10.5px;color:#e5e5ea;background:#0009;border-radius:999px;pointer-events:none}
+.jb-coil-key li{display:flex;align-items:center;gap:5px}
+.jb-coil-key i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.jb-coil-key .is-cool{background:#2f7bff}.jb-coil-key .is-warm{background:linear-gradient(90deg,#ff3b30,#ffd60a)}.jb-coil-key .is-bead{background:#fff;box-shadow:0 0 0 2px #2997ff}
+.jb-data-caption{flex-wrap:wrap}
+.jb-coil-toggle{display:inline-flex;align-items:center;gap:5px;min-height:32px;margin-left:auto;padding:4px 11px;border-radius:999px;border:1px solid #ffffff40;background:#ffffff14;color:#f5f5f7;font-size:12px;cursor:pointer}
+.jb-coil-toggle:hover{background:#ffffff26}
+@media(max-width:520px){.jb-coil-key{left:8px;right:auto;font-size:10px;gap:7px}.jb-coil{height:200px}}
+/* Inside the paired Climate Spiral deck the coil takes the chart's place and shrinks with the panel. */
+.jb-artwork-paired .jb-coil{flex:1 1 auto;height:145px;min-height:64px;margin:0}
+.jb-artwork-paired .jb-coil-toggle{min-height:26px;padding:2px 9px;font-size:11px}
+@media(max-width:1050px){.jb-artwork-paired .jb-coil{height:125px}}
+@media(max-width:760px){.jb-artwork-paired .jb-coil-key,.jb-artwork-paired .jb-coil-axis span:nth-child(2){display:none}.jb-artwork-paired .jb-coil{height:90px}}

@@ -24,11 +24,22 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } } },
-    // Opt-in WebKit with iPhone emulation (PLAYWRIGHT_WEBKIT=1). Playwright WebKit is not Safari on a physical iPhone.
+    // Opt-in device emulation (PLAYWRIGHT_DEVICES=1). Emulated engines and screens, not physical phones or tablets.
     // The six-viewport scans resize 320→1024 in one page; WebKit keeps a stale header grid track there
     // (see docs/EXPERIENCE-VALIDATION.md), so they stay Chromium-only.
-    ...(process.env.PLAYWRIGHT_WEBKIT === '1'
-      ? [{ name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } }]
+    ...(process.env.PLAYWRIGHT_DEVICES === '1'
+      ? [
+          { name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } },
+          ...([
+            ['webkit-iphone-se', 'iPhone SE'], ['webkit-iphone-pro-max', 'iPhone 15 Pro Max'], ['webkit-iphone-landscape', 'iPhone 13 landscape'],
+            ['webkit-ipad', 'iPad (gen 7)'], ['webkit-ipad-pro-landscape', 'iPad Pro 11 landscape'], ['webkit-desktop', 'Desktop Safari'],
+            ['android-pixel', 'Pixel 7'], ['android-small', 'Galaxy S9+'], ['android-tablet', 'Galaxy Tab S4'],
+          ] as const).map(([name, device]) => ({ name, testMatch: '**/climateSpiralFirstVisit.e2e.spec.ts', use: { ...devices[device], launchOptions: {} } })),
+        ]
+      : []),
+    // Opt-in installed browsers (PLAYWRIGHT_BRANDS=1): the real Google Chrome and Microsoft Edge apps on this machine.
+    ...(process.env.PLAYWRIGHT_BRANDS === '1'
+      ? (['chrome', 'msedge'] as const).map(channel => ({ name: channel, testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts'], use: { ...devices['Desktop Chrome'], channel, viewport: { width: 1440, height: 1000 }, launchOptions: {} } }))
       : []),
   ],
   webServer: {

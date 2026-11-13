@@ -32,7 +32,9 @@ Record for each item: device model, OS build, browser version, candidate SHA, ou
 | Silent inspection makes no sound. Hear selected strip and Hear selected January play one note each | | |
 | Flipping during playback stops Side A. Side B then plays twelve notes | | |
 | Locking the screen, switching apps or taking a call stops playback. Play works again afterwards | | |
-| Rotating to landscape and back: no sideways page scroll, controls stay reachable | | |
+| Rotating to landscape and back: Play stays in the first screen, no sideways page scroll | | |
+| First Scratch or Hear selected strip after loading: note on first press, or the “press again” notice | | |
+| Side B Climate Coil: renders, turns by drag, beads pulse with notes; the 2D chart toggle works | | |
 | Largest system text size: Play, the side buttons and the inspector remain usable | | |
 | VoiceOver / TalkBack: the side buttons announce their pressed state, the inspector announces strip or January, the value, the note and Hz, and “Now playing” is announced | | |
 | Comfort (1–5, optional) and the listener's own words on Side A versus Side B, Hear Data Only, and repeated single notes | | |
@@ -41,11 +43,17 @@ Screen-reader and comfort results describe the people and devices tested. They d
 
 ### Automated evidence at this checkpoint
 
-Branch `codex/climate-spiral-validation`, stacked on PR #15 (`1b9d48e`). All of this is automated browser evidence, not human evidence.
+Branch `codex/climate-spiral-validation`, stacked on PR #15 (`1b9d48e`). The candidate SHA is the commit that contains this paragraph; record it with `git rev-parse HEAD` on the session sheet. All of this is automated browser evidence, not human evidence.
 
-- `npm run check` passed 64 unit tests, the production build and 118 Chromium tests. These are the existing 116 plus 2 new tests in `tests/climateSpiralFirstVisit.e2e.spec.ts`. One test drives A1–A4 by touch at 390 × 844. It checks that each note heard matches the mapped frequency on screen and that the inspector stays silent. The other test is a regression test for the decode race described below.
-- `PLAYWRIGHT_WEBKIT=1 npx playwright test --project=webkit-iphone` passed 19 tests. These are the two first-visit tests and 17 Grooveprint tests in Playwright 1.64 WebKit (revision 2370) with iPhone 13 emulation. Five repeated runs of the first-visit file all passed. **This is WebKit automation, not Safari on a physical iPhone.** It cannot show real touch, speaker, interruption or VoiceOver behaviour.
-- The WebKit run found two defects, both fixed in `src/lib/useVisualTransport.ts`. Neither fix changes a mapping or a pinned asset.
+- `npm run check` passed 67 unit tests, the production build and 122 Chromium tests. The 116 earlier browser tests are joined by 6 new tests in `tests/climateSpiralFirstVisit.e2e.spec.ts`:
+  - the A1–A4 path by touch, checking that each note heard matches the mapped frequency shown and that the inspector stays silent;
+  - regression tests for the decode race, a rejected `decode()`, and an image failure that lands before the player resets;
+  - the Climate Coil's 3D/2D switch, and its no-WebGL fallback.
+- `PLAYWRIGHT_DEVICES=1 npx playwright test --project='webkit-*' --project='android-*'` passed 77 tests. Playwright 1.64 WebKit (revision 2370) emulated iPhone SE, iPhone 13, iPhone 15 Pro Max, iPhone 13 landscape, iPad (gen 7), iPad Pro 11 landscape and desktop Safari. Its Chromium build emulated Pixel 7, Galaxy S9+ and Galaxy Tab S4. iPhone 13 also ran 17 Grooveprint tests. **These are emulated engines and screens, not physical devices or Safari.** They cannot show real touch, speakers, interruptions or VoiceOver/TalkBack behaviour.
+- `PLAYWRIGHT_BRANDS=1 npx playwright test --project=chrome --project=msedge` runs the first-visit and Grooveprint files in the installed Google Chrome 157 and Microsoft Edge 155. One run passed 50 of 50. A later parallel run had 2 Edge failures, which reproduced in 4 of 10 parallel repeats and 0 of 10 serial repeats. In each, the first strip note was dropped because Edge's first audio start took longer than 250 ms. This is the instrument's intended guard against a late, stale touch, and it shows “Audio is ready. Move again…”. On a slow phone the first Scratch or Hear selected strip may therefore need a second press; check this on physical devices.
+- Real Safari 27.2 automation needs **Safari → Settings → Advanced → Show features for web developers**, then **Developer → Allow remote automation**. These settings were not enabled, so Safari itself is untested.
+- Before a landscape fix, the iPhone 13 landscape run found Play at 385–433 px on a 342 px screen, outside the first view. A short-landscape rule now keeps it within the first screen on iPhone 13, iPhone SE, Pixel 7 and 844 × 390.
+- The WebKit run found two defects, both fixed in `src/lib/useVisualTransport.ts`. Neither fix changes a mapping or a pinned asset. A rejected `decode()` now also leaves the visual unavailable instead of marking a black scan ready.
   - **All-black first scan.** On 2 of 12 cold loads, WebKit read the Climate Spiral before its pixels were decoded. All 48 strips came back as 0 brightness, so the grooves, the silent inspector and Hear selected strip would show and play darkness. Play itself re-samples the image. The transport now waits for `HTMLImageElement.decode()`. The result was 0 of 40 bad first scans after the fix. The new regression test fails without the fix.
   - **Endless loading on a failed image.** In WebKit a fast image failure arrived before the transport's reset cleared it, so the player stayed on Loading with Play disabled. The reset now replays a failure that already happened, and each player shows its own error message.
 - Cross-browser decoding of the pinned JPEG: across all 48 strips, Chromium and WebKit luma differ by at most 0.00294. No strip crosses a pitch band, so both browsers produce the same 48 notes and the same five distinct pitches.

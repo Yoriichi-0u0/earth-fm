@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 /**
- * The Climate Spiral A/B first-visit path from docs/EXPERIENCE-VALIDATION.md, driven by touch at phone size.
+ * The Climate Spiral A/B first-visit path from docs/EXPERIENCE-VALIDATION.md, driven by touch on each device screen.
  * Automated browser evidence only: it cannot show that a person understood or enjoyed the sound.
  */
 type Audit={notes:number[]};
@@ -13,7 +13,11 @@ const IMAGE_HZ=[50,53,55,57,60,62,65,67,69,72,74].map(hz);
 const MEASUREMENT_HZ=[48,50,52,55,57,60,62,64,67,69].map(hz);
 const inScale=(scale:number[],value:number)=>scale.some(f=>Math.abs(f-value)<.01);
 
-test.use({viewport:{width:390,height:844},hasTouch:true});
+// The default Chromium project is a desktop window, so it is narrowed to a phone. Device projects keep their own screens.
+test.use({hasTouch:true});
+test.beforeEach(async({page},testInfo)=>{if(['chromium','chrome','msedge'].includes(testInfo.project.name))await page.setViewportSize({width:390,height:844});});
+const SPIRAL='**/frames/climate-spiral-svs5190-2026-10-18.jpg';
+const spiralGrooves=(page:Page)=>page.locator('.jb-vinyl-fallback>.jb-grooveprint');
 
 async function setup(page:Page){
   await page.addInitScript(()=>{
@@ -55,6 +59,41 @@ test('the first scan waits for decoded pixels instead of reading a not-yet-decod
   expect(values.filter(value=>value===0).length).toBeLessThanOrEqual(4);
 });
 
+test('a rejected decode never becomes a ready scan with invented grooves',async({page})=>{
+  await page.addInitScript(()=>{
+    HTMLImageElement.prototype.decode=function(){return Promise.reject(new DOMException('The source image cannot be decoded.','EncodingError'));};
+  });
+  await page.goto('/');
+  await expect(page.locator('.jb-error')).toHaveText('This visual could not be read. Choose another frame or upload a local image.');
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeDisabled();
+  await expect(page.locator('.jb-state')).toHaveText('Visual unavailable');
+  await expect(spiralGrooves(page)).toHaveCount(0);
+  // Measurements are independent of the picture and stay available.
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).tap();
+  await expect(spiralGrooves(page)).toHaveAttribute('data-groove-count','12');
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+});
+
+test('an image failure that lands before the player resets shows an error instead of loading forever',async({page})=>{
+  // Deterministic version of the WebKit race: the failed image is already complete when the transport resets,
+  // and the browser's own error event was consumed before the reset cleared its message.
+  await page.route(SPIRAL,route=>route.abort());
+  await page.addInitScript(()=>{
+    const spiral=(image:HTMLImageElement)=>image.getAttribute('src')?.includes('climate-spiral-svs5190')??false;
+    const complete=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'complete')!;
+    Object.defineProperty(HTMLImageElement.prototype,'complete',{configurable:true,get(){return spiral(this)||complete.get!.call(this);}});
+    window.addEventListener('error',event=>{
+      if(event.isTrusted&&event.target instanceof HTMLImageElement&&spiral(event.target))event.stopImmediatePropagation();
+    },true);
+  });
+  await page.goto('/');
+  await expect(page.locator('.jb-error')).toHaveText('The image could not load. Try another frame.');
+  await expect(page.locator('.jb-state')).toHaveText('Visual unavailable');
+  await expect(page.locator('.jb-media-loading')).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeDisabled();
+  await expect(spiralGrooves(page)).toHaveCount(0);
+});
+
 test('a first visit plays Side A, hears one silent-inspected groove, flips and plays Side B by touch',async({page})=>{
   test.setTimeout(45_000);
   await setup(page);
@@ -65,7 +104,7 @@ test('a first visit plays Side A, hears one silent-inspected groove, flips and p
 
   // 1. Discover and play Side A: one Play control, inside the first phone screen, labelled as picture sound.
   await expect(play).toHaveCount(1);await expect(play).toBeEnabled();
-  const bounds=await play.boundingBox();expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(844);
+  const screen=page.viewportSize()!,bounds=await play.boundingBox();expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(screen.height);
   await expect(sideA).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('.jb-science-cue')).toContainText('Brightness → pitch. Not temperature.');
   await expect(readout).toContainText('PIXEL INPUT');
@@ -123,10 +162,41 @@ test('a first visit plays Side A, hears one silent-inspected groove, flips and p
   await expect(deck).not.toHaveClass(/is-playing/);
 
   // The phone layout never needs horizontal page scrolling along this path.
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(screen.width);
   await test.info().attach('first-visit-evidence',{contentType:'application/json',body:JSON.stringify({
     notice:'Automated browser evidence. Not a human comprehension, screen-reader or listening result.',
-    browser:test.info().project.name,sideAStripTwentyHz:stripHz,firstSideANoteHz:imageNote,
+    browser:test.info().project.name,screen,sideAStripTwentyHz:stripHz,firstSideANoteHz:imageNote,
     sideBFirstTwo:[first,second],
   })});
+});
+
+test('Side B opens on the 3D Climate Coil, keeps the observation readout, and switches to the 2D chart',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).tap();
+  const art=page.locator('.jb-side-content:not([hidden]) .jb-data-art');
+  await expect(art).toHaveAttribute('data-data-renderer','three',{timeout:15_000});
+  await expect(art.getByRole('img',{name:/^Climate Coil: every monthly GISTEMP v4 anomaly/})).toBeVisible();
+  const readout=await art.locator('.jb-data-value').innerText();
+  await art.getByRole('button',{name:'2D chart',exact:true}).tap();
+  await expect(art).toHaveAttribute('data-data-renderer','2d');
+  await expect(art.locator('svg[role=img]')).toBeVisible();
+  await expect(art.locator('canvas')).toHaveCount(0);
+  expect(await art.locator('.jb-data-value').innerText()).toBe(readout);
+  await expect(art.getByRole('button',{name:'3D coil',exact:true})).toHaveAttribute('aria-pressed','false');
+});
+
+test('without WebGL, Side B shows the 2D chart and never offers a broken 3D view',async({page})=>{
+  await page.addInitScript(()=>{
+    const original=HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext=function(this:HTMLCanvasElement,id:string,...args:unknown[]){
+      if(id==='webgl'||id==='webgl2'||id==='experimental-webgl')return null;
+      return Reflect.apply(original,this,[id,...args]);
+    } as typeof original;
+  });
+  await page.goto('/');
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).tap();
+  const art=page.locator('.jb-side-content:not([hidden]) .jb-data-art');
+  await expect(art).toHaveAttribute('data-data-renderer','2d');
+  await expect(art.locator('svg[role=img]')).toBeVisible();
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
 });

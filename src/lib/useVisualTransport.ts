@@ -62,7 +62,11 @@ export function useVisualTransport(options:Options) {
   const prepare=useCallback(()=>{
     const run=++prepareRun.current,image=videoUrl?null:imageRef.current;
     // WebKit can report a loaded <img> before its pixels are decoded; drawing it then reads transparent black.
-    if(image&&typeof image.decode==='function')void image.decode().catch(()=>undefined).then(()=>{if(run===prepareRun.current)read();});
+    // A rejected decode means the pixels are unusable, so it must never become a ready scan.
+    if(image&&typeof image.decode==='function')image.decode().then(
+      ()=>{if(run===prepareRun.current)read();},
+      ()=>{if(run===prepareRun.current){setSteps([]);setReady(false);setError('This visual could not be read. Choose another frame or upload a local image.');}},
+    );
     else read();
   },[videoUrl,read]);
   useEffect(()=>{

@@ -2,7 +2,20 @@
 
 **TerraJuke — The Earth Information Jukebox** is the provisional display name for this research branch. The repository, deployment identifiers, legacy links, stored preferences, exports and historical research retain their established identifiers.
 
-## Design direction
+## Apple-style refresh — 13 November 2026
+
+BoboMimi asked to drop the pine-green dark theme in favour of an Apple-like design. The modern pages now use:
+
+- **Surfaces:** neutral system greys, with true black and #1c1c1e cards in Dark, and #f5f5f7 with white cards in Light. There is no tinted page glow.
+- **Accent:** one blue for actions. Play is #0071e3 with white text in both modes. Links are #0066cc in Light and #2997ff in Dark. Dark-mode filled accent buttons use black text, because white on #2997ff measures 3.01:1.
+- **Typography:** the system face, which is SF Pro on Apple devices and Segoe UI or Roboto elsewhere. Tracking is looser, and the study fonts are no longer used on these pages. Apple fonts are referenced as system fonts and never bundled.
+- **Icon:** a new original app-style mark, a blue tile holding a black record with an Earth label and one scan line. Its source is `public/brand/terrajuke.svg`, rendered to the existing 128 px PNG. The ImageGen mark was retired.
+- **Landscape phones:** when a phone is held sideways, the hero collapses to its headline so Play stays within the first screen.
+- **Climate Coil (Three.js):** on Side B, every monthly GISTEMP v4 anomaly from the pinned snapshot is drawn as one coil. Time runs left to right, and each turn is a year with January at the top. Distance from the axis follows Side B's fixed −1.0 to +1.5 °C scale, and the twelve Januarys heard are white beads that pulse with each note. It is lazy-loaded, renders only on demand and pauses off-screen. It falls back to the 2D chart without WebGL, and a toggle switches between the two. The geometry lives in `src/lib/climateCoil.ts` with unit tests. NASA did not render this view.
+
+Scientific imagery keeps its original colours and dark media surfaces. Legacy keeps its own preserved styling.
+
+## Design direction (original study, 13 November 2026)
 
 | Study | Distinguishing idea | Decision |
 | --- | --- | --- |

@@ -1,34 +1,61 @@
-/* The mineral palette frames the app. Scientific media keeps its own surface. */
+/* Neutral, Apple-style surfaces frame the app; one blue accent marks actions.
+ * Scientific media keeps its own surface and colours. System fonts only: no Apple font files are bundled.
+ */
 :root[data-theme] .ss.ss-pages.ss-observatory {
-  --ef-panel: #19251f;
-  --ef-panel-raised: #223128;
-  --ef-border: #43584a;
-  --ef-control-border: #789181;
-  --ef-muted: #b6c8bb;
-  --ef-subtle: #a6b9ad;
-  --tj-canvas: #101914;
-  --tj-header: #17221b;
-  --tj-glow: radial-gradient(ellipse at 78% 0, #294235, transparent 50rem);
-  --tj-tray: #151f1a;
-  --tj-action: #d4f48c;
-  --tj-on-action: #202d17;
-  background: var(--tj-glow), var(--tj-canvas);
+  --tj-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Segoe UI', Roboto, 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --ef-bg: #000000;
+  --ef-panel: #1c1c1e;
+  --ef-panel-raised: #2c2c2e;
+  --ef-text: #f5f5f7;
+  --ef-muted: #a1a1a6;
+  --ef-subtle: #98989d;
+  --ef-border: #38383a;
+  --ef-control-border: #8e8e93;
+  --ef-accent: #2997ff;
+  --ef-on-accent: #000000;
+  --ef-selected: #0d2a47;
+  --ef-focus: #2997ff;
+  --ef-secondary: #64d2ff;
+  --ef-chart-grid: #48484a;
+  --ef-chart-text: #a1a1a6;
+  --ef-shadow: 0 1px 2px #0000004d, 0 8px 28px #00000059;
+  --ef-page-glow: linear-gradient(transparent, transparent);
+  --tj-canvas: #000000;
+  --tj-header: #1c1c1e;
+  --tj-glow: linear-gradient(transparent, transparent);
+  --tj-tray: #1c1c1e;
+  --tj-action: #0071e3;
+  --tj-on-action: #ffffff;
+  background: var(--tj-canvas);
+  font-family: var(--tj-font);
 }
 
 :root[data-theme='light'] .ss.ss-pages.ss-observatory {
-  --ef-panel: #fffefa;
-  --ef-panel-raised: #eeefe6;
-  --ef-border: #cbd4c5;
-  --ef-control-border: #748974;
-  --ef-muted: #485d50;
-  --ef-subtle: #526456;
-  --tj-canvas: #f7f6ee;
-  --tj-header: #f0f0e5;
-  --tj-glow: radial-gradient(ellipse at 78% 0, #e2ead7, transparent 50rem);
-  --tj-tray: #eeeee3;
-  --tj-action: #254b34;
-  --tj-on-action: #fff;
+  --ef-bg: #f5f5f7;
+  --ef-panel: #ffffff;
+  --ef-panel-raised: #f5f5f7;
+  --ef-text: #1d1d1f;
+  --ef-muted: #636366;
+  --ef-subtle: #636366;
+  --ef-border: #d2d2d7;
+  --ef-control-border: #86868b;
+  --ef-accent: #0066cc;
+  --ef-on-accent: #ffffff;
+  --ef-selected: #e8f1fc;
+  --ef-focus: #0071e3;
+  --ef-secondary: #0071a4;
+  --ef-chart-grid: #c7c7cc;
+  --ef-chart-text: #6e6e73;
+  --ef-shadow: 0 1px 2px #0000000d, 0 8px 28px #0000000f;
+  --tj-canvas: #f5f5f7;
+  --tj-header: #ffffff;
+  --tj-tray: #ffffff;
+  --tj-action: #0071e3;
+  --tj-on-action: #ffffff;
 }
+
+/* Replace the study fonts (DM Sans, Space Grotesk) with the system face across the modern pages. */
+.ss.ss-pages.ss-observatory :where(*):not(svg, svg *) { font-family: var(--tj-font) !important; }
 
 .ss.ss-pages .sp-header {
   display: grid;
@@ -42,8 +69,8 @@
   color: var(--ef-text);
   gap: .5rem;
   min-width: 0;
-  letter-spacing: -.055em;
-  font-weight: 700;
+  letter-spacing: -.02em;
+  font-weight: 650;
 }
 
 .ss.ss-pages .sp-brand-icon {
@@ -102,9 +129,9 @@
 
 .ss.ss-pages .jb-home .jb-intro h1 {
   font-size: clamp(2rem, 4.2vw, 3.75rem);
-  font-weight: 600;
-  letter-spacing: -.065em;
-  line-height: 1.03;
+  font-weight: 700;
+  letter-spacing: -.028em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -148,8 +175,8 @@
 .ss.ss-pages .jb-home :is(.jb-two-sided, .jb-deck) .jb-record-heading h2 {
   margin: 0;
   font-size: clamp(1.5rem, 2.6vw, 2.45rem);
-  font-weight: 600;
-  letter-spacing: -.045em;
+  font-weight: 700;
+  letter-spacing: -.022em;
 }
 
 .ss.ss-pages .jb-home .jb-state {
@@ -231,8 +258,8 @@
 
 .ss.ss-pages .sp-page-heading h1 {
   font-size: clamp(2rem, 4.1vw, 3.45rem);
-  font-weight: 600;
-  letter-spacing: -.053em;
+  font-weight: 700;
+  letter-spacing: -.028em;
   text-wrap: balance;
 }
 
@@ -286,4 +313,12 @@
   .ss.ss-pages .jb-home .jb-intro h1 { font-size: 1.88rem; }
   .ss.ss-pages .jb-intro>p { display: flex; flex-wrap: wrap; align-items: center; }
   .ss.ss-pages .jb-shelf-link { margin: 0 .65em 0 0; }
+}
+
+/* Phones held sideways: keep the Play control inside the first screen. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .ss.ss-pages .jb-home { padding-top: 10px; }
+  .ss.ss-pages .jb-intro { margin-bottom: 10px; }
+  .ss.ss-pages .jb-eyebrow, .ss.ss-pages .jb-intro>p { display: none; }
+  .ss.ss-pages .jb-home .jb-intro h1 { font-size: 1.45rem; }
 }
