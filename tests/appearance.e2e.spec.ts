@@ -158,7 +158,9 @@ for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${theme} ${route}: no document overflow`).toBe(true);
       if(route==='/'){
         const disc=await page.locator('.jb-vinyl-fallback').boundingBox(),toggle=await page.getByRole('button',{name:'Try 3D record',exact:true}).boundingBox();
-        expect(disc!.y+disc!.height,'vinyl must not cover its 3D action').toBeLessThanOrEqual(toggle!.y);
+        // Phones place the record beside its 3D action; any layout must keep them from overlapping.
+        const separate=disc!.x+disc!.width<=toggle!.x||toggle!.x+toggle!.width<=disc!.x||disc!.y+disc!.height<=toggle!.y||toggle!.y+toggle!.height<=disc!.y;
+        expect(separate,'vinyl must not cover its 3D action').toBe(true);
       }
       const bounds=await appearance(page).boundingBox();expect(bounds!.x).toBeGreaterThanOrEqual(0);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(viewport.width);
       if(route==='/'&&[320,390,768].includes(viewport.width)){

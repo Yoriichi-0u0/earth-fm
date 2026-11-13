@@ -72,3 +72,12 @@
   :root[data-theme] .ss.ss-pages .sp-header .sp-nav { gap: 0; }
   :root[data-theme] .ss.ss-pages .sp-header .sp-nav a { padding-inline: .3em; font-size: .74rem; }
 }
+
+/* Wider screens: give the coil room to explore; the data panel may grow taller than the vinyl column. */
+@media (min-width: 641px) {
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-art.has-coil { height: auto; min-height: 280px; padding-bottom: 30px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 205px; flex: none; }
+}
+@media (min-width: 641px) and (max-width: 1050px) {
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 185px; }
+}

@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Canvas,useFrame,useThree} from '@react-three/fiber';
-import {BufferGeometry,Color,Float32BufferAttribute,LineBasicMaterial,Line as ThreeLine} from 'three';
+import {BufferGeometry,Color,Float32BufferAttribute,LineBasicMaterial,Line as ThreeLine,Vector3} from 'three';
 import type {Group,Mesh,MeshStandardMaterial} from 'three';
 import type {ThreeEvent} from '@react-three/fiber';
 import {climateSnapshot} from '../data/climateSpiral';
@@ -38,6 +38,7 @@ function Coil({beads,current,pulse,motion,onReady,onUnavailable,onSelect,onHover
   const turn=useRef<Group>(null),halo=useRef<Mesh>(null),drag=useRef<{x:number;y:number}|null>(null);
   const angle=useRef({x:.35,y:-.5}),sway=useRef(0),pulseAt=useRef(0),cursor=useRef<Group>(null);
   const [hovered,setHovered]=useState<number|null>(null);
+  const published=useRef(''),probe=useMemo(()=>new Vector3(),[]);
   const cursorX=coilX(current.year,current.month);
   const lines=useCoilLines();
   useEffect(()=>()=>{lines.forEach(line=>{line.geometry.dispose();(line.material as LineBasicMaterial).dispose();});},[lines]);
@@ -66,6 +67,18 @@ function Coil({beads,current,pulse,motion,onReady,onUnavailable,onSelect,onHover
     if(cursor.current){const dx=cursorX-cursor.current.position.x;cursor.current.position.x=motion?cursor.current.position.x+dx*(1-Math.exp(-Math.min(delta,.05)*8)):cursorX;gliding=Math.abs(dx)>.002;}
     const age=(performance.now()-pulseAt.current)/1000,glow=motion?Math.exp(-age*4):0;
     if(halo.current){halo.current.scale.setScalar(1+glow*1.6);(halo.current.material as MeshStandardMaterial).opacity=.18+glow*.5;}
+    // Publish where each January bead lands on screen, so the 2D layer and tests can locate them without reading WebGL.
+    const host=gl.domElement.closest<HTMLElement>('.jb-coil');
+    if(host){
+      turn.current.updateMatrixWorld();
+      const spots=beads.map(point=>{
+        if(point.value===null)return '';
+        probe.set(...coilPoint(point.year,point.month,point.value)).applyMatrix4(turn.current!.matrixWorld).project(camera);
+        return `${((probe.x+1)/2*size.width).toFixed(0)},${((1-probe.y)/2*size.height).toFixed(0)}`;
+      }).join(';');
+      const key=`${spots}|${current.year}`;
+      if(key!==published.current){published.current=key;host.dataset.coilBeads=spots;host.dataset.coilCursorYear=String(current.year);}
+    }
     if(motion&&!drag.current)invalidate();else if(glow>.01||gliding)invalidate();
   });
   const at=current.value===null?null:coilPoint(current.year,current.month,current.value);

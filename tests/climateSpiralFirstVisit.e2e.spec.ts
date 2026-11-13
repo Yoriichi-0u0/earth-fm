@@ -200,3 +200,42 @@ test('without WebGL, Side B shows the 2D chart and never offers a broken 3D view
   await expect(art.locator('svg[role=img]')).toBeVisible();
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
 });
+
+test('tapping a January bead on the Climate Coil selects it silently and keeps readout, inspector and coil in step',async({page})=>{
+  test.setTimeout(45_000);
+  await setup(page);
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).tap();
+  const coil=page.locator('.jb-side-content:not([hidden]) .jb-coil');
+  await expect(coil.locator('xpath=..')).toHaveAttribute('data-data-renderer','three',{timeout:15_000});
+  await expect(coil).toHaveAttribute('data-coil-beads',/\d+,\d+/);
+  await page.waitForTimeout(300);
+  const spots=(await coil.getAttribute('data-coil-beads'))!.split(';').map(s=>s.split(',').map(Number));
+  const target=4,[x,y]=spots[target];
+  const before=(await notes(page)).length;
+  await coil.locator('canvas').click({position:{x,y}});
+  await expect(page.locator('.jb-readout')).toContainText('05 / 12');
+  const value=page.locator('.jb-side-content:not([hidden]) .jb-data-value>span');
+  const year=Number((await value.innerText()).match(/\d{4}/)![0]);
+  await expect(coil).toHaveAttribute('data-coil-cursor-year',String(year));
+  if(!await page.locator('.jb-groove-key input[type=range]').isVisible())await page.getByText('Read the grooves',{exact:true}).tap();
+  await expect(page.locator('.jb-groove-key input[type=range]')).toHaveAttribute('aria-valuetext',new RegExp(`^January ${year}, `));
+  await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
+  expect((await notes(page)).length).toBe(before);
+});
+
+test('on a phone the visual is full width, the record row sits below it, navigation is one line and Play stays reachable',async({page})=>{
+  test.skip((page.viewportSize()?.width??1000)>640,'Phone layout only.');
+  await page.goto('/');await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  const box=(selector:string)=>page.locator(selector).first().boundingBox().then(b=>b!);
+  const deck=await box('.jb-deck'),science=await box('.jb-artwork-paired .jb-science-window'),record=await box('.jb-artwork-paired .jb-earth-record');
+  expect(science.width).toBeGreaterThan(deck.width*.95);
+  expect(record.y).toBeGreaterThanOrEqual(science.y+science.height-1);
+  expect(record.height).toBeLessThan(200);
+  const tops=await page.locator('.sp-nav a').evaluateAll(links=>links.map(link=>Math.round(link.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
+  await page.locator('.jb-groove-key').scrollIntoViewIfNeeded();
+  const transport=await box('.jb-transport');
+  expect(transport.y).toBeGreaterThanOrEqual(-1);expect(transport.y).toBeLessThan(12);
+  await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeInViewport();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
+});
