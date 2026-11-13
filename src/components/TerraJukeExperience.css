@@ -101,3 +101,16 @@
   .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil-key { gap: 7px; padding: 3px 7px; font-size: 9.5px; }
 }
 .ss.ss-pages .jb-coil-key li { white-space: nowrap; }
+
+/* The note halo lives inside the disc, so it shares the disc's centre, size and tilt on every layout. */
+.ss.ss-pages .jb-vinyl-fallback > .jb-note-halo { top: -6%; left: -6%; width: 112%; border-color: color-mix(in srgb, var(--ef-accent) 60%, transparent); }
+
+/* Retire the last lime accents on the modern pages (Legacy keeps its own preserved palette). */
+.ss.ss-pages .jb-state .is-on { background: var(--ef-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ef-accent) 25%, transparent); }
+.ss.ss-pages .jb-scan { background: #64d2ff; box-shadow: 0 0 0 1px #00000066, 0 0 14px #64d2ff99; }
+.ss.ss-pages .jb-scan::before { background: linear-gradient(90deg, transparent, #64d2ff17); }
+.ss.ss-pages .jb-scan > span { color: #64d2ff; }
+.ss.ss-pages .jb-grooveprint { --gg-selected: #bfe6ff; }
+.ss.ss-pages .live-dot { background: var(--ef-accent); }
+/* Play/Stop keeps white text on hover and focus in both themes (a generic dark hover rule turned it black). */
+:root[data-theme] .ss.ss-pages .jb-home .jb-deck .jb-play:is(:hover, :focus-visible):not(:disabled) { color: var(--tj-on-action); background: color-mix(in srgb, var(--tj-action), #000 14%); }
