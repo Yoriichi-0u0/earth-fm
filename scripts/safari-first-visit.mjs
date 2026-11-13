@@ -28,7 +28,7 @@ const grooves=()=>js(`return [...document.querySelectorAll('.jb-vinyl-fallback>.
 
 try{
   const ua=await js('return navigator.userAgent');console.log('UA',ua);
-  await wd('POST',`${S}/window/rect`,{width:1280,height:900,x:40,y:40});
+  await wd('POST',`${S}/window/rect`,{width:1280,height:900,x:40,y:40});console.log('window',JSON.stringify(await js('return {w:innerWidth,h:innerHeight,dpr:devicePixelRatio,vis:document.visibilityState,focus:document.hasFocus()}')));
   // Cold loads: the first scan must never be all black.
   const loads=Number(process.argv[3]||10);let black=0,first=null;
   for(let i=0;i<loads;i++){
