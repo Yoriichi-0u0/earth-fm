@@ -12,7 +12,8 @@ export default defineConfig({
   expect: { timeout: 7_000 },
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    // PLAYWRIGHT_BASE_URL tests a deployed build (for example https://earth-fm.vercel.app) instead of the local dev server.
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:5173',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     reducedMotion: 'reduce',
@@ -42,7 +43,7 @@ export default defineConfig({
       ? (['chrome', 'msedge'] as const).map(channel => ({ name: channel, testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts'], use: { ...devices['Desktop Chrome'], channel, viewport: { width: 1440, height: 1000 }, launchOptions: {} } }))
       : []),
   ],
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: 'npm run dev -- --port 5173 --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,

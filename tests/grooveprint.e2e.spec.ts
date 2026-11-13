@@ -70,6 +70,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} Climate vinyl visual
 });
 
 test('both patterns reuse the source values and fixed sound mapping without extra image reads',async({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await setup(page);await expect(print(page)).toHaveAttribute('data-groove-count','48');
   const data=await print(page).locator('[data-groove-sector]').evaluateAll(nodes=>nodes.map(n=>Number(n.getAttribute('data-groove-value'))));
   expect(data).toHaveLength(48);expect(data.every(n=>n>=0&&n<=1)).toBe(true);
@@ -169,6 +170,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves rem
 });
 
 test('read-only groove geometry stays small and does not create another audio context',async({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await setup(page);
   const result=await page.evaluate(async()=>{
     const path='/src/lib/grooveprint.ts',source=Array.from(document.querySelectorAll('.jb-vinyl-fallback [data-groove-sector]'),n=>({brightness:Number(n.getAttribute('data-groove-value'))}));
@@ -184,6 +186,7 @@ const inspect=(page:Page)=>page.getByRole('slider',{name:'Inspect sector (silent
 const selectedValues=(page:Page)=>page.locator('.jb-groove-selected dl dd').allTextContents();
 
 test('silent inspection keeps every image/January input and mapped note consistent without starting audio',async({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   test.setTimeout(45_000);await setup(page);await page.locator('.jb-groove-key>details>summary').click();
   const brightness=await print(page).locator('[data-groove-sector]').evaluateAll(nodes=>nodes.map(n=>Number(n.getAttribute('data-groove-value'))));
   const expected=await page.evaluate(async values=>{const path='/src/lib/audio.ts';const {mapValueToNote}=await import(path);return values.map(value=>mapValueToNote(value,0,1));},brightness);

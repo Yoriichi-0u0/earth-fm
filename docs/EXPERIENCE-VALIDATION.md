@@ -41,6 +41,18 @@ Record for each item: device model, OS build, browser version, candidate SHA, ou
 
 Screen-reader and comfort results describe the people and devices tested. They do not certify accessibility.
 
+### Live production test build — 13 November 2026
+
+At BoboMimi's request, `a085d5d` was deployed from GitHub to Vercel Production and promoted. The deployment is `dpl_HxDBwVCdY4999iy8frvLqiSvdkd5`, at `earth-5a8jeo2dv-chia-0u0-s-projects.vercel.app`. `https://earth-fm.vercel.app` serves its bundle `index-BodG2ihT.js`, which is byte-identical to the local build of that SHA. The rollback target is the Earth FM `main` deployment `earth-dtijr0ryi` (`bee2801`). Record `a085d5d` as the candidate SHA in phone sessions on this URL.
+
+Results against the live URL (`PLAYWRIGHT_BASE_URL=https://earth-fm.vercel.app`) were:
+- real Safari 27.2: 16 of 16;
+- Chromium first-visit and Grooveprint: 22 passed, with 3 tests skipped because they import `/src` modules that a production build does not serve;
+- 10 emulated devices: 74 passed, with the same 3 tests skipped on iPhone 13;
+- real Chrome 157 and Edge 155, run serially: 44 passed, with the same 3 skipped on each.
+
+A visual sweep captured 54 screenshots: 9 views, light and dark, on desktop, iPhone (WebKit) and Pixel 7. It found no page errors, no console errors and no sideways overflow. Legacy (`/?legacy=1`) keeps its preserved styling. During Side B playback on the phone, the bead for the third January (1920) lit in step with the readout, 03 / 12 at −0.24 °C, G3.
+
 ### Automated evidence at this checkpoint
 
 Branch `codex/climate-spiral-validation`, stacked on PR #15 (`1b9d48e`). The candidate SHA is the commit that contains this paragraph; record it with `git rev-parse HEAD` on the session sheet. All of this is automated browser evidence, not human evidence.
