@@ -2,6 +2,8 @@
 
 **Pre-release review, November 12, 2026, Asia/Kuching.** Research baseline [`de0e54e`](https://github.com/Yoriichi-0u0/earth-fm/commit/de0e54eda020f1dabdec44567f4ffabb629e7d49), [Pacific Lab PR #11](https://github.com/Yoriichi-0u0/earth-fm/pull/11). The earlier [NASA resource discovery](NASA-RESOURCE-DISCOVERY-2026-11.md) covers the broader visualization inventory.
 
+The [November 13 published-resource review](NASA-PUBLISHED-RESOURCE-ALIGNMENT.md) records the official list, confirmed EIC catalog paths and version comparison.
+
 ## Challenge publication status
 
 The live [challenge Resources tab](https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/?tab=resources) returned HTTP 200. Its published `resourcesTabContent` said resources will be available Friday, November 13. It contained **zero entries**, descriptions, download links or source-specific instructions. The page gives no release time or timezone. The existing November 13 check is scheduled for 10 p.m. Malaysia time.
