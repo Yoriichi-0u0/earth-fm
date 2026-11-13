@@ -65,6 +65,7 @@ test('invalid or unavailable preference storage leaves the appearance controls u
 });
 
 test('theme changes preserve active audio, source pixels, mapped strip values and the saved take',async({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await page.addInitScript(()=>{
     const audit={contexts:[] as AudioContext[]};(window as unknown as {appearanceAudio:typeof audit}).appearanceAudio=audit;
     const Original=AudioContext;window.AudioContext=class extends Original{constructor(){super();audit.contexts.push(this);}};

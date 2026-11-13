@@ -30,6 +30,7 @@ async function noPrematureIdentity(page:Page){
 }
 
 for(const [index,title] of recordTitles.entries())test(`${title} stays concealed, uses the original audio and reveals the exact source`,async({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   const chunks:string[]=[];page.on('request',r=>{if(r.url().includes('/MysteryRecord'))chunks.push(r.url());});
   await setup(page,(index+.1)/4);await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();expect(chunks).toEqual([]);
   const record=await page.evaluate(async index=>{const path='/src/data/jukeboxRecords.ts';return (await import(path)).jukeboxRecords[index];},index);
