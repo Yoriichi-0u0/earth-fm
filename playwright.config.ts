@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['**/e2e.spec.ts','**/appearance.e2e.spec.ts','**/personalRecord.e2e.spec.ts','**/mysteryRecord.e2e.spec.ts','**/recordIntegration.e2e.spec.ts','**/grooveprint.e2e.spec.ts'],
+  testMatch: ['**/e2e.spec.ts','**/appearance.e2e.spec.ts','**/personalRecord.e2e.spec.ts','**/mysteryRecord.e2e.spec.ts','**/recordIntegration.e2e.spec.ts','**/grooveprint.e2e.spec.ts','**/climateSpiralFirstVisit.e2e.spec.ts'],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -22,7 +22,15 @@ export default defineConfig({
         : existsSync('/usr/bin/chromium') ? { executablePath: '/usr/bin/chromium' } : {}),
     },
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } } },
+    // Opt-in WebKit with iPhone emulation (PLAYWRIGHT_WEBKIT=1). Playwright WebKit is not Safari on a physical iPhone.
+    // The six-viewport scans resize 320→1024 in one page; WebKit keeps a stale header grid track there
+    // (see docs/EXPERIENCE-VALIDATION.md), so they stay Chromium-only.
+    ...(process.env.PLAYWRIGHT_WEBKIT === '1'
+      ? [{ name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } }]
+      : []),
+  ],
   webServer: {
     command: 'npm run dev -- --port 5173 --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',

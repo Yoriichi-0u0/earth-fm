@@ -54,16 +54,25 @@ export function useVisualTransport(options:Options) {
     const visibleWidth=Math.min(screen.clientWidth,screen.clientHeight*width/height);
     setFrameFit({left:(screen.clientWidth-visibleWidth)/2/screen.clientWidth*100,width:visibleWidth/screen.clientWidth*100});
   },[videoUrl]);
-  const prepare=useCallback(()=>{
+  const prepareRun=useRef(0);
+  const read=useCallback(()=>{
     try{setSteps(sample());setScanIndex(0);setReady(true);setError('');fitFrame();}
     catch{setReady(false);setError('This visual could not be read. Choose another frame or upload a local image.');}
   },[sample,fitFrame]);
+  const prepare=useCallback(()=>{
+    const run=++prepareRun.current,image=videoUrl?null:imageRef.current;
+    // WebKit can report a loaded <img> before its pixels are decoded; drawing it then reads transparent black.
+    if(image&&typeof image.decode==='function')void image.decode().catch(()=>undefined).then(()=>{if(run===prepareRun.current)read();});
+    else read();
+  },[videoUrl,read]);
   useEffect(()=>{
-    stop();setReady(false);setSteps([]);setScanIndex(0);setSampledTime(0);setError('');
+    prepareRun.current++;stop();setReady(false);setSteps([]);setScanIndex(0);setSampledTime(0);setError('');
     const video=videoRef.current;let prepared=false;
     const decoded=()=>{if(!prepared&&video&&video.readyState>=2){prepare();prepared=true;}};
     if(video){video.addEventListener('loadeddata',decoded);video.addEventListener('canplay',decoded);decoded();}
     else if(imageRef.current?.complete&&imageRef.current.naturalWidth)prepare();
+    // A fast failure (seen in WebKit) can land before this reset clears it; replay it for the player's own error handler.
+    else if(imageRef.current?.complete&&imageRef.current.getAttribute('src'))imageRef.current.dispatchEvent(new Event('error'));
     const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(fitFrame);
     if(screenRef.current)observer?.observe(screenRef.current);
     return()=>{observer?.disconnect();video?.pause();video?.removeEventListener('loadeddata',decoded);video?.removeEventListener('canplay',decoded);};

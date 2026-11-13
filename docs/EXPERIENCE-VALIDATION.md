@@ -1,6 +1,55 @@
-# Earth FM — first-visit and listening validation
+# TerraJuke (Earth FM) — first-visit and listening validation
 
 Prepared 10 November 2026. **Protocol only: zero participant or listening sessions performed. Human verification was deferred at BoboMimi's request.** Browser checks are separate technical evidence. Do not enter automated test output as participant results.
+
+## Climate Spiral A/B first sessions — 13 November 2026
+
+The first human sessions use the flagship only. Run these four tasks before the broader protocol below. **Status: zero participant, physical-device, screen-reader or listening sessions performed.**
+
+| Task and neutral prompt | Observe | Ask afterwards, before explaining |
+| --- | --- | --- |
+| A1. “Start listening to the first record, then stop it.” | Finds **Play record** without help. Note the time to first sound only if a clock was running. | “What information made that sound?” |
+| A2. “Find out what one groove stands for without making a sound. Then hear only that groove.” | Opens **Read the grooves**, moves **Inspect sector (silent)**, then presses **Hear selected strip**. | “What does the number you read describe?” |
+| A3. “Try the other side.” | Flips by the A/B buttons or the vinyl. Side A stops. Plays Side B. | “Which side is playing now?” |
+| A4. “What made the sound on each side?” | Uses the participant's own words. Do not prompt with the labels. | Side A is image brightness, including labels and background. It is not temperature. Side B is a selected January anomaly relative to the 1951–1980 January mean, in fixed 0.25 °C bands. The two sides are related sources, not frame-by-frame matches. |
+
+Score A4 as *clear*, *partial* or *confused* from the participant's words. Report counts with the actual denominator. A team member's rehearsal does not count as a first-time session.
+
+### Physical phones on the local network (no deployment)
+
+1. On the Mac, run `npm run build`, then `npx vite preview --host 0.0.0.0 --port 4173`. This serves the exact production build of the candidate SHA. `npm run dev` also works, but it serves unbundled development code.
+2. Join the phone and the Mac to the same Wi-Fi. Find the Mac's address with `ipconfig getifaddr en0` and open `http://<that address>:4173/` on the phone. Some guest or campus networks block devices from reaching each other. If so, use a personal hotspot. Do not use a public tunnel or a Vercel preview.
+3. Web Audio does not require HTTPS, so playback works over the local address. Legacy's copy-link button falls back to the address bar there. Use the iPhone's volume buttons before you start. Note whether the Ring/Silent switch is on, because on some iOS versions it mutes web audio.
+4. Stop the preview server after the session. Nothing is uploaded, and the phone keeps no participant data.
+
+### Physical device and assistive-technology checks for A/B
+
+Record for each item: device model, OS build, browser version, candidate SHA, output (speaker, wired or Bluetooth), and Pass, Fail or Not run with exact steps to reproduce.
+
+| Check | iPhone / Safari | Android / Chrome |
+| --- | --- | --- |
+| First tap on Play starts sound; Stop silences it right away | | |
+| Silent inspection makes no sound. Hear selected strip and Hear selected January play one note each | | |
+| Flipping during playback stops Side A. Side B then plays twelve notes | | |
+| Locking the screen, switching apps or taking a call stops playback. Play works again afterwards | | |
+| Rotating to landscape and back: no sideways page scroll, controls stay reachable | | |
+| Largest system text size: Play, the side buttons and the inspector remain usable | | |
+| VoiceOver / TalkBack: the side buttons announce their pressed state, the inspector announces strip or January, the value, the note and Hz, and “Now playing” is announced | | |
+| Comfort (1–5, optional) and the listener's own words on Side A versus Side B, Hear Data Only, and repeated single notes | | |
+
+Screen-reader and comfort results describe the people and devices tested. They do not certify accessibility.
+
+### Automated evidence at this checkpoint
+
+Branch `codex/climate-spiral-validation`, stacked on PR #15 (`1b9d48e`). All of this is automated browser evidence, not human evidence.
+
+- `npm run check` passed 64 unit tests, the production build and 118 Chromium tests. These are the existing 116 plus 2 new tests in `tests/climateSpiralFirstVisit.e2e.spec.ts`. One test drives A1–A4 by touch at 390 × 844. It checks that each note heard matches the mapped frequency on screen and that the inspector stays silent. The other test is a regression test for the decode race described below.
+- `PLAYWRIGHT_WEBKIT=1 npx playwright test --project=webkit-iphone` passed 19 tests. These are the two first-visit tests and 17 Grooveprint tests in Playwright 1.64 WebKit (revision 2370) with iPhone 13 emulation. Five repeated runs of the first-visit file all passed. **This is WebKit automation, not Safari on a physical iPhone.** It cannot show real touch, speaker, interruption or VoiceOver behaviour.
+- The WebKit run found two defects, both fixed in `src/lib/useVisualTransport.ts`. Neither fix changes a mapping or a pinned asset.
+  - **All-black first scan.** On 2 of 12 cold loads, WebKit read the Climate Spiral before its pixels were decoded. All 48 strips came back as 0 brightness, so the grooves, the silent inspector and Hear selected strip would show and play darkness. Play itself re-samples the image. The transport now waits for `HTMLImageElement.decode()`. The result was 0 of 40 bad first scans after the fix. The new regression test fails without the fix.
+  - **Endless loading on a failed image.** In WebKit a fast image failure arrived before the transport's reset cleared it, so the player stayed on Loading with Play disabled. The reset now replays a failure that already happened, and each player shows its own error message.
+- Cross-browser decoding of the pinned JPEG: across all 48 strips, Chromium and WebKit luma differ by at most 0.00294. No strip crosses a pitch band, so both browsers produce the same 48 notes and the same five distinct pitches.
+- WebKit-only layout observation, not fixed: resizing one page from 320 px through 390 px and 768 px to 1024 px leaves a stale header grid track. The page then scrolls 22 px sideways until a relayout. Fresh loads and realistic phone rotations (320↔568, 360→844, 390↔844) do not overflow. The two six-viewport Grooveprint scans therefore run in Chromium only. Re-check this when an iPad window is resized with Split View or Stage Manager.
 
 ## First visit: 10–12 minutes, without coaching
 
@@ -42,7 +91,7 @@ Record actual model, OS/build, browser/version, candidate SHA, orientation, text
 | Apple iOS Simulator, if already available | Record simulated device and runtime/build. Test Safari layout/controls/audio initialization and picker flows with a synthetic image. Label results **iOS Simulator**, not physical iPhone; it cannot establish real touch ergonomics, speakers/Bluetooth, battery/GPU or phone-call behavior. |
 | Chromium phone emulation | Verify layout, synthetic touch, keyboard, state/cancellation and automated accessibility. Label it **Chromium emulation**; it is not iOS Safari or physical-device evidence. |
 
-Current Mac inventory: only Command Line Tools are selected; `simctl`, Xcode/Simulator bundles, CoreSimulator runtimes and cached Playwright WebKit are unavailable. No simulator was installed or physical session accessed for this milestone.
+Mac inventory, 13 November 2026: only Command Line Tools are selected. `simctl`, Xcode, Simulator and CoreSimulator runtimes are unavailable. Playwright WebKit revision 2370 is now cached and runs the opt-in `webkit-iphone` project. No simulator was installed or physical session accessed. (On 10 November, cached Playwright WebKit was also unavailable.)
 
 ## Blank session note
 
