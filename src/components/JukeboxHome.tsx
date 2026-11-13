@@ -24,6 +24,7 @@ import {usePersonalImage} from '../lib/usePersonalImage';
 import type {PersonalImage} from '../lib/personalImage';
 import {observatoryImagery} from '../data/observatory';
 import './JukeboxHome.css';
+import './TerraJukeExperience.css';
 
 const noop=()=>{};
 const EarthGlobe=lazy(()=>import('./EarthGlobe'));
@@ -153,7 +154,7 @@ function ClimateDeck({record,motion,volume,onVolume}:{record:JukeboxRecord;motio
   return <DeckConsole record={effective} {...shown} error={shown.error||(side==='a'&&!manual?stripFeedback:undefined)} onPlay={()=>{setInspectedObservation(null);if(side==='a'&&!manual)instrument.stop();current.onPlay();}} side={side} sideControls={controls} recordObject={<EarthRecord side={side} signal={shown.signal} motion={motion} onFlip={()=>changeSide(side==='a'?'b':'a')} grooves={side==='a'?visualGrooves:dataGrooves} position={grooveIndex} descriptionId={grooveDescription}/>}
     recordNote={<GrooveprintKey side={side} id={grooveDescription} ready={side==='b'||visual.visual.ready} segments={side==='a'?visualGrooves:dataGrooves} index={grooveIndex} onInspect={inspectGroove} onAudition={auditionGroove} auditioning={auditioning}/>}
     performanceControls={side==='a'&&manual&&visual.visual.ready?<EarthLooper looper={looper}/>:undefined}
-    artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={side==='b'?(data.points[grooveIndex]??data.point):data.point} pulse={side==='b'?data.audio.noteEvent?.serial??0:0} motion={motion}/></div></>}
+    artwork={<><div className="jb-side-content" hidden={side!=='a'}><ScratchScanner enabled={manual&&visual.visual.ready} steps={visual.visual.steps} index={visual.visual.scanIndex} fit={visual.visual.frameFit} onSelect={playStrip} onCancel={cancelGesture} notice={instrument.notice}>{picture}</ScratchScanner></div><div className="jb-side-content" hidden={side!=='b'}><DataArtwork record={measurementRecord} current={side==='b'?(data.points[grooveIndex]??data.point):data.point} pulse={side==='b'?data.audio.noteEvent?.serial??0:0} motion={motion} onSelect={side==='b'?inspectGroove:undefined}/></div></>}
     volume={volume} onVolume={onVolume} extra={side==='b'?data.extra:undefined}/>;
 }
 

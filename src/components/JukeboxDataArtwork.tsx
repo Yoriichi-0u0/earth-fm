@@ -6,6 +6,7 @@ import {storyPoints} from '../data/guidedStory';
 import {MONTHS,formatAnomaly} from '../lib/climateMapping';
 import {AudioLines,Box,ChartLine} from 'lucide-react';
 import {useStudioLanguage} from '../lib/studioLanguage';
+import {mapRecordPoint} from '../lib/jukeboxData';
 import type {RecordPoint} from '../lib/jukeboxData';
 import './ClimateCoil.css';
 
@@ -22,8 +23,8 @@ function webglAvailable(){
   return webgl;
 }
 
-type Props={record:JukeboxRecord;current:RecordPoint;pulse?:number;motion?:boolean};
-export default function DataArtwork({record,current,pulse=0,motion=false}:Props){
+type Props={record:JukeboxRecord;current:RecordPoint;pulse?:number;motion?:boolean;onSelect?:(index:number)=>void};
+export default function DataArtwork({record,current,pulse=0,motion=false,onSelect}:Props){
   const {t,date}=useStudioLanguage();
   const arctic=record.id==='arctic';
   const all:readonly RecordPoint[]=arctic?arcticPoints:storyPoints.map(p=>({...p,value:p.anomaly}));
@@ -40,6 +41,7 @@ export default function DataArtwork({record,current,pulse=0,motion=false}:Props)
   },[]);
   const unavailable=useCallback(()=>{setFailed(true);setReady(false);setThree(false);},[]);
   const onReady=useCallback(()=>setReady(true),[]);
+  const [hovered,setHovered]=useState<number|null>(null);const tip=hovered===null?null:all[hovered]??null;const tipNote=tip&&!arctic?mapRecordPoint(tip,false):null;
   const coil=!arctic&&three&&!failed;
   return <div className={`jb-data-art${coil?' has-coil':''}`} ref={host} data-data-renderer={coil&&ready?'three':'2d'}>
     <div className="jb-art-label"><span>{t('DATA RECORD')}</span><span>{arctic?'NSIDC / ARCTIC':'NASA / GISTEMP'}</span></div>
@@ -47,8 +49,9 @@ export default function DataArtwork({record,current,pulse=0,motion=false}:Props)
       {!arctic&&<button type="button" className="jb-coil-toggle" aria-pressed={coil} disabled={failed} onClick={()=>{setReady(false);setThree(value=>!value);}}>{coil?<ChartLine size={14} aria-hidden="true"/>:<Box size={14} aria-hidden="true"/>}{t(coil?'2D chart':'3D coil')}</button>}
     </div>
     {coil?<div className="jb-coil" role="img" aria-label={t('Climate Coil: every monthly GISTEMP v4 anomaly from 1880 to 2026 as one coil. Time runs left to right, each turn is one year with January at the top, and the coil widens as the anomaly rises on a fixed −1.0 to +1.5 °C scale. White beads mark the twelve Januarys heard on Side B.')}>
-      {visible&&<CoilBoundary onUnavailable={unavailable}><Suspense fallback={null}><ClimateCoil beads={all} current={current} pulse={pulse} motion={motion} onReady={onReady} onUnavailable={unavailable}/></Suspense></CoilBoundary>}
-      <div className="jb-coil-axis" aria-hidden="true"><span>{minYear===1880?1880:minYear}</span><span>{t('Drag to turn')}</span><span>2026</span></div>
+      <div className="jb-coil-stage">{visible&&<CoilBoundary onUnavailable={unavailable}><Suspense fallback={null}><ClimateCoil beads={all} current={current} pulse={pulse} motion={motion} onReady={onReady} onUnavailable={unavailable} onSelect={onSelect} onHover={setHovered}/></Suspense></CoilBoundary>}</div>
+      <div className="jb-coil-axis" aria-hidden="true"><span>{minYear}</span><span>{t(onSelect?'Drag to turn · tap a bead':'Drag to turn')}</span><span>2026</span></div>
+      {tip&&tip.value!==null&&<p className="jb-coil-tip" aria-hidden="true"><b>{date(tip.year,tip.month,MONTHS[tip.month-1])}</b> {formatAnomaly(tip.value)}{tipNote&&<> · {tipNote.note}</>}</p>}
       <ul className="jb-coil-key" aria-hidden="true"><li><i className="is-cool"/>{t('below 1951–1980')}</li><li><i className="is-warm"/>{t('above')}</li><li><i className="is-bead"/>{t('January you hear')}</li></ul>
     </div>:<svg viewBox="0 0 710 260" role="img" aria-label={t(arctic?'September mean Arctic sea-ice extent, 1987–2022. The highlighted point is the current observation.':'Selected January temperature anomalies, 1880–2025. Years use actual calendar spacing.')}>
       {[low,(low+high)/2,high].map(value=><g key={value}><line x1="58" x2="658" y1={y(value)} y2={y(value)} stroke="#ffffff22" strokeDasharray="3 7"/><text x="12" y={y(value)+4}>{value.toFixed(1)}</text></g>)}
