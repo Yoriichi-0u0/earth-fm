@@ -15,8 +15,7 @@
 .jb-coil-toggle{display:inline-flex;align-items:center;gap:5px;min-height:32px;margin-left:auto;padding:4px 11px;border-radius:999px;border:1px solid #ffffff40;background:#ffffff14;color:#f5f5f7;font-size:12px;cursor:pointer}
 .jb-coil-toggle:hover{background:#ffffff26}
 @media(max-width:520px){.jb-coil-key{left:8px;right:auto;font-size:10px;gap:7px}.jb-coil{height:200px}}
-/* Inside the paired Climate Spiral deck the coil takes the chart's place and shrinks with the panel. */
-.jb-artwork-paired .jb-coil{flex:1 1 auto;height:145px;min-height:64px;margin:0}
 .jb-artwork-paired .jb-coil-toggle{min-height:26px;padding:2px 9px;font-size:11px}
-@media(max-width:1050px){.jb-artwork-paired .jb-coil{height:125px}}
-@media(max-width:760px){.jb-artwork-paired .jb-coil-key,.jb-artwork-paired .jb-coil-axis span:nth-child(2){display:none}.jb-artwork-paired .jb-coil{height:90px}}
+/* Paired-deck coil heights live in TerraJukeExperience.css. Between 641 and 760 px the narrow panel drops the key and hint. */
+.jb-artwork-paired .jb-coil{margin:0}
+@media(max-width:760px){.jb-artwork-paired .jb-coil-key,.jb-artwork-paired .jb-coil-axis span:nth-child(2){display:none}}

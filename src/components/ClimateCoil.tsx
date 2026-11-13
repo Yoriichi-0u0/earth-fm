@@ -38,7 +38,9 @@ function Coil({beads,current,pulse,motion,onReady,onUnavailable,onSelect,onHover
   const turn=useRef<Group>(null),halo=useRef<Mesh>(null),drag=useRef<{x:number;y:number}|null>(null);
   const angle=useRef({x:.35,y:-.5}),sway=useRef(0),pulseAt=useRef(0),cursor=useRef<Group>(null);
   const [hovered,setHovered]=useState<number|null>(null);
-  const published=useRef(''),probe=useMemo(()=>new Vector3(),[]);
+  const published=useRef(''),publishedAt=useRef(0),probe=useMemo(()=>new Vector3(),[]);
+  // A hovered bead cannot report pointer-out after the canvas unmounts (2D toggle, scrolled away).
+  useEffect(()=>()=>{onHover?.(null);},[onHover]);
   const cursorX=coilX(current.year,current.month);
   const lines=useCoilLines();
   useEffect(()=>()=>{lines.forEach(line=>{line.geometry.dispose();(line.material as LineBasicMaterial).dispose();});},[lines]);
@@ -68,8 +70,10 @@ function Coil({beads,current,pulse,motion,onReady,onUnavailable,onSelect,onHover
     const age=(performance.now()-pulseAt.current)/1000,glow=motion?Math.exp(-age*4):0;
     if(halo.current){halo.current.scale.setScalar(1+glow*1.6);(halo.current.material as MeshStandardMaterial).opacity=.18+glow*.5;}
     // Publish where each January bead lands on screen, so the 2D layer and tests can locate them without reading WebGL.
-    const host=gl.domElement.closest<HTMLElement>('.jb-coil');
-    if(host){
+    // Throttled: while the coil auto-rotates, positions change every frame.
+    const host=gl.domElement.closest<HTMLElement>('.jb-coil'),now=performance.now();
+    if(host&&(now-publishedAt.current>250||!motion)){
+      publishedAt.current=now;
       turn.current.updateMatrixWorld();
       const spots=beads.map(point=>{
         if(point.value===null)return '';

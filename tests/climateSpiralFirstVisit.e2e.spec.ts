@@ -239,3 +239,21 @@ test('on a phone the visual is full width, the record row sits below it, navigat
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeInViewport();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
 });
+
+test('hovering a bead shows its January, anomaly and note, and the tip never outlives a switch to 2D',async({page})=>{
+  test.skip(test.info().project.use.hasTouch===true&&test.info().project.name!=='chromium','Hover needs a fine pointer.');
+  await page.goto('/');
+  await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
+  const coil=page.locator('.jb-side-content:not([hidden]) .jb-coil');
+  await expect(coil).toHaveAttribute('data-coil-beads',/\d+,\d+/,{timeout:15_000});await page.waitForTimeout(300);
+  const [x,y]=(await coil.getAttribute('data-coil-beads'))!.split(';')[8].split(',').map(Number);
+  const canvas=(await coil.locator('canvas').boundingBox())!;
+  await page.mouse.move(canvas.x+x,canvas.y+y);
+  await expect(coil.locator('.jb-coil-tip')).toHaveText(/^January \d{4} [+−-]\d\.\d\d°C · [A-G]\d$/);
+  const art=page.locator('.jb-side-content:not([hidden]) .jb-data-art');
+  await art.getByRole('button',{name:'2D chart',exact:true}).click();
+  await page.mouse.move(0,0);
+  await art.getByRole('button',{name:'3D coil',exact:true}).click();
+  await expect(art).toHaveAttribute('data-data-renderer','three',{timeout:15_000});
+  await expect(art.locator('.jb-coil-tip')).toHaveCount(0);
+});

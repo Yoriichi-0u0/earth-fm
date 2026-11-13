@@ -81,3 +81,23 @@
 @media (min-width: 641px) and (max-width: 1050px) {
   .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 185px; }
 }
+
+/* Safe areas: index.html uses viewport-fit=cover, so keep content clear of a landscape notch or Dynamic Island.
+ * Each max() keeps the existing gutter (24 / 20 / 16 px) wherever the inset is smaller. */
+.ss.ss-pages { padding-left: max(24px, calc((100vw - 1240px) / 2), env(safe-area-inset-left, 0px)); padding-right: max(24px, calc((100vw - 1240px) / 2), env(safe-area-inset-right, 0px)); }
+@media (max-width: 650px) { .ss.ss-pages { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); } }
+@media (max-width: 360px) { .ss.ss-pages { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); } }
+@media (max-width: 640px) {
+  /* Sticky Play clears a status bar when the site runs full-screen from the Home Screen. */
+  .ss.ss-pages .jb-home .jb-transport { top: env(safe-area-inset-top, 0px); }
+}
+
+/* 44 pt touch target for the 3D/2D switch on any touch screen, phones and tablets alike. */
+@media (pointer: coarse) { .ss.ss-pages .jb-home .jb-coil-toggle { min-height: 44px; padding-inline: 14px; } }
+
+/* Narrowest phones (≤360 px): wrap side labels between words, never inside one, and keep the coil key on one line. */
+@media (max-width: 360px) {
+  .ss.ss-pages .jb-home .jb-side-selector button > span { overflow-wrap: normal; word-break: normal; hyphens: manual; font-size: 12.5px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil-key { gap: 7px; padding: 3px 7px; font-size: 9.5px; }
+}
+.ss.ss-pages .jb-coil-key li { white-space: nowrap; }
