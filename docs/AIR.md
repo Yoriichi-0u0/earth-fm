@@ -35,6 +35,8 @@ Tempo, Mute and Solo are the listener's musical choices. They never change a not
 
 ## Accessibility
 
+**Meet the four instruments** plays each aerosol alone (south, equator, north) before the mix, with its name on screen and read aloud, so a listener learns both rules by ear: the voice is the aerosol, the pitch is the latitude.
+
 The map is a keyboard instrument: ←/→ hear one slice at a time with a spoken description such as "8°E: light dust near 20°N; faint black carbon (smoke) near 5°S", Home/End jump to the edges, Enter plays from the selected slice, Escape stops. Every step updates the caption, the mixer meters, the globe and the needle together. Android browsers can vibrate a pattern for the loudest aerosol. Without WebGL, or when the visitor prefers it, a 2D globe shows the same longitude. Under reduced motion nothing glides or pulses.
 
 ## Limits

@@ -123,3 +123,13 @@ for (const theme of ['light', 'dark'] as const) test(`${theme}: The Air We Share
   const scan = await new AxeBuilder({ page }).include('.jb-player').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
   expect(scan.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) }))).toEqual([]);
 });
+
+test('Meet the four instruments plays each aerosol alone, in turn, and names it for the screen reader', async ({ page }) => {
+  await openAir(page);
+  await page.getByRole('button', { name: 'Meet the four instruments' }).click();
+  await expect(announcer(page)).toContainText('Black carbon (smoke): Smoky brass. Low in the south, high in the north.');
+  await expect(page.getByRole('button', { name: 'Meet the four instruments' })).toBeVisible({ timeout: 15_000 });
+  await expect(announcer(page)).toContainText('Those are the four instruments.');
+  const voices = (await events(page)).filter((e) => e.scope === 'meet' && e.aerosols.length).map((e) => e.aerosols);
+  expect(voices).toEqual([...Array(3).fill(['blackCarbon']), ...Array(3).fill(['dust']), ...Array(3).fill(['seaSalt']), ...Array(3).fill(['sulfate'])]);
+});

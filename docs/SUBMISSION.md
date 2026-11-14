@@ -29,6 +29,8 @@ Every NASA visualization is a **record**. Side A turns the picture's pixels into
 
 **The Air We Share** is the headline. NASA describes this resource as suited to *multi-track experimentation*, so TerraJuke reads NASA's colour bar from NASA's own image and gives each aerosol an instrument: smoky brass (fire smoke), desert strings (dust), an ocean bed (sea salt) and glass bells (sulfate). Earth is literally the record. Each slice of longitude that turns under the needle is one step of the groove: how much of each aerosol sets loudness, where it sits north or south sets pitch, and where there is none the instrument rests. Over Africa all four play at once. Mute or solo any track to pick out the Saharan dust river or the smoke from southern Africa. Side B tells NASA's own six stories, from Hurricane Erin's sea-salt spirals to Kilauea's sulfate stream.
 
+**Play the whole jukebox** turns TerraJuke into a real jukebox: it plays every record in turn, each introduced by an animated title card and a spoken announcement, which suits a big screen in an Earth Information Center or a judging table. The challenge welcomes a curated playlist as a deliverable; this is one that is generated live.
+
 Around the shelf: the **Record Journey**, an animated "from orbit to your ears" strip naming the satellite or model, the NASA team, the visualizers, the Earth Information Center and finally the listener, in their own time zone (computed in the browser, nothing sent). Also a 3D record rack, a Grooveprint picture of each groove, Scratch and Earth Looper for performing, Your Record for a personal image that never leaves the device, and Mystery Record.
 
 ## Challenge alignment
@@ -52,11 +54,11 @@ Each record states its limits: pixels are not measurements; GEOS is a model anal
 ## 90-second demo
 
 - **0:00–0:10.** Home. "NASA watches the whole planet. TerraJuke lets you hear it." Choose **The Air We Share**.
-- **0:10–0:35.** Press **Play the world**. The globe turns under the needle; the meters jump. "Each slice of longitude is a step in the groove. Dust plays strings, smoke plays brass, sea salt plays the ocean bed, sulfate rings like glass." Solo **Dust** over Africa and the Atlantic: "that's the Sahara crossing an ocean."
+- **0:10–0:35.** Press **Meet the four instruments** for five seconds, then **Play the world**. The globe turns under the needle; the meters jump. "Each slice of longitude is a step in the groove. Dust plays strings, smoke plays brass, sea salt plays the ocean bed, sulfate rings like glass." Solo **Dust** over Africa and the Atlantic: "that's the Sahara crossing an ocean."
 - **0:35–0:50.** Side B: **Hurricane Erin**. The caption and screen reader read NASA's story; the sea-salt track swells.
 - **0:50–1:05.** Close your eyes: focus the map, press → a few times. "Every slice is described out loud. The same music works without the picture."
 - **1:05–1:20.** Flip to **Climate Spiral** Side B: twelve Januaries rise from G3 to A4. "Here the notes are the measurements."
-- **1:20–1:30.** Scroll to the Record Journey ending at "You". "From a satellite, through NASA, to your ears, wherever you are. TerraJuke."
+- **1:20–1:30.** Press **Play the whole jukebox** and let the title card roll. Scroll to the Record Journey ending at "You". "From a satellite, through NASA, to your ears, wherever you are. TerraJuke."
 
 ## Credits
 

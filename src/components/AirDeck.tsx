@@ -15,13 +15,14 @@ import {useAirModel} from '../lib/air/useAirModel';
 import {AirEngine} from '../lib/air/audio';
 import {AEROSOLS,AEROSOL_NAMES,IMAGE_HEIGHT,IMAGE_WIDTH,STEPS,STILL_URL,type Aerosol} from '../lib/air/analyze';
 import {STORIES,STORY_STEPS} from '../lib/air/stories';
-import {DEFAULT_BPM,MAPPING_TABLE,MAX_BPM,MIN_BPM,VOICES,stepSeconds,type Chord} from '../lib/air/sonify';
-import {lonLabel,mixSentence,shareSentence,stepCaption,strengthWord} from '../lib/air/describe';
+import {DEFAULT_BPM,MAPPING_TABLE,MAX_BPM,MEET_LATITUDES,MIN_BPM,VOICES,meetScore,stepSeconds,type Chord} from '../lib/air/sonify';
+import {latLabel,lonLabel,mixSentence,shareSentence,stepCaption,strengthWord} from '../lib/air/describe';
 import './NightLightsDeck.css';
 import './AirDeck.css';
 
 type Side='a'|'b';
-type Mode='idle'|'world'|'story'|'tour';
+type Mode='idle'|'world'|'story'|'tour'|'meet';
+const MEET=meetScore();
 type Current={index:number;chord:Chord;serial:number;at:number;dur:number;scope:string};
 const canVibrate=()=>typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'&&/Android/i.test(navigator.userAgent);
 const loudest=(c:Chord)=>c.notes.reduce<Chord['notes'][number]|null>((a,n)=>!a||n.loudness>a.loudness?n:a,null);
@@ -90,6 +91,14 @@ export default function AirDeck({record,motion,volume,onVolume}:{record:JukeboxR
     let last='';
     audio.current?.play(tour.score,{getBpm:()=>bpmRef.current,onStep:(i,c)=>{const id=tour.owner[i];if(id!==last){last=id;setStoryId(id);const s=STORIES.find(x=>x.id===id)!;setMessage(`${t(s.title)}. ${t(s.caption)}`);}onStep(i%STORY_STEPS,c,id,stepSeconds(bpmRef.current));},onEnd:()=>{setMode('idle');setCompleted(true);setMessage(t('All six of NASA’s stories have played.'));}});
   }
+  function playMeet(){
+    stopAll(false);setMode('meet');setCompleted(false);setRequestAt(performance.now());
+    audio.current?.play(MEET,{getBpm:()=>Math.min(bpmRef.current,96),onStep:(i,c)=>{
+      const m=MEET[i];
+      if(m.aerosol&&m.lat===MEET_LATITUDES[0])setMessage(`${t(AEROSOL_NAMES[m.aerosol])}: ${t(VOICES[m.aerosol].instrument)}. ${t('Low in the south, high in the north.')}`);
+      onStep(i,c,'meet',stepSeconds(Math.min(bpmRef.current,96)));
+    },onEnd:()=>{setMode('idle');setCompleted(true);setMessage(t('Those are the four instruments. Press Play to hear them together.'));}});
+  }
   function hearStep(i:number){
     if(!ready)return;
     stopAll(false);setFocus(i);
@@ -111,17 +120,19 @@ export default function AirDeck({record,motion,volume,onVolume}:{record:JukeboxR
   // ---- What the needle shows -----------------------------------------------------------
   const playing=mode!=='idle';
   const worldStep=ready?model.steps[current&&current.scope==='world'?current.index:focus]:null;
-  const storyStep=ready&&current&&current.scope!=='world'?model.stories.find(s=>s.story.id===current.scope)!.steps[current.index]:null;
-  const shownStep=storyStep??(side==='a'||mode==='world'?worldStep:null);
+  const meetStep=current&&current.scope==='meet'?MEET[current.index]:null;
+  const storyStep=ready&&current&&STORIES.some(s=>s.id===current.scope)?model.stories.find(s=>s.story.id===current.scope)!.steps[current.index]:null;
+  const shownStep=meetStep?null:storyStep??(side==='a'||mode==='world'?worldStep:null);
   const top=current?loudest(current.chord):null;
   const target:GlobeTarget=storyStep?{lon:(storyStep.lon0+storyStep.lon1)/2,lat:STORIES.find(s=>s.id===current!.scope)!.lat,at:current!.at,dur:current!.dur,glide:false}
     :shownStep?{lon:(shownStep.lon0+shownStep.lon1)/2,lat:top?.lat??15,at:current?.at??0,dur:current?.dur??1,glide:mode==='world'}
     :{lon:story.lon,lat:story.lat,at:0,dur:1,glide:false};
   const caption=!ready?t(model.status==='error'?'NASA’s aerosol image could not be analysed.':'Reading NASA’s aerosol map in your browser…')
+    :meetStep?(meetStep.aerosol?`${t(AEROSOL_NAMES[meetStep.aerosol])} · ${t(VOICES[meetStep.aerosol].instrument)} · ${latLabel(meetStep.lat??0)} → ${meetStep.notes[0].name}`:t('Next instrument…'))
     :shownStep?stepCaption((shownStep.lon0+shownStep.lon1)/2,shownStep.mix):`${t(story.title)} · ${mixSentence(storyTrack!.mix)}`;
   const signal:RecordSignal={playing,note:top?.name??'—',frequency:top?.hz??null,event:current?{serial:current.serial,at:current.at,index:current.index}:null};
   const stepMs=stepSeconds(bpm)*1000;
-  const progress=!current?0:mode==='world'?(current.index+1)/STEPS:mode==='tour'&&tour?(STORIES.findIndex(s=>s.id===current.scope)*STORY_STEPS+current.index+1)/tour.score.length:(current.index+1)/STORY_STEPS;
+  const progress=!current?0:mode==='meet'?(current.index+1)/MEET.length:mode==='world'?(current.index+1)/STEPS:mode==='tour'&&tour?(STORIES.findIndex(s=>s.id===current.scope)*STORY_STEPS+current.index+1)/tour.score.length:(current.index+1)/STORY_STEPS;
   const needleX=shownStep?(shownStep.rect.x0+shownStep.rect.x1)/2/IMAGE_WIDTH*100:null;
 
   const sideControls=<>
@@ -135,6 +146,7 @@ export default function AirDeck({record,motion,volume,onVolume}:{record:JukeboxR
   </>;
 
   const mixerPanel=<div className="air-performance">
+    <div className="air-meet"><button type="button" aria-pressed={mode==='meet'} onClick={()=>mode==='meet'?stopAll():playMeet()}>{t(mode==='meet'?'Stop':'Meet the four instruments')}</button><span>{t('Each aerosol alone, from the far south to the far north.')}</span></div>
     <div className="air-tempo"><label htmlFor="air-bpm">{t('Tempo')}</label><input id="air-bpm" type="range" min={MIN_BPM} max={MAX_BPM} step={4} value={bpm} aria-valuetext={`${bpm} ${t('beats per minute')}`} onChange={e=>setBpm(Number(e.target.value))}/><output htmlFor="air-bpm">{bpm} BPM</output></div>
     <AirMixer tracks={tracks} onChange={(a,next)=>setTracks(prev=>({...prev,[a]:next}))} shares={ready?model.shares:null} chord={current?.chord??null} serial={current?.serial??0} stepMs={stepMs} motion={motion}/>
     {canVibrate()&&<label className="nl-vibrate"><input type="checkbox" checked={vibrate} onChange={e=>setVibrate(e.target.checked)}/><Vibrate size={14}/>{t('Feel the loudest aerosol (supported Android browsers)')}</label>}
