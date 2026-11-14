@@ -43,7 +43,8 @@ test('Side A turns the whole world under the needle, west to east, and stops cle
   expect((await events(page)).length).toBe(stoppedAt);
 });
 
-test('keyboard: arrows hear one slice at a time and describe it; Home jumps west; Escape stops', async ({ page }) => {
+test('keyboard and touch: arrows hear one slice at a time and wrap around the world; a tap jumps; Escape stops', async ({ page }) => {
+  test.setTimeout(45_000);
   await openAir(page);
   const map = page.getByRole('application', { name: /Aerosol map/ });
   await map.focus();
@@ -51,10 +52,14 @@ test('keyboard: arrows hear one slice at a time and describe it; Home jumps west
   await expect(announcer(page)).toContainText('177°W');
   await page.keyboard.press('ArrowRight');
   await expect.poll(async () => (await events(page)).at(-1)?.index).toBe(1);
-  for (let i = 0; i < 31; i++) await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowLeft');
+  await expect.poll(async () => (await events(page)).at(-1)?.index).toBe(63);
+  await expect(announcer(page)).toContainText('177°E');
+  const box = (await map.boundingBox())!;
+  await page.mouse.click(box.x + box.width * (32.5 / 64), box.y + box.height * 0.5); // the slice just east of 0°, over the Sahara
   await expect.poll(async () => (await events(page)).at(-1)?.index).toBe(32);
   await expect(announcer(page)).toContainText(/dust near \d+°N/);
-  await page.keyboard.press('Enter');
+  await map.focus(); await page.keyboard.press('Enter');
   await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   await page.keyboard.press('Escape');
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
@@ -103,7 +108,7 @@ test('axe finds no violations on The Air We Share with its liner notes open', as
   expect(results.violations).toEqual([]);
 });
 
-for (const theme of ['light', 'dark'] as const) test(`${theme}: The Air We Share fits phones and tablets without sideways scrolling`, async ({ page }) => {
+for (const theme of ['light', 'dark'] as const) test(`${theme}: The Air We Share fits phones and tablets without sideways scrolling`,{tag:'@full'}, async ({ page }) => {
   await page.emulateMedia({ colorScheme: theme });
   await openAir(page);
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {

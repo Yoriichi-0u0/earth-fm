@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
+import {warmInstrument} from './instrumentWarmup';
 import AxeBuilder from '@axe-core/playwright';
 
 test('playback moves the observation and chart; pause and seeking preserve control', async ({ page }) => {
@@ -515,7 +516,7 @@ test('Create separates musical choices, keeps volume live, stops on changes and 
   await expect(page.locator('.sp-data-summary')).toContainText('+1.37°C');
 });
 
-test('Data compares complete A/B melodies in order with fixed settings and optional spiral geometry',async({page})=>{
+test('Data compares complete A/B melodies in order with fixed settings and optional spiral geometry',{tag:'@full'},async({page})=>{
   test.setTimeout(65000);await page.goto('/data');
   await page.getByRole('checkbox',{name:'Compare another year',exact:true}).check();
   await page.getByLabel('Year B',{exact:true}).selectOption('1880');
@@ -572,7 +573,7 @@ test('the chosen tone persists across the pages, and the interface is English on
   await expect(page.getByRole('heading',{name:'Make the music yours.'})).toBeVisible();
 });
 
-test('five pages and expanded data are accessible and fit mobile screens',async({page})=>{
+test('five pages and expanded data are accessible and fit mobile screens',{tag:'@full'},async({page})=>{
   test.setTimeout(90000);
   for(const language of ['en']){
     for(const path of ['/','/listen','/create','/data','/about']){
@@ -605,7 +606,7 @@ test('Listen is simple and sound controls recover with blocked preference storag
   await expect(page.getByRole('status')).toHaveText('Stopped.');expect(errors).toEqual([]);
 });
 
-test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation', async ({page})=>{
+test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation',{tag:'@dev'}, async ({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await page.goto('/create');
   await expect(page.getByRole('group',{name:'Melody tone'})).toBeVisible();
@@ -650,7 +651,7 @@ test('all five melody tones retain mapped fundamentals, deterministic data-only 
   }
 });
 
-test('homepage globe rotates gently, pauses for interaction, and obeys motion preferences',async({page})=>{
+test('homepage globe rotates gently, pauses for interaction, and obeys motion preferences',{tag:'@timing'},async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.goto('/');
   await page.locator('.jb-earth-extra summary').click();
@@ -787,7 +788,7 @@ test('moving Earth sound samples video during playback and obeys still-frame and
  await page.getByRole('button',{name:'Continue to the real data →',exact:true}).click();await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toHaveCount(0);await expect(page.getByRole('heading',{name:'Now, hear the measurements.'})).toBeVisible();
 });
 
-test('new stations and live proof remain accessible and usable on mobile',async({page})=>{
+test('new stations and live proof remain accessible and usable on mobile',{tag:'@full'},async({page})=>{
  test.setTimeout(90000);await page.setViewportSize({width:390,height:844});
  for(const language of ['en'])for(const route of ['/listen?station=all','/listen?station=arctic','/data?station=arctic','/create?station=arctic','/listen?visual=motion']){
   await page.goto(route);await page.locator('h1').waitFor();
@@ -798,7 +799,7 @@ test('new stations and live proof remain accessible and usable on mobile',async(
  }
 });
 
-test('Earth Looper replays mapped positions and rhythm locally, then clears without persisting a take',async({page})=>{
+test('Earth Looper replays mapped positions and rhythm locally, then clears without persisting a take',{tag:'@timing'},async({page})=>{
   const posts:string[]=[];page.on('request',request=>{if(request.method()==='POST')posts.push(request.url());});
   await page.addInitScript(()=>{
     const audit={notes:[] as {hz:number;at:number}[],contexts:[] as AudioContext[]};(window as unknown as {loopAudit:typeof audit}).loopAudit=audit;
@@ -807,6 +808,7 @@ test('Earth Looper replays mapped positions and rhythm locally, then clears with
   await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
   const loop=page.getByRole('region',{name:'Earth Looper',exact:true}),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
   const storage=await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}));
+  await warmInstrument(page);await page.evaluate(()=>(window as unknown as {loopAudit:{notes:unknown[]}}).loopAudit.notes.splice(0));
   await loop.getByRole('button',{name:'Record',exact:true}).click();
   for(const [index,position] of ['12','31','7'].entries()){
     await slider.fill(position);await expect(loop).toHaveAttribute('data-loop-count',String(index+1));if(index<2)await page.waitForTimeout(index===0?140:230);
@@ -834,7 +836,7 @@ test('Earth Looper replays mapped positions and rhythm locally, then clears with
   await page.getByRole('button',{name:'Select record: Climate Spiral',exact:true}).click();await page.getByRole('button',{name:'Play with Earth',exact:true}).click();await expect(page.locator('.jb-looper')).toHaveAttribute('data-loop-count','0');
 });
 
-test('slow manual startup gives an explicit retry and a pending replay can be cancelled',async({page})=>{
+test('slow manual startup gives an explicit retry and a pending replay can be cancelled',{tag:'@timing'},async({page})=>{
   await page.addInitScript(()=>{
     const contexts:AudioContext[]=[];(window as unknown as {slowContexts:AudioContext[]}).slowContexts=contexts;
     const Original=AudioContext;window.AudioContext=class extends Original{delayed=true;constructor(){super();contexts.push(this);}get state():AudioContextState{return this.delayed?'suspended':super.state;}async resume(){await super.resume();if(this.delayed){await new Promise(resolve=>setTimeout(resolve,350));this.delayed=false;}}};
@@ -849,15 +851,16 @@ test('slow manual startup gives an explicit retry and a pending replay can be ca
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await page.waitForTimeout(350);await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
 });
 
-test('Earth Looper enforces the note limit and finishes an empty recording at the time limit',async({page})=>{
+test('Earth Looper enforces the note limit and finishes an empty recording at the time limit',{tag:['@full','@timing']},async({page})=>{
   test.setTimeout(35_000);await page.goto('/');await page.getByRole('button',{name:'Play with Earth',exact:true}).click();const loop=page.locator('.jb-looper'),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
+  await warmInstrument(page);
   await loop.getByRole('button',{name:'Record',exact:true}).click();
   for(let i=0;i<64;i++){await slider.fill(String(i%47+2));await expect(loop).toHaveAttribute('data-loop-count',String(i+1));}
   await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(loop.getByRole('status')).toHaveText('64-note limit reached. Your take is ready.');
   await loop.getByRole('button',{name:'Record again',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-phase','idle',{timeout:16_000});await expect(loop).toHaveAttribute('data-loop-count','0');await expect(loop.getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
 });
 
-test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{
+test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',{tag:'@timing'},async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:700},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
     await page.goto(new URL('/',test.info().project.use.baseURL).href);const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const playBounds=await play.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await play.tap();await page.getByRole('button',{name:'Stop',exact:true}).tap();

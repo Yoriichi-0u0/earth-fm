@@ -33,7 +33,8 @@ Node.js 22.12+ or 24. Run `npm ci` once per checkout; `npx playwright install ch
 npm run dev            # Vite on 0.0.0.0:5173
 npm run build          # tsc -b (type check) then vite build → dist/
 npm run test           # unit tests: tsx --test tests/*.test.ts (node:test + node:assert)
-npm run test:e2e       # Playwright, Chromium; starts the dev server on 127.0.0.1:5173
+npm run test:e2e       # Playwright, Chromium: full suite against a production build
+npm run test:e2e:quick # the same without @full matrix and long-audio tests
 npm run check          # test + build + test:e2e — run before asking for review
 npm run data:refresh   # verify source hashes and rebuild bundled observation data
 ```
@@ -50,9 +51,13 @@ npx playwright test --last-failed --workers=1
 There is no linter; `tsc -b` in `npm run build` is the type check.
 
 Playwright notes:
-- `playwright.config.ts` lists e2e files explicitly in `testMatch`. **A new `*.e2e.spec.ts` file must be added there or it never runs.**
-- The full suite is about 10 minutes with 3 workers, and audio-timing tests can fail under parallel load. Rerun failures with `--workers=1` before treating them as real.
-- `PLAYWRIGHT_BASE_URL=https://terrajuke.vercel.app npm run test:e2e` tests production; tests that import `/src` skip themselves there. `PLAYWRIGHT_DEVICES=1` adds emulated WebKit/Android projects, `PLAYWRIGHT_BRANDS=1` the installed Chrome and Edge.
+- The main `chromium` project tests a **production build** served by `vite preview` on port 4180 (built automatically by the web server). Tests tagged `@dev` import `/src` modules and run in a `chromium-dev` project against the dev server on 5173. Tag any new test that imports `/src` with `{tag:'@dev'}`.
+- `npm run test:e2e:quick` (`E2E_QUICK=1`) skips `@full` tests: viewport/theme matrices and long real-time performances. Use it while iterating; `npm run check` runs everything before merging. Tag new matrix or long-audio tests `{tag:'@full'}`.
+- `npm run test:e2e` runs `scripts/e2e.mjs`: phase 1 runs everything except `@timing` on 4 workers; phase 2 runs the load-sensitive `@timing` tests (takes, replays, touch gestures, animation timing) on 2 workers with one retry; a pass on retry is reported as flaky. Reports go to `playwright-report/main` and `playwright-report/timing`. Tag a new test `@timing` if it measures real-time playback or a gesture and can be starved by a busy machine. Plain `npx playwright test …` still works for single files.
+- Every `*.e2e.spec.ts` file is picked up automatically.
+- Chromium renders Web Audio to a fake output stream (`--disable-audio-output`), so tests make no sound and parallel browsers don't queue for the audio device. `PLAYWRIGHT_AUDIO=1` restores real output.
+- Audio-timing tests can fail when the machine is busy (other dev servers, image processing). Rerun failures with `--last-failed --workers=1` before treating them as real.
+- `PLAYWRIGHT_BASE_URL=https://terrajuke.vercel.app npm run test:e2e` tests production; `@dev` tests skip themselves there. `PLAYWRIGHT_DEVICES=1` adds emulated WebKit/Android projects, `PLAYWRIGHT_BRANDS=1` the installed Chrome and Edge.
 
 ## Architecture
 

@@ -1,5 +1,11 @@
 export const LOOP_MAX_MS=15_000;
 export const LOOP_MAX_NOTES=64;
+/**
+ * A note this late means the tab stalled (background tabs throttle timers to 1 s or more), so the
+ * replay ends instead of bursting old notes. Shorter hiccups (garbage collection, a busy phone)
+ * play on: the schedule is anchored to the start, so later notes land on time again.
+ */
+export const LOOP_STALL_MS=500;
 export type ScanEvent={strip:number;atMs:number};
 export type ScanTake={sourceImage:string;stripCount:number;durationMs:number;events:readonly ScanEvent[]};
 type Timer=ReturnType<typeof setTimeout>;
@@ -36,7 +42,7 @@ export class ScanReplay{
     const tick=async(index:number)=>{
       if(token!==this.generation)return;
       const event=take.events[index];
-      if(this.time.now()-start-event.atMs>120){finish('late');return;}
+      if(this.time.now()-start-event.atMs>LOOP_STALL_MS){finish('late');return;}
       try{
         const played=await this.play(event);
         if(token!==this.generation)return;

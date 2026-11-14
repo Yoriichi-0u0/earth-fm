@@ -65,7 +65,7 @@ test('invalid or unavailable preference storage leaves the appearance controls u
   }
 });
 
-test('theme changes preserve active audio, source pixels, mapped strip values and the saved take',async({page})=>{
+test('theme changes preserve active audio, source pixels, mapped strip values and the saved take',{tag:['@dev','@timing']},async({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await page.addInitScript(()=>{
     const audit={contexts:[] as AudioContext[]};(window as unknown as {appearanceAudio:typeof audit}).appearanceAudio=audit;
@@ -117,7 +117,7 @@ test('a missing WebGL context leaves the 2D instrument and audio usable in Light
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);await page.getByRole('button',{name:'Stop',exact:true}).click();
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} theme has no automated accessibility or contrast findings across the main pages and Legacy`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} theme has no automated accessibility or contrast findings across the main pages and Legacy`,{tag:'@full'},async({page})=>{
   test.setTimeout(90_000);await page.goto('/');await chooseAppearance(page,theme);
   const results=[];
   for(const route of pages){
@@ -129,7 +129,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} theme has no automat
   expect(results.filter(r=>r.violations.length)).toEqual([]);
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific explanations and disabled controls retain contrast`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific explanations and disabled controls retain contrast`,{tag:'@full'},async({page})=>{
   test.setTimeout(90_000);await page.goto('/');await chooseAppearance(page,theme);const results=[];
   for(const route of ['/about','/create','/data','/listen']){
     await page.goto(route);
@@ -150,7 +150,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific 
   await test.info().attach(`expanded-contrast-${theme}`,{body:JSON.stringify(results),contentType:'application/json'});expect(results.filter(r=>r.violations.length)).toEqual([]);
 });
 
-for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}])test(`responsive appearance and keyboard controls fit ${viewport.width} × ${viewport.height}`,async({page})=>{
+for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}])test(`responsive appearance and keyboard controls fit ${viewport.width} × ${viewport.height}`,{tag:'@full'},async({page})=>{
   test.setTimeout(60_000);await page.setViewportSize(viewport);
   for(const theme of ['light','dark']){
     await page.goto('/');await chooseAppearance(page,theme);
