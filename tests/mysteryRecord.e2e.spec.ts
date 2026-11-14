@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-const recordTitles=['Climate Spiral','Moving Earth','Arctic September','Temperature Through Time'];
+const recordTitles=['Climate Spiral','Moving Earth','Temperature Through Time'];
 
 type Audit={contexts:AudioContext[];notes:number[];hold:boolean;fail:boolean;resumes:(()=>void)[]};
 declare global{interface Window{mysteryAudit:Audit}}
@@ -27,13 +27,13 @@ async function noPrematureIdentity(page:Page){
   const scene=mystery(page);
   await expect(scene.getByRole('img')).toHaveCount(0);await expect(scene.getByRole('link')).toHaveCount(0);
   const snapshot=await scene.ariaSnapshot();expect(snapshot).not.toMatch(/NASA|NSIDC|GISTEMP|January|September mean|brightness|temperature measurements|196\.00|million km/);
-  await expect(scene.getByRole('radio')).toHaveCount(4);await expect(scene.getByRole('radio',{checked:true})).toHaveCount(0);
+  await expect(scene.getByRole('radio')).toHaveCount(recordTitles.length);await expect(scene.getByRole('radio',{checked:true})).toHaveCount(0);
 }
 
 for(const [index,title] of recordTitles.entries())test(`${title} stays concealed, uses the original audio and reveals the exact source`,{tag:'@dev'},async({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   const chunks:string[]=[];page.on('request',r=>{if(r.url().includes('/MysteryRecord'))chunks.push(r.url());});
-  await setup(page,(index+.1)/4);await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();expect(chunks).toEqual([]);
+  await setup(page,(index+.1)/recordTitles.length);await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();expect(chunks).toEqual([]);
   const record=await page.evaluate(async index=>{const path='/src/data/jukeboxRecords.ts';return (await import(path)).mysteryRecords[index];},index);
   await page.getByRole('button',{name:'Select record: '+record.title,exact:true}).click();await page.getByRole('button',{name:'Play record',exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.notes.length)).toBeGreaterThanOrEqual(5);
@@ -57,7 +57,7 @@ test('reveal can skip listening/guessing; another mystery resets the round and a
   await setup(page);await open(page);expect(await page.evaluate(()=>window.mysteryAudit.contexts.length)).toBe(0);
   await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await expect(mystery(page)).toContainText("Here's the source. Curiosity is the point.");expect(await page.evaluate(()=>window.mysteryAudit.contexts.length)).toBe(0);
   await mystery(page).getByRole('button',{name:'Try another mystery',exact:true}).click();await expect(mystery(page).getByRole('heading',{name:'Mystery Record',exact:true})).toBeFocused();await noPrematureIdentity(page);
-  await mystery(page).getByRole('radio',{name:'Arctic September',exact:true}).check();await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await expect(mystery(page).getByRole('heading',{name:'Moving Earth',exact:true})).toBeVisible();await expect(mystery(page)).toContainText('Another record was in the grooves. Meet its source.');await expect(mystery(page)).not.toContainText('incorrect');
+  await mystery(page).getByRole('radio',{name:'Temperature Through Time',exact:true}).check();await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await expect(mystery(page).getByRole('heading',{name:'Moving Earth',exact:true})).toBeVisible();await expect(mystery(page)).toContainText('Another record was in the grooves. Meet its source.');await expect(mystery(page)).not.toContainText('incorrect');
 });
 
 test('Stop and Replay stay in the same round; another mystery, record switch and navigation close the old owner',async({page})=>{
@@ -65,7 +65,7 @@ test('Stop and Replay stay in the same round; another mystery, record switch and
   await mystery(page).getByRole('button',{name:'Stop mystery',exact:true}).click();await expect(mystery(page).getByRole('button',{name:'Replay',exact:true})).toBeEnabled();
   const first=await page.evaluate(()=>window.mysteryAudit.notes.slice(0,5));await page.evaluate(()=>{window.mysteryAudit.notes=[];});await mystery(page).getByRole('button',{name:'Replay',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.notes.length)).toBeGreaterThanOrEqual(5);expect(await page.evaluate(()=>window.mysteryAudit.notes.slice(0,5))).toEqual(first);
   await mystery(page).getByRole('button',{name:'Try another mystery',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.contexts.every(c=>c.state==='closed'))).toBe(true);await noPrematureIdentity(page);
-  await play(page).click();await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
+  await play(page).click();await page.getByRole('button',{name:'Select record: The Ice Year',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
   await open(page);await play(page).click();await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
 });
 
@@ -78,16 +78,16 @@ for(const draw of [0,.6])test(`pending ${draw===0?'visual':'measurement'} startu
 });
 
 test('a hidden tab stops sound without resuming; appearance changes preserve the current round and active owner',async({page})=>{
-  await setup(page,.6);await open(page);await mystery(page).getByRole('radio',{name:'Climate Spiral',exact:true}).check();await play(page).click();
+  await setup(page,.9);await open(page);await mystery(page).getByRole('radio',{name:'Climate Spiral',exact:true}).check();await play(page).click();
   const contexts=await page.evaluate(()=>window.mysteryAudit.contexts.length);
   await chooseAppearance(page,'light');await chooseAppearance(page,'dark');await expect(mystery(page).getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();expect(await page.evaluate(()=>window.mysteryAudit.contexts.length)).toBe(contexts);
   const zh=page.getByRole('region',{name:'Mystery Record',exact:true});await expect(zh.getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();await expect(zh.getByRole('radio',{name:'Climate Spiral',exact:true})).toBeChecked();
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});await expect(zh.getByRole('button',{name:'Replay',exact:true})).toBeVisible();const count=await page.evaluate(()=>window.mysteryAudit.notes.length);
-  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(600);expect(await page.evaluate(()=>window.mysteryAudit.notes.length)).toBe(count);await zh.getByRole('button',{name:'Reveal source',exact:true}).click();await expect(zh).toContainText('NSIDC');
+  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(600);expect(await page.evaluate(()=>window.mysteryAudit.notes.length)).toBe(count);await zh.getByRole('button',{name:'Reveal source',exact:true}).click();await expect(zh).toContainText('GISTEMP');
 });
 
 test('audio initialization and missing imagery fail neutrally and keep Reveal available',async({page})=>{
-  await setup(page,.6);await open(page);await page.evaluate(()=>{window.mysteryAudit.fail=true;});await play(page).click();await expect(mystery(page).getByRole('alert')).toContainText('could not play');expect(await mystery(page).getByRole('alert').innerText()).not.toMatch(/NSIDC|sea.ice|Arctic/);await play(page).click();await expect(mystery(page).getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();
+  await setup(page,.9);await open(page);await page.evaluate(()=>{window.mysteryAudit.fail=true;});await play(page).click();await expect(mystery(page).getByRole('alert')).toContainText('could not play');expect(await mystery(page).getByRole('alert').innerText()).not.toMatch(/GISTEMP|GISS|January|°C/);await play(page).click();await expect(mystery(page).getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();
   await page.route('**/frames/climate-spiral-svs5190-2026-10-18.jpg',route=>route.abort());await page.evaluate(()=>{Math.random=()=>0;});await mystery(page).getByRole('button',{name:'Try another mystery',exact:true}).click();await expect(mystery(page).getByRole('alert')).toBeVisible();await expect(play(page)).toBeDisabled();await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await expect(mystery(page).getByRole('link',{name:'NASA SVS 5190',exact:false})).toBeVisible();
 });
 

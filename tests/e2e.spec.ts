@@ -741,8 +741,7 @@ for(const failure of ['graphics unavailable','image unavailable']){
 test('Listen opens the jukebox and each station story keeps the five-page layout and source-aware links',async({page})=>{
  await page.goto('/');await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();await expect(page).toHaveURL(/\/listen$/);
  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Your planet. On the record.');await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(7);
- await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).click();
- await page.getByRole('link',{name:'Discover the story',exact:true}).click();await expect(page).toHaveURL(/station=arctic/);
+ await page.goto('/listen?station=arctic');await expect(page).toHaveURL(/station=arctic/);
  await page.reload();await expect(page.getByRole('heading',{name:'Listen to the ice record.'})).toBeVisible();
  await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();await expect(page).toHaveURL(/\/data\?station=arctic$/);
  await expect(page.getByRole('heading',{name:'Every ice note has an observation.'})).toBeVisible();

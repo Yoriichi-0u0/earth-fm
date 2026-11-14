@@ -1,9 +1,8 @@
 import {frames} from './frames';
 import {storyFrame} from './guidedStory';
-import {arcticTrack} from './earthStations';
 import type {EarthFrame} from './frames';
 
-export type JukeboxRecordId='spiral'|'nightlights'|'air'|'ocean'|'motion'|'arctic'|'temperature';
+export type JukeboxRecordId='spiral'|'nightlights'|'air'|'ocean'|'motion'|'ice'|'temperature';
 export type JukeboxRecord={/** false: not drawn by Mystery Record (it needs one picture or one measurement series). */mystery?:boolean;id:JukeboxRecordId;number:string;title:string;kind:'visual'|'data';subtitle:string;source:string;sourceUrl:string;meaning:string;frame?:EarthFrame;posterUrl?:string;accent:string};
 export const jukeboxRecords:readonly JukeboxRecord[]=[
   {id:'spiral',number:'01',title:'Climate Spiral',kind:'visual',subtitle:'One story. Two sides. Picture and measurements.',source:'NASA SVS 5190',sourceUrl:storyFrame.sourceUrl,meaning:'Image brightness makes pitch. These are pixels, not temperature measurements.',frame:storyFrame,accent:'#64d2ff'},
@@ -11,7 +10,7 @@ export const jukeboxRecords:readonly JukeboxRecord[]=[
   {mystery:false,id:'air',number:'03',title:'The Air We Share',kind:'visual',subtitle:'Four aerosols, four instruments. Earth turns under the needle.',source:'NASA SVS 5669 · GEOS Aerosols',sourceUrl:'https://svs.gsfc.nasa.gov/5669/',meaning:'Each aerosol NASA colours becomes an instrument: how strongly a pixel shows its colour sets loudness, latitude sets pitch, longitude sets time. Rendered model colours, not optical depth.',posterUrl:'/nasa/svs5669/svs5669_poster_640x360.jpg',accent:'#c19adc'},
     {mystery:false,id:'ocean',number:'04',title:'Currents of Heat',kind:'visual',subtitle:'Pole to pole: hear the ocean warm, then cool.',source:'NASA SVS 3912 · ECCO2',sourceUrl:'https://svs.gsfc.nasa.gov/3912/',meaning:'Each current trace’s colour is read back to a temperature on NASA’s own 0–32 °C scale; warm water plays high, cold water low. Model temperatures, read from colour.',posterUrl:'/nasa/svs3912/svs3912_poster_720x360.jpg',accent:'#ff8a3d'},
   {id:'motion',number:'05',title:'Moving Earth',kind:'visual',subtitle:'An Earth in motion. An evolving sound.',source:'NASA EIC · attributed mirror',sourceUrl:frames[2].mirrorUrl,meaning:'Changing video pixels shape the sound. This is an archived visual, not a live measurement feed.',frame:frames[2],posterUrl:'/frames/untethered-record-poster.jpg',accent:'#9acfcf'},
-  {id:'arctic',number:'06',title:'Arctic September',kind:'data',subtitle:'Listen to the shape of a changing Arctic.',source:'NSIDC · project-derived means',sourceUrl:arcticTrack.sourceUrl,meaning:'September extent in million km² sets pitch. These are project-derived means, not an EIC visual frame.',accent:'#9bc7ef'},
+  {mystery:false,id:'ice',number:'06',title:'The Ice Year',kind:'visual',subtitle:'Arctic sea ice through 2024: hear it shrink and return.',source:'NASA SVS 5046 · JAXA AMSR2',sourceUrl:'https://svs.gsfc.nasa.gov/5046/',meaning:'Each month, the sea ice NASA drew north of 50°N is measured on NASA’s own globe; less ice plays a lower note. Side B plays any place’s ice season. Ice as rendered by NASA, not a data product.',posterUrl:'/nasa/svs5046/2024-03-15.webp',accent:'#9cc8ef'},
   {id:'temperature',number:'07',title:'Temperature Through Time',kind:'data',subtitle:'The Side B measurements, on their own.',source:'NASA GISS · GISTEMP v4',sourceUrl:'https://data.giss.nasa.gov/gistemp/',meaning:'Global monthly anomalies set pitch, relative to the 1951–1980 January average. Selected years, not a continuous record.',accent:'#f0b08b'},
 ];
 /** Records Mystery Record can play concealed. */

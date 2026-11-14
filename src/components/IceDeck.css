@@ -1,0 +1,26 @@
+/* The Ice Year: NASA's Arctic globe, a month strip that doubles as a bar chart, and a touch marker. */
+.jb-media.ice-media{height:auto;display:flex;flex-direction:column;background:#02060a}
+.jb-media.ice-media .jb-art-footer{position:static;padding:4px 16px 10px;background:none}
+.ice-globe{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:crosshair;touch-action:manipulation;background:radial-gradient(circle at 50% 50%,#0b1a28 0 30%,#02060a 62%)}
+.ice-globe[data-side=a]{cursor:default}
+.ice-globe img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .45s ease;user-select:none}
+.ice-globe img.is-shown{opacity:1}
+.ss-pages:not(.ss-motion) .ice-globe img{transition:none}
+.ice-globe:focus-visible{outline:2px solid var(--ef-focus,#64d2ff);outline-offset:-3px}
+.ice-marker{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;border:2px solid #ffd60a;box-shadow:0 0 0 3px #0008,0 0 14px #ffd60a;pointer-events:none}
+.ss-motion .ice-marker.is-playing{animation:ice-pulse .8s ease-in-out infinite alternate}
+.ice-months{list-style:none;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;margin:0;padding:10px 16px 4px;background:#050b11}
+.ice-months button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;width:100%;height:72px;padding:4px 0;border:1px solid #ffffff1c;border-radius:8px;background:#0b1520;color:#c9d6de;font:inherit;font-size:11px;cursor:pointer}
+.ice-months button i{display:block;width:60%;height:calc(var(--h) * .5);min-height:2px;border-radius:3px;background:linear-gradient(#f2f7ff,#9cc8ef)}
+.ice-months button[aria-pressed=true]{border-color:#9cc8ef;background:#122436;color:#fff}
+.ice-months button:focus-visible{outline:2px solid var(--ef-focus,#64d2ff);outline-offset:2px}
+.ice-media .air-caption{margin:0;padding:10px 16px 4px;min-height:3.4em}
+.ice-vinyl{position:relative;width:min(220px,62%);aspect-ratio:1;margin:8px auto;border-radius:50%;background:repeating-radial-gradient(circle,#111 0 2px,#1d1d1f 3px 5px);display:grid;place-items:center;box-shadow:0 14px 34px #0007}
+.ice-vinyl img{width:72%;aspect-ratio:1;object-fit:cover;object-position:50% 50%;border-radius:50%;transform:scale(1.02)}
+.ice-vinyl i{position:absolute;width:8px;height:8px;border-radius:50%;background:#e5e5ea;border:2px solid #111}
+.ss-motion .ice-vinyl.is-spinning{animation:ice-spin 6s linear infinite}
+@keyframes ice-spin{to{transform:rotate(360deg)}}
+@keyframes ice-pulse{to{box-shadow:0 0 0 3px #0008,0 0 26px #ffd60a;transform:scale(1.15)}}
+.jb-media.ice-media .jb-art-label{position:static;padding:8px 16px 4px;background:none}
+@media(max-width:760px){.jb-media.ice-media{height:auto}}
+@media(max-width:520px){.ice-months{gap:2px;padding:8px 8px 4px}.ice-months button{height:54px;font-size:10px;border-radius:6px}}

@@ -20,7 +20,7 @@ async function openMystery(page:Page){
   await page.getByRole('button',{name:'Open Mystery Record',exact:true}).click();
   await expect(mystery(page).getByRole('button',{name:'Play mystery',exact:true})).toBeEnabled();
 }
-async function setup(page:Page,draw=.6){
+async function setup(page:Page,draw=.9){
   await page.addInitScript(draw=>{
     Math.random=()=>draw;
     const audit:Audit={contexts:[],notes:0,holdAudio:false,resumes:[],holdImages:false,loads:[],created:[],revoked:[]};window.integrationAudit=audit;
@@ -63,10 +63,10 @@ test('normal → mystery → personal → mystery → original keeps exactly one
   await mystery(page).getByRole('button',{name:'Play mystery',exact:true}).click();
   await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();
   await expect(mystery(page)).toContainText('Measurement sound');
-  await expect(mystery(page).getByRole('link',{name:/NSIDC/})).toHaveAttribute('href','https://doi.org/10.7265/N5K072F8');
+  await expect(mystery(page).getByRole('link',{name:/GISTEMP/})).toHaveAttribute('href','https://data.giss.nasa.gov/gistemp/');
   await mystery(page).getByRole('button',{name:'Open full record',exact:true}).click();
   await closed(page);await noLateNotes(page);
-  await expect(page.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Temperature Through Time',exact:true})).toBeVisible();
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
   await expect(page.locator('.jb-record')).toHaveCount(7);
   await page.getByRole('button',{name:'Your Record',exact:true}).click();
@@ -156,7 +156,7 @@ for(const owner of ['personal','mystery'])test(`leaving Home during ${owner} pla
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
 });
 
-for(const [draw,second] of [[.6,'September 1990'],[.9,'January 1900']] as const)test(`measurement reveal retains ${second} on reveal/Stop; a silent reveal labels the starting point`,async({page})=>{
+for(const [draw,second] of [[.7,'January 1900'],[.9,'January 1900']] as const)test(`measurement reveal retains ${second} on ${draw===.9?'Stop':'reveal'}; a silent reveal labels the starting point`,async({page})=>{
   await setup(page,draw);await openMystery(page);
   await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();
   await expect(mystery(page).locator('.mr-observation-label')).toHaveText('Starting observation · no note heard yet');

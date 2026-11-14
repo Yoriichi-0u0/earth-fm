@@ -1,0 +1,438 @@
+{
+ "title": "Daily Arctic Sea Ice, By Year",
+ "svsId": 5046,
+ "page": "https://svs.gsfc.nasa.gov/5046/",
+ "released": "2022-11-28",
+ "lastUpdated": "2026-04-23",
+ "credits": {
+  "producer": "NASA's Scientific Visualization Studio",
+  "visualizer": "Trent L. Schindler",
+  "data": "JAXA GCOM-W1 \"SHIZUKU\" AMSR2: 10 km daily sea ice concentration (3-day running minimum, drawn where >= 15%) and 89 GHz brightness temperature (ice colour); land: NASA Blue Marble Next Generation (monthly)"
+ },
+ "eic": "Linked from the Earth Information Center Daily Visualizations gallery (see docs/NASA-PUBLISHED-RESOURCE-ALIGNMENT.md).",
+ "retrievedAt": "2026-11-14T23:10:00+08:00",
+ "retrievalNote": "svs.gsfc.nasa.gov refused connections from this network on 14 Nov 2026; every EXR came from the Internet Archive raw (id_) capture of NASA's own URL, listed per frame.",
+ "camera": {
+  "source": "OpenEXR header of every frame (identical in all twelve)",
+  "worldToCamera": [
+   -1.0,
+   -0.0,
+   0.0,
+   0.0,
+   -0.0,
+   -1.0,
+   0.0,
+   0.0,
+   -0.0,
+   -0.0,
+   -1.0,
+   0.0,
+   -1.4197188685631003e-14,
+   5.0083973968974294e-14,
+   185.0,
+   1.0
+  ],
+  "worldToNDC": [
+   -0.8333449959754944,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   -1.4815021753311157,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   -1.0000100135803223,
+   -1.0,
+   -1.1831156307472515e-14,
+   7.419952374959973e-14,
+   184.90185546875,
+   185.0
+  ],
+  "screenWindowWidth": 2.3999664783477783,
+  "clipNear": 0.10000000149011612,
+  "clipFar": 10000.0,
+  "renderer": "Created using: Pixar PhotoRealistic RenderMan 23.5"
+ },
+ "processing": "scripts/svs5046-prepare.sh: sips EXR -> PNG (linear) -> sRGB (matches NASA's arctic_sea_ice.2024001_print.jpg within 2/255 on open ocean) -> 960x540 analysis PNG with colour chunks stripped, and 1600x900 WebP (cwebp q82) for display. No generated imagery.",
+ "derived": {
+  "file": "src/data/arcticIce2024.json",
+  "by": "scripts/svs5046-analyse.ts",
+  "sha256": "a7a05ef908caf170d444a1b08452ebc4272bc8da62bae17f0cc59254931c8ac1"
+ },
+ "frames": [
+  {
+   "date": "2024-01-15",
+   "dayOfYear": 15,
+   "originalFilename": "arctic_sea_ice.2024015.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024015.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250527232209id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024015.exr",
+   "archiveCaptureId": "20250527232209",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 10088962,
+    "sha256": "6df637facac9feb6b3f7b6c69db3e00738754c652aad4a8baff0bad9e1103b1d",
+    "renderedOn": "2024:01:16 14:01:18"
+   },
+   "display": {
+    "file": "2024-01-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 82682,
+    "sha256": "72a1a76f5f11807942dde5a8fd0fddc78ef5f3f59c165d02590f74ae574c3a07"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-01-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 403384,
+    "sha256": "0b7cc75a41748633a784a6e1b36a89aef71d261de9493143c2e02fcdc39ee637"
+   }
+  },
+  {
+   "date": "2024-02-15",
+   "dayOfYear": 46,
+   "originalFilename": "arctic_sea_ice.2024046.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024046.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250205044236id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024046.exr",
+   "archiveCaptureId": "20250205044236",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 9996737,
+    "sha256": "2c92d5fbcc4f1ebc6a5bc20c055644f9df30f6a1421b81b4538beb965a686d41",
+    "renderedOn": "2024:02:16 14:01:20"
+   },
+   "display": {
+    "file": "2024-02-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 82116,
+    "sha256": "23345b2276ffa7e08a664d21a5008396d69a89572b338da40ffa75cc55942c2f"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-02-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 398444,
+    "sha256": "862ec55e453897bfe304055749579e2bc3c078017677e8a00fc913729552ba20"
+   }
+  },
+  {
+   "date": "2024-03-15",
+   "dayOfYear": 75,
+   "originalFilename": "arctic_sea_ice.2024075.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024075.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250523092713id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024075.exr",
+   "archiveCaptureId": "20250523092713",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 9881419,
+    "sha256": "6eb207bbe4a80c03acf8868165f384e9e0ec54997947297fe4bc4d419f24fd92",
+    "renderedOn": "2024:03:16 14:01:30"
+   },
+   "display": {
+    "file": "2024-03-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 82406,
+    "sha256": "1f5b129f6c104799ab379a17f095f57ad6e4c5e8b0b7d253e81b84167881797f"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-03-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 395539,
+    "sha256": "d4bc049269090a1bf0a1d71f9a558ce9299bcdf6a37c386574054924af020a28"
+   }
+  },
+  {
+   "date": "2024-04-15",
+   "dayOfYear": 106,
+   "originalFilename": "arctic_sea_ice.2024106.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024106.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250528040643id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024106.exr",
+   "archiveCaptureId": "20250528040643",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 9679819,
+    "sha256": "e13a4f576fcc8e6c0b5d5c05e5dc6f80c6657563b801895395d37a5d2fd749de",
+    "renderedOn": "2024:04:16 14:01:31"
+   },
+   "display": {
+    "file": "2024-04-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 77370,
+    "sha256": "82307f692b6ca56444135598321e133870ef41a34ccb4646e7e2c2646628d1bb"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-04-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 392361,
+    "sha256": "a63f8520907b37d80ec4a3275d5be54448adafa1d4365a4aa07e62b673b099e3"
+   }
+  },
+  {
+   "date": "2024-05-15",
+   "dayOfYear": 136,
+   "originalFilename": "arctic_sea_ice.2024136.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024136.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250523140832id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024136.exr",
+   "archiveCaptureId": "20250523140832",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 9965569,
+    "sha256": "9cfffbf807a601a0b6a25443493c173cb12837b468445beca25be206191a6ce5",
+    "renderedOn": "2024:05:16 14:01:30"
+   },
+   "display": {
+    "file": "2024-05-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 79758,
+    "sha256": "09b14c43ec9a30227009b6c49b7c0c43bc50a55677703a959e5f812cc01827d3"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-05-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 408175,
+    "sha256": "f39a5f39d14581c9ac70f40cfe822c375f534a06a033383fe61052844331488b"
+   }
+  },
+  {
+   "date": "2024-06-15",
+   "dayOfYear": 167,
+   "originalFilename": "arctic_sea_ice.2024167.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024167.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250607134631id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024167.exr",
+   "archiveCaptureId": "20250607134631",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 10388561,
+    "sha256": "0056b03104da7a8dc89fa7aea755ae81fac3aaba69670a313e25e32f839840c0",
+    "renderedOn": "2024:06:21 15:22:23"
+   },
+   "display": {
+    "file": "2024-06-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 82038,
+    "sha256": "959184d59e50b0bf8effa093d42509da01e3d824a0d197a2ea07b31e2c4dce45"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-06-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 428213,
+    "sha256": "9f081bde27426276b62b212be6f31788f70419854a2e05c2959887f335a6f4b6"
+   }
+  },
+  {
+   "date": "2024-07-15",
+   "dayOfYear": 197,
+   "originalFilename": "arctic_sea_ice.2024197.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024197.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250521134838id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024197.exr",
+   "archiveCaptureId": "20250521134838",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 10477495,
+    "sha256": "cf564bfaf827f3bb972f6654b26a6aaac232797d8c48db224dc3b33fcff9e15e",
+    "renderedOn": "2024:07:16 15:01:34"
+   },
+   "display": {
+    "file": "2024-07-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 77612,
+    "sha256": "d25fa061320c505a05f7e4e47f1f6cb9a6ec0062d5230449489489631ab63236"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-07-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 431295,
+    "sha256": "327ec963ad65d8f2caacef7e45bde3d7d3753ee6057354cba4030f6fbd484557"
+   }
+  },
+  {
+   "date": "2024-08-15",
+   "dayOfYear": 228,
+   "originalFilename": "arctic_sea_ice.2024228.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024228.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20260404034931id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024228.exr",
+   "archiveCaptureId": "20260404034931",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 10434711,
+    "sha256": "8be3ee9edf439ba770299ed3f3c6eee7653ed5923e85db38c87b274dc5f5361e",
+    "renderedOn": "2024:08:16 15:00:51"
+   },
+   "display": {
+    "file": "2024-08-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 78492,
+    "sha256": "83c8a8d0d7428a34b748b25114e35762a1f7b1b4e709b51e9319ea5fc08193c4"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-08-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 432061,
+    "sha256": "757378070f2ef31241254d99f0dd3155abc584e13dc11d12b89a90430f2fda04"
+   }
+  },
+  {
+   "date": "2024-09-15",
+   "dayOfYear": 259,
+   "originalFilename": "arctic_sea_ice.2024259.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024259.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250524092300id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024259.exr",
+   "archiveCaptureId": "20250524092300",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 10253903,
+    "sha256": "a9f47df1e394aa125d26bd63d7444b644ce8b7e7704cbf2516ca974f7dde6211",
+    "renderedOn": "2024:09:16 15:00:54"
+   },
+   "display": {
+    "file": "2024-09-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 86608,
+    "sha256": "443d6b710bd088b49609dec8f23509458631afb6b4f40e62886b0ed5e111dab7"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-09-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 431150,
+    "sha256": "cfdd1bf19a920a7f2cc4701671e4489b3e0cca2cb2d6c21a28497dc5ba77efba"
+   }
+  },
+  {
+   "date": "2024-10-15",
+   "dayOfYear": 289,
+   "originalFilename": "arctic_sea_ice.2024289.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024289.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250519221727id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024289.exr",
+   "archiveCaptureId": "20250519221727",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 10058175,
+    "sha256": "7508784967c355c5cd7b439ef61288f2005dea86b474f8f6967f7a34c1866f89",
+    "renderedOn": "2024:10:16 15:00:58"
+   },
+   "display": {
+    "file": "2024-10-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 86758,
+    "sha256": "63b9027b4f2575797d5208bbf721d38c6f79f885b9da439dbd9e21fdd536dd97"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-10-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 421027,
+    "sha256": "55219fbde67336495ee9568df804d456cf4e1e0ccf71ab2cb89be2d90fb3a5f2"
+   }
+  },
+  {
+   "date": "2024-11-15",
+   "dayOfYear": 320,
+   "originalFilename": "arctic_sea_ice.2024320.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024320.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250701162944id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024320.exr",
+   "archiveCaptureId": "20250701162944",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 9982350,
+    "sha256": "b2970cf1ac326323367bc559c8106e8f27fcb5fe2cf760c4ab1b8f6d071d2ef8",
+    "renderedOn": "2024:11:16 15:00:57"
+   },
+   "display": {
+    "file": "2024-11-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 84134,
+    "sha256": "31d4dc0afdc81c82ae075e01225225dc47109ec9f307778df48a6fd964d3d0d4"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-11-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 407195,
+    "sha256": "fd67f2bf92efcdb4bc7b8877c3382b7fdd44578fb7ffd754cbb4170b3788e605"
+   }
+  },
+  {
+   "date": "2024-12-15",
+   "dayOfYear": 350,
+   "originalFilename": "arctic_sea_ice.2024350.exr",
+   "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024350.exr",
+   "routeUsed": "internet-archive",
+   "archiveUrl": "https://web.archive.org/web/20250518213843id_/https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005046/frames/3840x2160_16x9_30p/arctic/2024/no_dates/arctic_sea_ice.2024350.exr",
+   "archiveCaptureId": "20250518213843",
+   "original": {
+    "width": 3840,
+    "height": 2160,
+    "format": "OpenEXR 2, RGBA half, zips",
+    "bytes": 9855138,
+    "sha256": "0c57234e8e01d21d78dee728f05e8d1d8ce7d2e71d3928e3a4965a1ac2b22863",
+    "renderedOn": "2024:12:16 15:00:57"
+   },
+   "display": {
+    "file": "2024-12-15.webp",
+    "width": 1600,
+    "height": 900,
+    "bytes": 80072,
+    "sha256": "89a0bee7b6ed6f6e7f232845c903d58af1e72287fdd654b2dcd7b5d2e1070d57"
+   },
+   "analysis": {
+    "file": "../../../validation/svs5046/2024-12-15.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 398566,
+    "sha256": "1009d707494a55e184f1ae253a08eea9f88552f006da9fd649f81317dda8e836"
+   }
+  }
+ ]
+}

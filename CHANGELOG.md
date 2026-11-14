@@ -17,9 +17,16 @@ have git tags and GitHub releases. Times are MYT (UTC+8). How to cut a release: 
   [docs/SOURCE-VERIFICATION.md](docs/SOURCE-VERIFICATION.md) (all seven records checked on 14 Nov 2026).
 - CLAUDE.md rule: every pull request updates `[Unreleased]`; every merge to `main` that changes the app cuts a release.
 
-### In progress (branch `claude/arctic-record-nasa`, not merged)
-- Record 06 rebuilt from NASA SVS 5046 (*Daily Arctic Sea Ice*, AMSR2, 2024), replacing the NSIDC-derived
-  Arctic September remix. See the decision log for the source choice.
+- Record 06 **The Ice Year** from NASA SVS 5046 (*Daily Arctic Sea Ice*, JAXA AMSR2, 2024), replacing the
+  NSIDC-derived *Arctic September*. Side A: twelve months, the ice area NASA drew north of 50°N (measured through
+  NASA's own RenderMan camera) sets pitch: 13.6 million km² in March to 3.9 in September. Side B: touch or arrow-key
+  any Arctic place to hear its ice season. [docs/ARCTIC-ICE.md](docs/ARCTIC-ICE.md).
+- **About this sound (5W1H)** under every record: What, Who, When, Where, Why and How, from each record's
+  provenance (`src/data/soundStories.ts`).
+
+### Removed
+- *Arctic September* from the shelf, the jukebox data deck and Mystery Record (Mystery now draws from Climate Spiral,
+  Moving Earth and Temperature Through Time). The NSIDC series stays only in the Arctic guided story.
 
 ## [7.0.0] - 2026-11-14 22:58 · PR #27 · live
 

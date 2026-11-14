@@ -25,7 +25,7 @@ Every NASA visualization is a **record**. Side A turns the picture's pixels into
 | 03 | **The Air We Share** | SVS 5669, GEOS Aerosols | Four aerosols become four instruments on a mixing desk while a Three.js Earth turns under the needle; Side B plays NASA's six stories |
 | 04 | **Currents of Heat** | SVS 3912, ECCO2 currents and temperature | Each current's colour read back to °C on NASA's numeric scale: pole to pole, warm water high; touch any place to hear its temperature |
 | 05 | Moving Earth | EIC exhibit animation | Video pixels resampled on every note |
-| 06 | Arctic September | NSIDC Sea Ice Index | September extent → pitch (measurements) |
+| 06 | **The Ice Year** | SVS 5046, Daily Arctic Sea Ice (JAXA AMSR2, 2024; EIC daily visualizations) | A: each month's ice area, measured on NASA's globe through NASA's own camera, sets pitch: the Arctic shrinks to a September low and returns. B: touch any place to hear its ice season |
 | 07 | Temperature Through Time | NASA GISS GISTEMP v4 | The Side B measurements on their own |
 
 **The Air We Share** is the headline. NASA describes this resource as suited to *multi-track experimentation*, so TerraJuke reads NASA's colour bar from NASA's own image and gives each aerosol an instrument: smoky brass (fire smoke), desert strings (dust), an ocean bed (sea salt) and glass bells (sulfate). Earth is literally the record. Each slice of longitude that turns under the needle is one step of the groove: how much of each aerosol sets loudness, where it sits north or south sets pitch, and where there is none the instrument rests. Over Africa all four play at once. Mute or solo any track to pick out the Saharan dust river or the smoke from southern Africa. Side B tells NASA's own six stories, from Hurricane Erin's sea-salt spirals to Kilauea's sulfate stream.
@@ -65,4 +65,4 @@ Each record states its limits: pixels are not measurements; GEOS is a model anal
 
 ## Credits
 
-NASA Scientific Visualization Studio; NASA Global Modeling and Assimilation Office; NASA GISS; NASA/NOAA Suomi NPP VIIRS and Black Marble; NSIDC. Visualizers and scientists are credited in each record's liner notes and in `public/nasa/*/provenance.json`. TerraJuke is an independent project and does not imply NASA endorsement. Built with React, Three.js (react-three-fiber), Anime.js and the Web Audio API; developed with AI assistance (Claude Code).
+NASA Scientific Visualization Studio; NASA Global Modeling and Assimilation Office; NASA GISS; NASA/NOAA Suomi NPP VIIRS and Black Marble; JAXA GCOM-W1 AMSR2 (sea ice in SVS 5046); NSIDC (the Arctic guided story). Visualizers and scientists are credited in each record's liner notes and in `public/nasa/*/provenance.json`. TerraJuke is an independent project and does not imply NASA endorsement. Built with React, Three.js (react-three-fiber), Anime.js and the Web Audio API; developed with AI assistance (Claude Code).

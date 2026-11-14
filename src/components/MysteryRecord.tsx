@@ -38,7 +38,7 @@ function VisualRound(props:RoundProps){
 
 function MeasurementRound(props:RoundProps){
   const {record,volume}=props;
-  const sequence=useMemo(()=>measurementSequence(record.id==='arctic'?'arctic':'temperature'),[record.id]);
+  const sequence=useMemo(()=>measurementSequence('temperature'),[]);
   const audio=useSequenceTransport<(typeof sequence.points)[number]>();
   // Stop clears the transport readout. Keep only committed observations for reveal.
   const [lastHeard,setLastHeard]=useState<(typeof sequence.points)[number]|null>(null);
@@ -60,7 +60,7 @@ function MysteryRound({record,motion,volume,onVolume,onOpen,onNext,playback,sour
   function play(){if(document.hidden)return;setAttempted(true);setLimited(false);playback.start();}
   function reveal(){playback.stop();setRevealed(true);}
   const status=playback.error?'This record could not play. Try again, reveal its source, or choose another mystery.':playback.starting?'Starting sound…':playback.active?'Listening…':limited?'Excerpt stopped. Replay or reveal its source.':attempted?'Ready to replay':'Ready to listen';
-  const explanation=record.id==='spiral'?'You heard the Climate Spiral picture: brightness sets pitch, colour shapes timbre, and horizontal position sets stereo pan. The pixels are not monthly temperature measurements.':record.id==='motion'?'Changing pixels in an archived animation shape pitch, timbre and stereo pan. With motion off, a still frame is used. This is not a live measurement feed.':record.id==='arctic'?'Twelve selected September mean extents, in million km², set pitch through fixed sea-ice bands. These are project-derived NSIDC means. Accompaniment is musical arrangement, not extra observations.':'Twelve selected January anomalies, in °C relative to 1951–1980, set pitch through fixed temperature bands. Selected years are not a continuous timeline. Accompaniment is musical arrangement, not extra observations.';
+  const explanation=record.id==='spiral'?'You heard the Climate Spiral picture: brightness sets pitch, colour shapes timbre, and horizontal position sets stereo pan. The pixels are not monthly temperature measurements.':record.id==='motion'?'Changing pixels in an archived animation shape pitch, timbre and stereo pan. With motion off, a still frame is used. This is not a live measurement feed.':'Twelve selected January anomalies, in °C relative to 1951–1980, set pitch through fixed temperature bands. Selected years are not a continuous timeline. Accompaniment is musical arrangement, not extra observations.';
   return <section className={`mr-record${motion?'':' mr-quiet'}`} aria-labelledby="mr-title" data-mystery-phase={revealed?'revealed':'concealed'}>
     <header className="mr-heading"><div><p>TerraJuke / ?</p><h2 id="mr-title" ref={heading} tabIndex={-1}>{t('Mystery Record')}</h2></div><span className="mr-live"><i aria-hidden="true"/>{t('GENERATED LIVE')}</span></header>
     {!revealed&&<div className="mr-sleeve">

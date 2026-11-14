@@ -28,9 +28,9 @@ test('Play the whole jukebox starts record 1 by itself, and Stop, Escape or choo
 
   await start.click();
   await expect(bar).toBeVisible();
-  await page.getByRole('button', { name: 'Select record: Arctic September' }).click();
+  await page.getByRole('button', { name: 'Select record: The Ice Year' }).click();
   await expect(bar).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'Arctic September', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The Ice Year', exact: true })).toBeVisible();
 });
 
 test('when a record finishes, the show hands over to the next one and plays it', { tag: ['@full', '@timing'] }, async ({ page }) => {

@@ -45,12 +45,12 @@ export default defineConfig({
     // (see docs/EXPERIENCE-VALIDATION.md), so they stay Chromium-only.
     ...(process.env.PLAYWRIGHT_DEVICES === '1'
       ? [
-          { name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts', '**/nightLights.e2e.spec.ts','**/air.e2e.spec.ts','**/home.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } },
+          { name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts', '**/nightLights.e2e.spec.ts','**/air.e2e.spec.ts','**/home.e2e.spec.ts','**/ice.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } },
           ...([
             ['webkit-iphone-se', 'iPhone SE'], ['webkit-iphone-pro-max', 'iPhone 15 Pro Max'], ['webkit-iphone-landscape', 'iPhone 13 landscape'],
             ['webkit-ipad', 'iPad (gen 7)'], ['webkit-ipad-pro-landscape', 'iPad Pro 11 landscape'], ['webkit-desktop', 'Desktop Safari'],
             ['android-pixel', 'Pixel 7'], ['android-small', 'Galaxy S9+'], ['android-tablet', 'Galaxy Tab S4'],
-          ] as const).map(([name, device]) => ({ name, testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts','**/home.e2e.spec.ts'], use: { ...devices[device], launchOptions: {} } })),
+          ] as const).map(([name, device]) => ({ name, testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts','**/home.e2e.spec.ts','**/ice.e2e.spec.ts'], use: { ...devices[device], launchOptions: {} } })),
         ]
       : []),
     // Opt-in installed browsers (PLAYWRIGHT_BRANDS=1): the real Google Chrome and Microsoft Edge apps on this machine.
