@@ -22,7 +22,7 @@ const now = (page: Page) => page.evaluate(() => performance.now());
 const caption = (page: Page) => page.getByTestId('nl-caption');
 
 async function openNightLights(page: Page, decade = false): Promise<void> {
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button', { name: 'Select record: Night Lights' }).click();
   await expect(page.getByRole('heading', { name: 'Night Lights' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'India', exact: true })).toBeEnabled({ timeout: 15_000 });
@@ -165,7 +165,7 @@ test('tempo and beats per bar change timing and accents only: 60 BPM, 3 per bar,
 });
 
 test('the 3D jukebox follows the chosen record and knows when it plays; it is hidden from assistive technology', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/listen');
   const stage = page.locator('.jb-stage');
   await expect(stage).toHaveAttribute('data-stage-selected', 'spiral');
   await expect(stage).toHaveAttribute('aria-hidden', 'true');

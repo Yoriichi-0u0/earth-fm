@@ -37,7 +37,7 @@ async function audit(page:Page){
 }
 
 test('PNG, JPEG and WebP make an explicitly personal record; native chooser remains single-file',async({page})=>{
-  await page.goto('/');
+  await page.goto('/listen');
   const chooser=page.waitForEvent('filechooser');await page.getByRole('button',{name:'Choose image',exact:true}).click();const fileChooser=await chooser;expect(fileChooser.isMultiple()).toBe(false);await fileChooser.setFiles(fixture());
   await expect(page.getByRole('heading',{name:'Your Record',exact:true})).toBeVisible();
   await expect(page.locator('.jb-deck .jb-art-label')).toContainText('YOUR IMAGE');
@@ -55,7 +55,7 @@ test('PNG, JPEG and WebP make an explicitly personal record; native chooser rema
 });
 
 test('bad signatures, size, geometry, animation and native decode errors recover without replacing the old image',async({page})=>{
-  await audit(page);await page.goto('/');await upload(page);const original=await page.locator('.jb-media img').getAttribute('src');
+  await audit(page);await page.goto('/listen');await upload(page);const original=await page.locator('.jb-media img').getAttribute('src');
   const huge=Buffer.from(readFileSync(fixture()));huge.writeUInt32BE(20000,16);
   const animated=Buffer.from(readFileSync(fixture()));animated.write('acTL',37);
   const invalid=Buffer.alloc(57);Buffer.from([137,80,78,71,13,10,26,10]).copy(invalid);invalid.writeUInt32BE(13,8);invalid.write('IHDR',12);invalid.writeUInt32BE(32,16);invalid.writeUInt32BE(32,20);invalid.write('IDAT',37);invalid.write('IEND',49);
@@ -75,22 +75,22 @@ test('bad signatures, size, geometry, animation and native decode errors recover
 });
 
 test('a first-image error has a direct retry; empty MIME is sniffed and the new record receives keyboard focus',async({page})=>{
-  await page.goto('/');await input(page).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('broken')});
+  await page.goto('/listen');await input(page).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('broken')});
   await expect(page.locator('.jb-player').getByRole('alert')).toContainText('Choose a PNG');await expect(page.getByRole('button',{name:'Choose another image',exact:true})).toBeVisible();
   const chooser=page.waitForEvent('filechooser');await page.getByRole('button',{name:'Choose another image',exact:true}).click();await (await chooser).setFiles(fixture());
   await expect(page.getByRole('heading',{name:'Your Record',exact:true})).toBeFocused();await expect(page.getByRole('alert')).toHaveCount(0);
   await input(page).setInputFiles({name:'no-mime',mimeType:'',buffer:readFileSync(fixture())});await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
-  await expect(page.getByRole('link',{name:'Browse Earth stories',exact:true})).toHaveAttribute('href','/listen?station=all');
+  await expect(page.getByRole('link',{name:'Browse Earth stories',exact:true})).toHaveAttribute('href','/listen');
 });
 
 test('a failed replacement preserves the image but deliberately clears the old take',{tag:'@timing'},async({page})=>{
-  await page.goto('/');await upload(page);const source=await page.locator('.jb-media img').getAttribute('src');await scratch(page);await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('20');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
+  await page.goto('/listen');await upload(page);const source=await page.locator('.jb-media img').getAttribute('src');await scratch(page);await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('20');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
   await input(page).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('broken')});await expect(page.getByRole('alert')).toContainText('Its take has been cleared.');await expect(page.locator('.jb-media img')).toHaveAttribute('src',source!);
   await scratch(page);await expect(loop(page)).toHaveAttribute('data-loop-count','0');await expect(loop(page).getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
 });
 
 test('record and replay use the same notes; replacing even the same file cancels the take and closes the old audio',{tag:'@timing'},async({page})=>{
-  await audit(page);await page.goto('/');await upload(page);await scratch(page);
+  await audit(page);await page.goto('/listen');await upload(page);await scratch(page);
   await warmInstrument(page);await page.evaluate(()=>window.personalAudit.notes.splice(0));
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();
   for(const [i,position] of ['12','31','7'].entries()){await slider(page).fill(position);await expect(loop(page)).toHaveAttribute('data-loop-count',String(i+1));await page.waitForTimeout(160);}
@@ -108,7 +108,7 @@ test('record and replay use the same notes; replacing even the same file cancels
 });
 
 test('rapid replacement, Remove, navigation and late image callbacks cannot restore a stale source',async({page})=>{
-  await audit(page);await page.goto('/');await upload(page);
+  await audit(page);await page.goto('/listen');await upload(page);
   await page.evaluate(()=>{window.personalAudit.holdImages=true;});
   await input(page).setInputFiles(fixture('jpg'));await expect(page.locator('.jb-personal-loading')).toBeVisible();await expect.poll(()=>page.evaluate(()=>window.personalAudit.late.length)).toBe(1);
   await page.evaluate(()=>{window.personalAudit.holdImages=false;});await upload(page,fixture('webp'));const winner=await page.locator('.jb-media img').getAttribute('src');
@@ -123,14 +123,14 @@ test('rapid replacement, Remove, navigation and late image callbacks cannot rest
 });
 
 test('a decode timeout releases its URL and choosing a curated record cancels pending decoding',async({page})=>{
-  await audit(page);await page.goto('/');await page.clock.install();await page.evaluate(()=>{window.personalAudit.holdImages=true;});await input(page).setInputFiles(fixture());await expect.poll(()=>page.evaluate(()=>window.personalAudit.late.length)).toBe(1);
+  await audit(page);await page.goto('/listen');await page.clock.install();await page.evaluate(()=>{window.personalAudit.holdImages=true;});await input(page).setInputFiles(fixture());await expect.poll(()=>page.evaluate(()=>window.personalAudit.late.length)).toBe(1);
   await page.clock.runFor(10_050);await expect(page.getByRole('alert')).toContainText('could not be opened');await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
   await input(page).setInputFiles(fixture());await expect(page.locator('.jb-personal-loading')).toBeVisible();await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).click();await page.evaluate(()=>{window.personalAudit.late.splice(0).forEach(fn=>fn());});
   await expect(page.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
 });
 
 test('pending audio startup and pending replay are cancelled when the personal source changes',{tag:'@timing'},async({page})=>{
-  await audit(page);await page.goto('/');await upload(page);await scratch(page);
+  await audit(page);await page.goto('/listen');await upload(page);await scratch(page);
   await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('12');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
   await page.evaluate(()=>{window.personalAudit.delayAudio=true;for(const context of window.personalAudit.contexts)if(context.state==='running')void context.suspend();});
   await loop(page).getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop(page)).toHaveAttribute('data-loop-phase','preparing');
@@ -143,7 +143,7 @@ test('pending audio startup and pending replay are cancelled when the personal s
 test('the image, filename and take stay out of storage and outbound requests; navigation and reload forget them',{tag:'@timing'},async({page})=>{
   await audit(page);const requests:{url:string;method:string;body:string|null}[]=[];
   page.on('request',request=>{if(!request.url().startsWith('blob:'))requests.push({url:request.url(),method:request.method(),body:request.postData()});});
-  await page.goto('/');await expect(page.getByRole('button',{name:'Choose image',exact:true})).toBeVisible();
+  await page.goto('/listen');await expect(page.getByRole('button',{name:'Choose image',exact:true})).toBeVisible();
   // The 3D jukebox fetches its public label images once; wait for them before the no-requests baseline.
   await expect(page.locator('.jb-stage')).toHaveAttribute('data-stage-labels','loaded',{timeout:15000});
   const storage=()=>page.evaluate(async()=>({local:{...localStorage},session:{...sessionStorage},databases:await indexedDB.databases(),caches:await caches.keys()}));const before=await storage();requests.length=0;
@@ -158,7 +158,7 @@ test('the image, filename and take stay out of storage and outbound requests; na
 test('personal touch dragging scans the visible image while vertical gestures scroll and cancel audio',{tag:'@timing'},async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
-    await page.goto(new URL('/',test.info().project.use.baseURL).href);await upload(page);await scratch(page);
+    await page.goto(new URL('/listen',test.info().project.use.baseURL).href);await upload(page);await scratch(page);
     const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!,cdp=await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.3,y:bounds.y+bounds.height*.5,id:1}]});
     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.7,y:bounds.y+bounds.height*.5,id:1}]});
@@ -173,7 +173,7 @@ test('personal touch dragging scans the visible image while vertical gestures sc
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} personal record fits phone and tablet, and preserves a take through appearance changes`,{tag:['@full','@timing']},async({page})=>{
-  test.setTimeout(60_000);await audit(page);await page.goto('/');await chooseAppearance(page,theme);await upload(page);
+  test.setTimeout(60_000);await audit(page);await page.goto('/listen');await chooseAppearance(page,theme);await upload(page);
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   const count=await page.evaluate(()=>window.personalAudit.contexts.length);await chooseAppearance(page,theme==='light'?'dark':'light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);expect(await page.evaluate(()=>window.personalAudit.contexts.length)).toBe(count);await page.getByRole('button',{name:'Stop',exact:true}).click();await scratch(page);
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('31');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();

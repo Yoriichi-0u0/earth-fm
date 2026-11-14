@@ -11,7 +11,7 @@ const loop=(page:Page)=>page.getByRole('region',{name:'Earth Looper',exact:true}
 
 for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refinement comparison`,{tag:'@full'},async({page})=>{
   const layouts:unknown[]=[];
-  await page.goto('/');await chooseAppearance(page,theme);
+  await page.goto('/listen');await chooseAppearance(page,theme);
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();await page.locator('.jb-groove-key>details>summary').click();
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
     await page.setViewportSize(viewport);
@@ -49,11 +49,11 @@ async function setup(page:Page){
     const read=CanvasRenderingContext2D.prototype.getImageData;
     CanvasRenderingContext2D.prototype.getImageData=function(...args:Parameters<typeof read>){audit.reads++;return read.apply(this,args);};
   });
-  await page.goto('/');await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  await page.goto('/listen');await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
 }
 
 for(const theme of ['light','dark'] as const)test(`${theme} Climate vinyl visual comparison on desktop and phone`,{tag:'@full'},async({page})=>{
-  await page.goto('/');await chooseAppearance(page,theme);
+  await page.goto('/listen');await chooseAppearance(page,theme);
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
     await page.setViewportSize(viewport);
@@ -135,7 +135,7 @@ test('late audio startup, hidden tabs and navigation cannot drive a stale engrav
 });
 
 test('an unavailable image has no invented grooves while Side B keeps real observations',async({page})=>{
-  await page.route('**/frames/climate-spiral-svs5190-2026-10-18.jpg',route=>route.abort());await page.goto('/');
+  await page.route('**/frames/climate-spiral-svs5190-2026-10-18.jpg',route=>route.abort());await page.goto('/listen');
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeDisabled();await expect(page.locator('.jb-error')).toBeVisible();await expect(print(page)).toHaveCount(0);
   await expect(page.locator('.jb-groove-key')).toContainText('when the decoded strips are ready');
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await expect(print(page)).toHaveAttribute('data-groove-count','12');

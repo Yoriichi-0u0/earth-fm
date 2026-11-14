@@ -6,7 +6,7 @@ const events = (page: Page) => page.evaluate(() => window.terrajukeOcean?.events
 const announcer = (page: Page) => page.getByTestId('ocean-announcer');
 
 async function openOcean(page: Page): Promise<void> {
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button', { name: 'Select record: Currents of Heat' }).click();
   await expect(page.getByRole('heading', { name: 'Currents of Heat', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Play pole to pole' })).toBeEnabled({ timeout: 20_000 });

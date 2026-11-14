@@ -20,7 +20,7 @@ async function setup(page:Page,draw=0){
         osc.frequency.setValueAtTime=(hz,at)=>{mapped=hz;return set(hz,at);};osc.start=(when)=>{audit.notes.push(mapped??osc.frequency.value);start(when);};return osc;}
     };
   },draw);
-  await page.goto('/');
+  await page.goto('/listen');
 }
 async function open(page:Page){await page.getByRole('button',{name:'Open Mystery Record',exact:true}).click();await expect(mystery(page)).toHaveAttribute('data-mystery-phase','concealed');await expect(play(page)).toBeEnabled();}
 async function noPrematureIdentity(page:Page){

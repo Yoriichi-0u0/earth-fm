@@ -29,3 +29,8 @@
 :is(.ss,html) .jb-show-bar button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#ffffff1f;color:#fff;font:600 13px/1 -apple-system,system-ui,sans-serif;cursor:pointer}
 :is(.ss,html) .jb-show-bar button:hover{background:#ffffff2e}
 @media(prefers-reduced-motion:reduce){:is(.ss,html) .jb-show-start{transition:none}}
+/* "Guide me" sits beside "Browse records" under the intro. */
+.ss.ss-pages .jb-intro>p>span.jb-intro-links{display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;margin-top:6px}
+.ss.ss-pages .jb-intro-links .jb-shelf-link{margin:0}
+.ss.ss-pages .jb-guide-start{display:inline-flex;align-items:center;gap:.4em;min-height:44px;padding:0;border:0;background:none;color:var(--ef-accent);font-size:.86rem;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.ss.ss-pages .jb-guide-start[aria-pressed=true]{color:var(--ef-text);background:none}

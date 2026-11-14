@@ -31,6 +31,6 @@ test('Arctic trace preserves full source precision and exports the exact mapped 
  const missing=arcticCsv([{year:2023,month:9,period:'2023-09',value:null}]);assert.match(missing,/2023-09,,,,,arctic-september-fixed-v1,missing/);
 });
 test('Station deep links remain inside the existing five pages',()=>{
- assert.equal(pageUrl('listen','arctic'),'/listen?station=arctic');assert.equal(pageUrl('listen','all'),'/listen?station=all');
- assert.equal(pageUrl('listen','climate','motion'),'/listen?visual=motion');assert.equal(pageUrl('data','arctic'),'/data?station=arctic');assert.equal(pageUrl('home','arctic'),'/');
+ assert.equal(pageUrl('listen','arctic'),'/listen?station=arctic');assert.equal(pageUrl('listen','all'),'/listen');assert.equal(pageUrl('listen'),'/listen');assert.equal(pageUrl('listen','climate'),'/listen?station=climate');
+ assert.equal(pageUrl('listen','climate','motion'),'/listen?station=climate&visual=motion');assert.equal(pageUrl('data','arctic'),'/data?station=arctic');assert.equal(pageUrl('home','arctic'),'/');
 });

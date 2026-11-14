@@ -40,7 +40,7 @@ async function setup(page:Page,draw=.6){
       set src(value:string){if(value.startsWith('blob:')&&audit.holdImages){const callback=this.onload;audit.loads.push(()=>callback?.call(this,new Event('load')));return;}super.src=value;}
     };
   },draw);
-  await page.goto('/');
+  await page.goto('/listen');
 }
 async function closed(page:Page){await expect.poll(()=>page.evaluate(()=>window.integrationAudit.contexts.every(c=>c.state==='closed'))).toBe(true);}
 async function noLateNotes(page:Page){const count=await page.evaluate(()=>window.integrationAudit.notes);await page.waitForTimeout(650);expect(await page.evaluate(()=>window.integrationAudit.notes)).toBe(count);}
