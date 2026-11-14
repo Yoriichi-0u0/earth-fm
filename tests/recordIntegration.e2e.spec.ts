@@ -66,7 +66,7 @@ test('normal → mystery → personal → mystery → original keeps exactly one
   await closed(page);await noLateNotes(page);
   await expect(page.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
-  await expect(page.locator('.jb-record')).toHaveCount(4);
+  await expect(page.locator('.jb-record')).toHaveCount(5);
   await page.getByRole('button',{name:'Your Record',exact:true}).click();
   await expect(page.locator('.jb-media img')).toHaveAttribute('src',url!);
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);

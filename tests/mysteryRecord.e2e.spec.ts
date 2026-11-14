@@ -33,7 +33,7 @@ for(const [index,title] of recordTitles.entries())test(`${title} stays concealed
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   const chunks:string[]=[];page.on('request',r=>{if(r.url().includes('/MysteryRecord'))chunks.push(r.url());});
   await setup(page,(index+.1)/4);await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();expect(chunks).toEqual([]);
-  const record=await page.evaluate(async index=>{const path='/src/data/jukeboxRecords.ts';return (await import(path)).jukeboxRecords[index];},index);
+  const record=await page.evaluate(async index=>{const path='/src/data/jukeboxRecords.ts';return (await import(path)).mysteryRecords[index];},index);
   await page.getByRole('button',{name:'Select record: '+record.title,exact:true}).click();await page.getByRole('button',{name:'Play record',exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.notes.length)).toBeGreaterThanOrEqual(5);
   const normal=await page.evaluate(()=>window.mysteryAudit.notes.slice(0,5));await page.getByRole('button',{name:'Stop',exact:true}).click();

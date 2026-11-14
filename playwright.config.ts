@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['**/e2e.spec.ts','**/appearance.e2e.spec.ts','**/personalRecord.e2e.spec.ts','**/mysteryRecord.e2e.spec.ts','**/recordIntegration.e2e.spec.ts','**/grooveprint.e2e.spec.ts','**/climateSpiralFirstVisit.e2e.spec.ts'],
+  testMatch: ['**/e2e.spec.ts','**/appearance.e2e.spec.ts','**/personalRecord.e2e.spec.ts','**/mysteryRecord.e2e.spec.ts','**/recordIntegration.e2e.spec.ts','**/grooveprint.e2e.spec.ts','**/climateSpiralFirstVisit.e2e.spec.ts','**/nightLights.e2e.spec.ts'],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -30,7 +30,7 @@ export default defineConfig({
     // (see docs/EXPERIENCE-VALIDATION.md), so they stay Chromium-only.
     ...(process.env.PLAYWRIGHT_DEVICES === '1'
       ? [
-          { name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } },
+          { name: 'webkit-iphone', testMatch: ['**/climateSpiralFirstVisit.e2e.spec.ts', '**/grooveprint.e2e.spec.ts', '**/nightLights.e2e.spec.ts'], grepInvert: /at six viewports/, use: { ...devices['iPhone 13'], launchOptions: {} } },
           ...([
             ['webkit-iphone-se', 'iPhone SE'], ['webkit-iphone-pro-max', 'iPhone 15 Pro Max'], ['webkit-iphone-landscape', 'iPhone 13 landscape'],
             ['webkit-ipad', 'iPad (gen 7)'], ['webkit-ipad-pro-landscape', 'iPad Pro 11 landscape'], ['webkit-desktop', 'Desktop Safari'],

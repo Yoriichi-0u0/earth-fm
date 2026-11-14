@@ -1,20 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {chooseMysteryRecord} from '../src/lib/mysteryRecord';
-import {jukeboxRecords} from '../src/data/jukeboxRecords';
+import {mysteryRecords as jukeboxRecords} from '../src/data/jukeboxRecords';
 import {measurementSequence,mapRecordPoint} from '../src/lib/jukeboxData';
 import {arcticStory,mapArctic} from '../src/data/earthStations';
 import {storyPoints} from '../src/data/guidedStory';
 import {mapData} from '../src/lib/symphony';
 
 test('the first mystery can select every curated record without inventing a new source',()=>{
-  assert.deepEqual([0,.25,.5,.999999].map(draw=>chooseMysteryRecord(undefined,()=>draw)),jukeboxRecords);
+  const n=jukeboxRecords.length;
+  assert.deepEqual(jukeboxRecords.map((_,k)=>chooseMysteryRecord(undefined,()=>(k+.5)/n)),jukeboxRecords);
   for(const value of [NaN,Infinity,-.1,1])assert.throws(()=>chooseMysteryRecord(undefined,()=>value),RangeError);
 });
 test('another mystery never immediately repeats the previous record, including selection boundaries',()=>{
   for(const previous of jukeboxRecords){
-    const chosen=[0,1/3,.999999].map(draw=>chooseMysteryRecord(previous.id,()=>draw));
-    assert.equal(new Set(chosen.map(record=>record.id)).size,3);
+    const others=jukeboxRecords.length-1;
+    const chosen=Array.from({length:others},(_,k)=>chooseMysteryRecord(previous.id,()=>(k+.5)/others));
+    assert.equal(new Set(chosen.map(record=>record.id)).size,others);
     assert.ok(chosen.every(record=>record!==previous));
   }
 });

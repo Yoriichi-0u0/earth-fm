@@ -223,4 +223,34 @@ export const DECADE_MAPPING_TABLE = [
   ['A year with nothing brighter than the base map', 'A rest (silence)'],
   ['Brighter / dimmer / similar to the year before (±5 %)', 'Purple / orange / white ring, and the matching vibration'],
   ['After 2023: NASA’s change map for the same place', 'The change-map figure: rising pair, falling pair or single tone'],
+  ['Tempo (BPM) and beats per bar: your musical choice', 'Time between years, and an accent (plus an optional click) on the first beat of each bar. They never change a year’s note'],
 ] as const;
+
+// ---- Tempo and meter (musical choices, never data) ------------------------------------
+// One year per beat. Tempo sets the time between years; beats per bar groups the years and
+// accents the first beat of each bar. Neither changes which note a year plays.
+export const DEFAULT_BPM = 120;
+export const MIN_BPM = 60;
+export const MAX_BPM = 180;
+export const METERS = [2, 3, 4, 6] as const;
+export type Meter = (typeof METERS)[number];
+/** The downbeat is this much louder (capped at full loudness); its pitch is unchanged. */
+export const ACCENT_GAIN = 1.25;
+
+export const clampBpm = (bpm: number) => Math.max(MIN_BPM, Math.min(MAX_BPM, Math.round(bpm)));
+/** Milliseconds between years at this tempo (500 ms at the default 120 BPM). */
+export const beatMs = (bpm: number) => 60000 / clampBpm(bpm);
+
+export function beatPosition(index: number, beatsPerBar: Meter): { bar: number; beat: number; downbeat: boolean } {
+  return { bar: Math.floor(index / beatsPerBar) + 1, beat: (index % beatsPerBar) + 1, downbeat: index % beatsPerBar === 0 };
+}
+
+/** The same notes, shortened to fit a fast beat and louder on a downbeat. Pitch never changes. */
+export function rhythmPlan(plan: NotePlan, downbeat: boolean, bpm: number): NotePlan {
+  const duration = Math.min(YEAR_NOTE_SECONDS, (beatMs(bpm) / 1000) * 0.7);
+  return {
+    ...plan,
+    gain: downbeat ? Math.min(1, plan.gain * ACCENT_GAIN) : plan.gain,
+    notes: plan.notes.map((n) => ({ ...n, duration: Math.min(n.duration, duration) })),
+  };
+}

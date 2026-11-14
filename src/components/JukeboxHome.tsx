@@ -14,6 +14,8 @@ import {useStudioLanguage} from '../lib/studioLanguage';
 import {goToPage,pageUrl} from '../lib/studioRouter';
 import type {RecordSide,RecordSignal} from '../lib/recordSignal';
 import EarthRecord from './EarthRecord';
+import DeckConsole from './DeckConsole';
+import type {DeckState,VisualRecord} from './DeckConsole';
 import {GrooveprintKey} from './Grooveprint';
 import {imageGrooveprint,measurementGrooveprint} from '../lib/grooveprint';
 import ScratchScanner from './ScratchScanner';
@@ -29,30 +31,7 @@ import './TerraJukeExperience.css';
 const noop=()=>{};
 const EarthGlobe=lazy(()=>import('./EarthGlobe'));
 const MysteryRecord=lazy(()=>import('./MysteryRecord'));
-type DeckState={playing:boolean;starting:boolean;ready:boolean;completed:boolean;progress:number;note:string;frequency:string;position:string;input:string;onPlay:()=>void;signal:RecordSignal;requestAt:number;error?:string;playLabel?:string;manual?:boolean};
-type VisualRecord=Omit<JukeboxRecord,'id'|'frame'|'sourceUrl'>&{id:JukeboxRecordId|'personal';sourceUrl?:string;frame?:{imageUrl:string;videoUrl?:string;description:string}};
-type ConsoleProps=DeckState&{record:VisualRecord;artwork:ReactNode;volume:number;onVolume:(value:number)=>void;extra?:ReactNode;side?:RecordSide;sideControls?:ReactNode;recordObject?:ReactNode;recordNote?:ReactNode;performanceControls?:ReactNode};
-
-function DeckConsole({record,artwork,playing,starting,ready,completed,progress,note,frequency,position,input,onPlay,volume,onVolume,error,extra,side,sideControls,recordObject,recordNote,signal,requestAt,playLabel,manual,performanceControls}:ConsoleProps){
-  const {t}=useStudioLanguage();const active=playing||starting;
-  return <article className={`jb-deck ${active?'is-playing':''}${side?' jb-two-sided':''}${manual?' jb-manual':''}`} aria-labelledby="jb-record-title" data-record-kind={record.kind} data-record-side={side} data-play-mode={manual?'manual':'automatic'} data-note-serial={signal.event?.serial??0} data-note-at={signal.event?.at??0} data-play-request-at={requestAt} data-frequency={signal.frequency??''}>
-    <header className="jb-deck-header">
-      <div className="jb-record-heading"><h2 id="jb-record-title" tabIndex={-1}>{t(record.title)}</h2></div>
-      <span className="jb-state" role="status"><i className={active?'is-on':''}/>{t(!ready?(error?'Visual unavailable':'Loading…'):starting?'Starting…':playing?'Now playing':completed?'Finished':'Ready to play')}</span>
-    </header>
-    <div className="jb-transport"><button className="jb-play" type="button" disabled={!ready} onClick={onPlay}>{active?<Square size={17} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}<span>{t(active?'Stop':playLabel??'Play record')}</span></button><label className="jb-volume"><Volume2 size={18}/><span className="sr-only">{t('Jukebox volume')}</span><input type="range" min="0" max="1" step=".01" value={volume} onChange={e=>onVolume(Number(e.target.value))}/></label></div>
-    <div className="jb-progress-row"><progress aria-label={t(manual?'Scan position':'Record progress')} max="1" value={progress}/><span>{t(completed?'Complete':record.kind==='visual'?'48 visual strips':'12 observations')}<b>{manual?t('Your pace'):<>~25 {t('seconds')}</>}</b></span></div>
-    {sideControls}
-    <div className={`jb-artwork${recordObject?' jb-artwork-paired':''}`}>{recordObject}<div className="jb-science-window">{artwork}</div></div>
-    {performanceControls}
-    <dl className="jb-readout"><div><dt>{t(record.kind==='visual'?'PIXEL INPUT':'OBSERVATION')}</dt><dd>{input}</dd></div><div><dt>{t('GENERATED NOTE')}</dt><dd className="jb-note">{note}<small>{frequency}</small></dd></div><div><dt>{t(record.kind==='visual'?'SCAN POSITION':'RECORD POSITION')}</dt><dd>{position}</dd></div></dl>
-    {recordNote}
-    {extra}
-    <div className="jb-source"><div className="jb-source-line"><span>{t(record.kind==='visual'?'Visual sound':'Measurement sound')}</span>{record.sourceUrl?<a href={record.sourceUrl} target="_blank" rel="noreferrer">{t(record.source)} <ArrowUpRight size={13}/></a>:<span>{t(record.source)}</span>}</div><p>{t(record.meaning)}</p>{side&&<p className="jb-side-provenance">{t('Related sources, different transformations. The image and observations are not matched frame by frame.')}</p>}</div>
-    {error&&<p className="jb-error" role="alert">{t(error)}</p>}
-  </article>;
-}
-
+const NightLightsDeck=lazy(()=>import('./NightLightsDeck'));
 function useVisualRecord(record:VisualRecord,motion:boolean,volume:number){
   const {t}=useStudioLanguage();const [animate,setAnimate]=useState(true),[requestAt,setRequestAt]=useState(0);
   const frame=record.frame!;
@@ -199,14 +178,14 @@ export default function JukeboxHome({motion}:{motion:boolean}){
     <div className="jb-layout">
       <div className="jb-player" ref={player} role="region" aria-label={t('Record player')} tabIndex={-1}>
         {selected==='personal'&&personal.error&&<p className="jb-personal-error" role="alert">{t(personal.error)}{personal.image&&<> {t('Your previous image is still available. Its take has been cleared.')}</>}</p>}
-        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
+        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='nightlights'?<Suspense fallback={<p role="status">{t('Loading Night Lights…')}</p>}><NightLightsDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
       </div>
       <div className="jb-record-shelf">
         <section className="jb-library" id="record-shelf" tabIndex={-1} aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>selectRecord('mystery')}><Disc3 aria-hidden="true" size={14}/>{t('Mystery Record')}</button></div>
           <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
             <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
               <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
-              <span className="jb-record-copy"><small>{t(item.id==='spiral'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
+              <span className="jb-record-copy"><small>{t(item.id==='spiral'||item.id==='nightlights'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
             </button>)}</div>
             {edges.left&&<button className="jb-shelf-arrow jb-shelf-previous" type="button" aria-label={t('Previous records')} onClick={()=>moveShelf(-1)}><ChevronLeft size={17}/></button>}
             {edges.right&&<button className="jb-shelf-arrow jb-shelf-next" type="button" aria-label={t('More records')} onClick={()=>moveShelf(1)}><ChevronRight size={17}/></button>}

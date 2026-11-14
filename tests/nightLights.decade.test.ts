@@ -131,3 +131,24 @@ test('years with nothing above the base map are rests; year-on-year direction us
   assert.equal(plan.notes.length, 1);
   assert.ok(Math.abs(plan.notes[0].hz - 440) < 0.01, 'twice the light → A4');
 });
+
+import { beatMs, beatPosition, clampBpm, rhythmPlan, ACCENT_GAIN } from '../src/lib/nightLights/decade.ts';
+
+test('tempo and meter change timing and accents only, never pitch', () => {
+  assert.equal(beatMs(120), 500, 'the default tempo keeps half a second per year');
+  assert.equal(beatMs(60), 1000);
+  assert.equal(clampBpm(10), 60);
+  assert.equal(clampBpm(999), 180);
+  assert.deepEqual([0, 1, 2, 3].map((i) => beatPosition(i, 3)), [
+    { bar: 1, beat: 1, downbeat: true }, { bar: 1, beat: 2, downbeat: false }, { bar: 1, beat: 3, downbeat: false }, { bar: 2, beat: 1, downbeat: true },
+  ]);
+  const base = yearPlan({ year: 2012, mapPixels: 100, litPixels: 5, litFraction: 0.05, light: 20 }, 10, 'more', 512)!;
+  for (const bpm of [60, 120, 180]) {
+    for (const downbeat of [true, false]) {
+      const p = rhythmPlan(base, downbeat, bpm);
+      assert.deepEqual(p.notes.map((n) => n.hz), base.notes.map((n) => n.hz), 'same pitch');
+      assert.ok(p.notes.every((n) => n.duration <= (beatMs(bpm) / 1000) * 0.7 + 1e-9), 'fits the beat');
+      assert.equal(p.gain, downbeat ? Math.min(1, base.gain * ACCENT_GAIN) : base.gain);
+    }
+  }
+});
