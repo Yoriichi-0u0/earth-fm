@@ -26,7 +26,7 @@ cd terrajuke && npm ci && npx playwright install chromium
 npm run dev    # http://localhost:5173
 ```
 
-Jacy's GitHub account needs write access to the repository (Chia: Settings → Collaborators).
+Jacy's Claude uses Chia's GitHub account, so access is already in place. Because both sessions push as the same account, start every PR description with **"From Jacy's Claude"** so reviews and history show which session made it.
 
 ## Tasks, in order
 
