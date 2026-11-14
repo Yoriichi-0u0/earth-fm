@@ -26,7 +26,7 @@ function makeTexture(side:RecordSide|'grooves'){
 function Vinyl({side,signal,motion,pointer,onReady,onUnavailable}:SceneProps){
   const pose=useRef<Group>(null),spin=useRef<Group>(null),halo=useRef<Mesh>(null);
   const {invalidate,gl,size,camera}=useThree();
-  const originalArt=useLoader(TextureLoader,'/art/earth-fm-vinyl-surface.jpg');
+  const originalArt=useLoader(TextureLoader,'/art/terrajuke-vinyl-surface.jpg');
   const textures=useMemo(()=>{const surface=originalArt.clone();surface.colorSpace=SRGBColorSpace;surface.needsUpdate=true;return {surface,grooves:makeTexture('grooves'),a:makeTexture('a'),b:makeTexture('b')};},[originalArt]);
   const frameCount=useRef(0),lastPublish=useRef(0),fps=useRef(60);
   useEffect(()=>()=>{Object.values(textures).forEach(texture=>texture.dispose());},[textures]);

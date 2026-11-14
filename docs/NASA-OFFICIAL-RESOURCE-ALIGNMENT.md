@@ -1,6 +1,6 @@
-# Earth FM — Official NASA resource alignment
+# TerraJuke — Official NASA resource alignment
 
-**Pre-release review, November 12, 2026, Asia/Kuching.** Research baseline [`de0e54e`](https://github.com/Yoriichi-0u0/earth-fm/commit/de0e54eda020f1dabdec44567f4ffabb629e7d49), [Pacific Lab PR #11](https://github.com/Yoriichi-0u0/earth-fm/pull/11). The earlier [NASA resource discovery](NASA-RESOURCE-DISCOVERY-2026-11.md) covers the broader visualization inventory.
+**Pre-release review, November 12, 2026, Asia/Kuching.** Research baseline [`de0e54e`](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/commit/de0e54eda020f1dabdec44567f4ffabb629e7d49), [Pacific Lab PR #11](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/pull/11). The earlier [NASA resource discovery](NASA-RESOURCE-DISCOVERY-2026-11.md) covers the broader visualization inventory.
 
 The [November 13 published-resource review](NASA-PUBLISHED-RESOURCE-ALIGNMENT.md) records the official list, confirmed EIC catalog paths and version comparison.
 
@@ -10,9 +10,9 @@ The live [challenge Resources tab](https://www.spaceappschallenge.org/2026/chall
 
 The November 12 selected answer in the challenge discussion says both frame processing and sonifying underlying measurements may be relevant. Arun Lohar identifies himself as a Space Apps Navigator and advises keeping a meaningful link between the measurements and the EIC visual. He refers teams to the forthcoming Resources tab for specific requirements. The discussion about which SVS or Worldview frames qualify has a separate community reply and remains unanswered. [Navigator answer #1844](https://github.com/nasa/spaceapps/discussions/1844) · [Frame eligibility discussion #1801](https://github.com/nasa/spaceapps/discussions/1801)
 
-The Global Organizing Team explicitly permits advance topic and resource research and asks teams to begin hackathon project work at the event start. Its reply about third-party materials also calls for crediting all data, resources and tools, and using at least one NASA resource for Global Awards. The treatment of Earth FM's pre-existing application and films remains a separate question for the organizers. [GO Team clarification](https://github.com/nasa/spaceapps/discussions/1777) · [2026 event schedule](https://www.spaceappschallenge.org/2026/)
+The Global Organizing Team explicitly permits advance topic and resource research and asks teams to begin hackathon project work at the event start. Its reply about third-party materials also calls for crediting all data, resources and tools, and using at least one NASA resource for Global Awards. The treatment of TerraJuke's pre-existing application and films remains a separate question for the organizers. [GO Team clarification](https://github.com/nasa/spaceapps/discussions/1777) · [2026 event schedule](https://www.spaceappschallenge.org/2026/)
 
-## Existing Earth FM sources
+## Existing TerraJuke sources
 
 No row has a verified match to the unpublished list. Each row records what could be matched once exact source links appear.
 
@@ -38,7 +38,7 @@ Terrasonic’s public repository pointed to **SVS 5176**. NASA credits the visua
 
 The separately downloaded SVS 5683 `elnino_2026_ssta_1010_nolabels.02200_preview.jpg` is a browser-ready 1920 × 1080 JPEG, 730,572 bytes, SHA-256 `cf99c7533b1d58b2ebc205228121b80598361ed87318a996fa8830e395841548`. The stacked maps show visually aligned coastlines. The catalog does not supply a projection or bounding box for that JPEG. Prefer 5176 when geographic alignment is the main question. Both leads are public NASA resources with challenge-list inclusion pending. [SVS 5683](https://svs.gsfc.nasa.gov/5683/)
 
-Chart2Music’s point-by-point navigation and Accessible Groove Pizza’s separate spoken practice and music modes suggest a focused usability check for the current flagship. With the display hidden, have a first-time listener flip the record, inspect one strip or observation, hear it and explain what generated the note. Earth FM already exposes keyboard controls and can turn accompaniment off. Use the result to decide whether the focused announcement needs the current side, input value or unit. [Chart2Music](https://github.com/julianna-langston/chart2music) · [Accessible Groove Pizza](https://github.com/NYUMusEdLab/Accessible-Groove-Pizza)
+Chart2Music’s point-by-point navigation and Accessible Groove Pizza’s separate spoken practice and music modes suggest a focused usability check for the current flagship. With the display hidden, have a first-time listener flip the record, inspect one strip or observation, hear it and explain what generated the note. TerraJuke already exposes keyboard controls and can turn accompaniment off. Use the result to decide whether the focused announcement needs the current side, input value or unit. [Chart2Music](https://github.com/julianna-langston/chart2music) · [Accessible Groove Pizza](https://github.com/NYUMusEdLab/Accessible-Groove-Pizza)
 
 ## Recommendation
 

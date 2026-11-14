@@ -2,12 +2,14 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import chinese from './studio-zh.json';
 export type Language = 'en' | 'zh';
-const STORAGE_KEY = 'earth-fm-studio-language';
+const STORAGE_KEY = 'terrajuke-studio-language';
+/** Key used while the project was named Earth FM; read only so returning visitors keep their language. */
+const LEGACY_STORAGE_KEY = 'earth-fm-studio-language';
 const messages: Record<string, string> = chinese;
 const LanguageContext = createContext<{language: Language; setLanguage: (value: Language) => void}>({language:'en',setLanguage:()=>{}});
 export function StudioLanguageProvider({children}: {children: ReactNode}) {
   const [language,setLanguage] = useState<Language>(() => {
-    try { return localStorage.getItem(STORAGE_KEY) === 'zh' ? 'zh' : 'en'; } catch { return 'en'; }
+    try { return (localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY)) === 'zh' ? 'zh' : 'en'; } catch { return 'en'; }
   });
   useEffect(()=>{ try { localStorage.setItem(STORAGE_KEY,language); } catch { /* Language still works without storage. */ } },[language]);
   useEffect(()=>{ const previous=document.documentElement.lang; document.documentElement.lang=language==='zh'?'zh-Hans':'en'; return ()=>{document.documentElement.lang=previous;}; },[language]);

@@ -1,35 +1,38 @@
-# Earth FM production deployment
+# TerraJuke production deployment
 
-Live website: [earth-fm.vercel.app](https://earth-fm.vercel.app/).
+Live website: [terrajuke.vercel.app](https://terrajuke.vercel.app/). `earth-fm.vercel.app` is an alias of the same Vercel project.
 
-Earth Symphony Studio 2.0 beta: [Open Studio](https://earth-fm.vercel.app/?studio=1). English is the default, with an optional persistent Simplified Chinese language choice. The guided revision makes Studio the canonical root entry. The original application remains at `?legacy=1`, with old anchors and shared-mix links preserved. The user approved publishing the five-page and NASA observatory revision through main on 2026-11-02. Home, Listen, Create, Explore Data and About have separate routes; exact static rewrites support direct refresh while preserving `/data/…` source files. See [Studio science, sound and verification notes](EARTH_SYMPHONY_STUDIO.md).
+Home (`/`) is the jukebox. Listen, Create, Explore Data and About have their own routes (`/listen`, `/create`, `/data`, `/about`); exact static rewrites in `vercel.json` support a direct refresh while preserving `/data/…` source files. English is the default, with an optional persistent Simplified Chinese choice. The original Earth FM app remains at `?legacy=1`, with old anchors and shared-mix links preserved.
 
-Earth FM uses a single branch and deployment workflow: **`main` → Vercel production**. All code and setup remain on `main`. Preview deployments are disabled, and `vercel.json` permits automatic Git deployments only from `main`. Test suites and testing pipelines are not part of this workflow.
+TerraJuke has one production workflow: **`main` → Vercel production**. Preview deployments are disabled, and `vercel.json` permits automatic Git deployments only from `main`.
 
-The connected [Vercel project `earth-fm`](https://vercel.com/chia-0u0-s-projects/earth-fm) uses GitHub repository `Yoriichi-0u0/earth-fm`, production branch `main`, and the repository root. Build settings are Node.js 24, install command `npm ci`, build command `npm run build`, and output directory `dist`.
+The connected [Vercel project `terrajuke`](https://vercel.com/chia-0u0-s-projects/terrajuke) builds GitHub repository `Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox`, production branch `main`, from the repository root. Build settings are Node.js 24, install command `npm ci`, build command `npm run build`, and output directory `dist`.
 
 ## Publish through GitHub
 
-Commit changes directly to `main`, then push:
+1. Work on a branch and open a draft pull request early (see [CLAUDE.md](../CLAUDE.md)).
+2. Run `npm run check` (unit tests, build and the Playwright suite) and make sure it passes.
+3. Merge to `main`, then verify the live site (below).
 
-```sh
-git switch main
-git add <changed-files>
-git commit -m "Describe the change"
-git push origin main
-```
-
-The connected Vercel build publishes the production website automatically. There is no separate preview, staging, or testing step.
+The push to `main` triggers the Vercel production build automatically. There is no separate preview or staging step.
 
 ## Explicit terminal deployment
 
-From this linked checkout on `main`:
+From this linked checkout on `main`, when a Git-triggered build needs repeating:
 
 ```sh
 vercel project inspect --non-interactive
 vercel deploy --prod --yes --scope chia-0u0-s-projects
 ```
 
-Production builds run `npm run build`. The static sonification application processes data, audio, and uploads in the browser. Supabase is connected for future backend work, with public configuration scoped to Vercel production; see [CONNECTIONS.md](CONNECTIONS.md).
+## Verify the live site
+
+Run the Playwright suite against production. Tests that import from `/src` skip themselves on a deployed URL.
+
+```sh
+PLAYWRIGHT_BASE_URL=https://terrajuke.vercel.app npm run test:e2e
+```
+
+Production builds run `npm run build`. The static sonification app processes data, audio and uploads in the browser. Supabase is connected for future backend work, with public configuration scoped to Vercel production; see [CONNECTIONS.md](CONNECTIONS.md).
 
 Keep the production website URL in `docs/SUBMISSION.md` for the Space Apps submission.

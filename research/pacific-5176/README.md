@@ -1,4 +1,4 @@
-# Earth FM — Accessible listening and Pacific map comparison
+# TerraJuke — Accessible listening and Pacific map comparison
 
 This branch stacks on PR #12 at 796b82a. Climate Spiral A/B remains the flagship. The separate Pacific route explores matched render columns from SVS 5176. The original 5688 lab and its assets are pinned in PR #11.
 
@@ -40,4 +40,4 @@ git diff --check
 test ! -e dist/research
 ```
 
-The conversion check verifies full source hashes, exact RGB bytes, derivative hashes and the alignment statistics. It used FFmpeg 9.0.2. The browser verification captures 2D, 3D and phone-sized screenshots and two strip WAVs. The WAVs use Earth FM's offline ambient export of the same strip values. The live one-note audition uses the shorter scratch envelope, verified separately through oscillator events. This experiment has no production entry or bundle impact. Chromium software WebGL and emulation are the graphics evidence. Native Safari, physical phones and assistive-technology tests are pending.
+The conversion check verifies full source hashes, exact RGB bytes, derivative hashes and the alignment statistics. It used FFmpeg 9.0.2. The browser verification captures 2D, 3D and phone-sized screenshots and two strip WAVs. The WAVs use TerraJuke's offline ambient export of the same strip values. The live one-note audition uses the shorter scratch envelope, verified separately through oscillator events. This experiment has no production entry or bundle impact. Chromium software WebGL and emulation are the graphics evidence. Native Safari, physical phones and assistive-technology tests are pending.

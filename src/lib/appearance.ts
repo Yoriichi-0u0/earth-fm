@@ -1,6 +1,8 @@
 export type AppearancePreference = 'auto' | 'light' | 'dark';
 export type EffectiveAppearance = 'light' | 'dark';
-export const APPEARANCE_KEY = 'earth-fm-appearance';
+export const APPEARANCE_KEY = 'terrajuke-appearance';
+/** Key used while the project was named Earth FM; read only so returning visitors keep their choice. */
+export const LEGACY_APPEARANCE_KEY = 'earth-fm-appearance';
 
 export function parseAppearancePreference(value: unknown): AppearancePreference {
   return value === 'light' || value === 'dark' ? value : 'auto';
@@ -11,7 +13,7 @@ export function resolveAppearance(preference: AppearancePreference, systemDark: 
 }
 
 export function readAppearancePreference(storage: Pick<Storage, 'getItem'> | null): AppearancePreference {
-  try { return parseAppearancePreference(storage?.getItem(APPEARANCE_KEY)); }
+  try { return parseAppearancePreference(storage?.getItem(APPEARANCE_KEY) ?? storage?.getItem(LEGACY_APPEARANCE_KEY)); }
   catch { return 'auto'; }
 }
 

@@ -1,4 +1,4 @@
-# TerraJuke (Earth FM) — first-visit and listening validation
+# TerraJuke — first-visit and listening validation
 
 Prepared 10 November 2026. **Protocol only: zero participant or listening sessions performed. Human verification was deferred at BoboMimi's request.** Browser checks are separate technical evidence. Do not enter automated test output as participant results.
 
@@ -137,7 +137,7 @@ Listening comfort, repetition, balance, responsiveness, fatigue / volume changes
 
 Evidence reference / not-run checks / next reproducible fix:
 
-Keep real participant notes private by default; publish only permitted, appropriately anonymized findings. [Issue #7](https://github.com/Yoriichi-0u0/earth-fm/issues/7) tracks remaining device/listening checks. Release approval remains a separate BoboMimi decision; this protocol performs no merge or deployment.
+Keep real participant notes private by default; publish only permitted, appropriately anonymized findings. [Issue #7](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/issues/7) tracks remaining device/listening checks. Release approval remains a separate BoboMimi decision; this protocol performs no merge or deployment.
 
 ## Technical review at this checkpoint
 

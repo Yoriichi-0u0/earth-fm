@@ -87,7 +87,7 @@
 /* Chart sizing applies only to the scientific plot, never to footer icons. */
 .jb-art-footer>svg{width:16px;height:16px;flex:0 0 16px;margin:0}
 /* Original generated record artwork is presentation only; NASA pixels use their own untouched element. */
-.jb-vinyl-disc{background:#08121c url('/art/earth-fm-vinyl-surface.jpg') center/cover no-repeat;background-blend-mode:normal}
+.jb-vinyl-disc{background:#08121c url('/art/terrajuke-vinyl-surface.jpg') center/cover no-repeat;background-blend-mode:normal}
 .jb-vinyl-label,.side-b .jb-vinyl-label{background:transparent;border:0;box-shadow:none;color:#eff8d7;text-shadow:0 1px 4px #06131b}.side-b .jb-vinyl-label{color:#ffe0c5}.jb-vinyl-label i{visibility:hidden}
 /* Let text grow independently of the artwork and keep the controls fully readable. */
 .jb-record-heading,.jb-record-copy,.jb-side-selector button>span{min-width:0;overflow-wrap:anywhere}

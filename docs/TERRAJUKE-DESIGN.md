@@ -1,6 +1,6 @@
 # TerraJuke design preview
 
-**TerraJuke — The Earth Information Jukebox** is the provisional display name for this research branch. The repository, deployment identifiers, legacy links, stored preferences, exports and historical research retain their established identifiers.
+**TerraJuke — The Earth Information Jukebox** replaced the name Earth FM on 13 November 2026. It began as the provisional display name for this research branch. Since 14 November the repository, Vercel project, package, exports and stored preferences also use TerraJuke. Browser preferences saved under the old `earth-fm-*` keys are still read as a fallback. The `?legacy=1` app and dated research records keep the Earth FM name they had at the time.
 
 ## Apple-style refresh — 13 November 2026
 

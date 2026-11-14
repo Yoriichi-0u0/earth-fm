@@ -20,7 +20,14 @@ test('a missing, corrupt or blocked saved appearance safely falls back to Auto',
   assert.equal(readAppearancePreference({getItem:()=>null}),'auto');
   let requestedKey='';
   assert.equal(readAppearancePreference({getItem:key=>{requestedKey=key;return 'dark';}}),'dark');
-  assert.equal(requestedKey,'earth-fm-appearance');
+  assert.equal(requestedKey,'terrajuke-appearance');
+});
+
+test('a choice saved under the Earth FM key carries over, and the TerraJuke key wins once written',()=>{
+  const store=(entries:Record<string,string>)=>({getItem:(key:string)=>entries[key]??null});
+  assert.equal(readAppearancePreference(store({'earth-fm-appearance':'dark'})),'dark');
+  assert.equal(readAppearancePreference(store({'earth-fm-appearance':'dark','terrajuke-appearance':'light'})),'light');
+  assert.equal(readAppearancePreference(store({'earth-fm-appearance':'dark','terrajuke-appearance':'auto'})),'auto');
 });
 
 test('all three explicit choices are saved without making storage availability a requirement',()=>{
@@ -30,5 +37,5 @@ test('all three explicit choices are saved without making storage availability a
     assert.doesNotThrow(()=>persistAppearancePreference(null,preference));
     assert.doesNotThrow(()=>persistAppearancePreference({setItem:()=>{throw new DOMException('Storage full','QuotaExceededError');}},preference));
   }
-  assert.deepEqual(writes,[['earth-fm-appearance','light'],['earth-fm-appearance','dark'],['earth-fm-appearance','auto']]);
+  assert.deepEqual(writes,[['terrajuke-appearance','light'],['terrajuke-appearance','dark'],['terrajuke-appearance','auto']]);
 });

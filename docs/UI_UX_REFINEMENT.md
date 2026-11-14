@@ -1,4 +1,4 @@
-# Earth FM — unified listening room refinement
+# TerraJuke — unified listening room refinement
 
 Status: UI refinement after production commit 28e4d93. Following local review, the user explicitly approved committing and pushing this revision to GitHub main for the existing Vercel production workflow. Earlier no-push notes below describe the completed local review stage.
 

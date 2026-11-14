@@ -1,4 +1,4 @@
-# Earth FM — curated Earth Stations
+# TerraJuke — curated Earth Stations
 
 ## Plan and design review
 
@@ -33,10 +33,10 @@ No dependency, backend, additional page or new scientific source file was introd
 
 Public review entry points:
 
-- [Earth Stations](https://earth-fm.vercel.app/listen?station=all)
-- [Arctic September](https://earth-fm.vercel.app/listen?station=arctic)
-- [Live visual sound](https://earth-fm.vercel.app/listen?visual=motion)
-- [Arctic source trace](https://earth-fm.vercel.app/data?station=arctic)
-- [Arctic creative mix](https://earth-fm.vercel.app/create?station=arctic)
+- [Earth Stations](https://terrajuke.vercel.app/listen?station=all)
+- [Arctic September](https://terrajuke.vercel.app/listen?station=arctic)
+- [Live visual sound](https://terrajuke.vercel.app/listen?visual=motion)
+- [Arctic source trace](https://terrajuke.vercel.app/data?station=arctic)
+- [Arctic creative mix](https://terrajuke.vercel.app/create?station=arctic)
 
 A deployment/browser check is software evidence. Real external visitors may now review the public experience and voluntarily share their own reflection files; no real-learner findings have been invented or inferred from automated test scores.

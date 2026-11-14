@@ -1,4 +1,4 @@
-# Earth FM — first-time learner pilot protocol
+# TerraJuke — first-time learner pilot protocol
 
 Historical guided-lesson protocol. For the current jukebox-first Home, Flip, Scratch/Looper, Your Record, Mystery and silent Grooveprint review, use [EXPERIENCE-VALIDATION.md](EXPERIENCE-VALIDATION.md). The lesson-specific protocol below is preserved for its original scope.
 

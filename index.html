@@ -12,7 +12,7 @@
     </style>
     <script>
       // Resolve before the module/CSS loads; the shared provider adopts the same preference.
-      (()=>{let p='auto';try{const v=localStorage.getItem('earth-fm-appearance');if(v==='light'||v==='dark')p=v;}catch{}
+      (()=>{let p='auto';try{const v=localStorage.getItem('terrajuke-appearance')??localStorage.getItem('earth-fm-appearance');if(v==='light'||v==='dark')p=v;}catch{}
         const t=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;
         document.documentElement.dataset.appearance=p;document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;
         document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#090f14':'#f4f6f3';})();

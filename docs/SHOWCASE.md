@@ -1,6 +1,6 @@
-# Earth FM — one story, two ways to hear it
+# TerraJuke — one story, two ways to hear it
 
-Showcase research, 10 November 2026. Application checkpoint: `c17301ad99cd0b1b49f6ce09c99db6b1544d58f7` on stacked [draft PR #9](https://github.com/Yoriichi-0u0/earth-fm/pull/9), including [PR #8](https://github.com/Yoriichi-0u0/earth-fm/pull/8). This is a presenter/capture plan, not a new guided interface, completed demo video or competition-compliance claim. The timing below is a target, not a measured end-to-end rehearsal.
+Showcase research, 10 November 2026. Application checkpoint: `c17301ad99cd0b1b49f6ce09c99db6b1544d58f7` on stacked [draft PR #9](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/pull/9), including [PR #8](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/pull/8). This is a presenter/capture plan, not a new guided interface, completed demo video or competition-compliance claim. The timing below is a target, not a measured end-to-end rehearsal.
 
 For future videos, shortlist candidates from [MotionGit](https://motiongit.com/), recommend the strongest fit and begin production after BoboMimi selects a template. The [November 11 audit](NASA-RESOURCE-DISCOVERY-2026-11.md#showcase-source-and-disclosure-audit) covers the finished 29.6-second and 88-second films.
 
@@ -8,7 +8,7 @@ For future videos, shortlist candidates from [MotionGit](https://motiongit.com/)
 
 - [ ] Credit NASA SVS 5190, Mark SubbaRao and Ed Hawkins for the pinned Climate Spiral image. Give its October 18, 2026 retrieval date and link the [frozen visual and GISTEMP provenance](../public/data/climate-spiral-provenance.json).
 - [ ] Credit NASA GISS GISTEMP v4 and identify the selected January observations, snapshot date and 1951–1980 January reference.
-- [ ] Identify Microsoft SoniaNeural synthetic narration and the AI-generated illustrative vinyl in the publication description. Describe the app footage as a capture and the sound as Earth FM’s browser synthesis.
+- [ ] Identify Microsoft SoniaNeural synthetic narration and the AI-generated illustrative vinyl in the publication description. Describe the app footage as a capture and the sound as TerraJuke’s browser synthesis.
 - [ ] Check the current submission instructions for the applicable duration and disclosure placement before selecting a competition cut. See the [source and disclosure audit](NASA-RESOURCE-DISCOVERY-2026-11.md#showcase-source-and-disclosure-audit).
 
 ## The 85-second demonstration
@@ -17,13 +17,13 @@ Let people hear something before explaining everything. The strongest proposed m
 
 | Time | Existing action and visual | Suggested narration | Capture direction |
 | --- | --- | --- | --- |
-| 0–6 s | Home; select **Climate Spiral**, Side A. | “Earth FM. Choose an Earth story. Press Play.” | Establish the shelf, selected record and Play. Use opening capture 01. |
+| 0–6 s | Home; select **Climate Spiral**, Side A. | “TerraJuke. Choose an Earth story. Press Play.” | Establish the shelf, selected record and Play. Use opening capture 01. |
 | 6–17 s | Press **Play record**. | “First, hear NASA’s Climate Spiral picture. Brightness becomes pitch; these are pixels, not temperatures.” | Keep the NASA image, scan position and generated note together. Leave about four seconds without speech. Capture 02; this is a live pixel scan, not NASA’s original soundtrack. |
 | 17–33 s | **Flip the record** to B; enable **Hear Data Only**, then explicitly press **Play record**. | “Flip it. Now twelve selected January temperature anomalies set pitch, relative to the 1951–1980 January average. Hear Data Only removes accompaniment.” | Hold the chart, unit, note and source label; allow a short unvoiced excerpt. Capture 03. Flip and changing Hear Data Only stop the preceding audio. Do not narrate the short excerpt as the entire history. |
 | 33–47 s | Flip to A; **Play with Earth**; move across the image and pause at a few positions. | “Back to the picture. Move across it: the same pixel rules, played by you.” | Show pointer movement, scan line and changing note in one shot. Leave room for three separated notes. Capture 04. A keyboard-slider alternative is equally valid. |
 | 47–63 s | Flip to B; **Read the grooves**; move **Inspect sector (silent)** to 12/12. | “The groove makes the input visible. January 2025: plus 1.37 degrees. Its fixed band maps to A4, 440 hertz. Equal sectors show order, not elapsed years.” | Move from the selected outline to year/value/note. Capture 05; optional phone insert 06. Inspection is silent: the note is a mapped target, not a newly sounded audition or a claim it was heard in the preceding excerpt. |
 | 63–80 s | **Mystery Record** → **Play mystery**; listen briefly, then **Reveal source**, without requiring a guess. | “A final mystery: listen, then reveal the source. Your guess is a hunch, not scientific proof. The reveal explains what made the sound.” | Keep the sleeve concealed until Reveal; show the actual random source and its pixel/measurement label. Captures 07–08. Do not promise a particular draw or fake a correct guess. |
-| 80–85 s | Stop any sound; hold the revealed source and **Open full record**. | “See the source. Hear the pattern. Explore.” | Finish on the actual app. An edited end credit may identify Earth FM / BoboMimi and the sources; it is not another application screen. |
+| 80–85 s | Stop any sound; hold the revealed source and **Open full record**. | “See the source. Hear the pattern. Explore.” | Finish on the actual app. An edited end credit may identify TerraJuke / BoboMimi and the sources; it is not another application screen. |
 
 Preserve the short quiet gaps. The default pixel sequence includes repeated notes and dark strips; do not replace its audio or claim every movement changes pitch. In the fixed snapshot, existing strip 8 maps to F3 (174.61 Hz) and strip 15 to C4 (261.63 Hz). These are useful rehearsal anchors, not a new mapping or a promise for other images. Drag naturally; the original slider/Arrow keys are the alternative. Do not describe a sequence of keyboard commands as a touch-drag test.
 
@@ -67,6 +67,6 @@ No user-facing copy or audio change was required. One documentation issue was co
 
 PR #8 at `c301527` already integrates PR #3 and #4. PR #9 retains that ancestry and still targets the integration branch; production remains `bee2801`. This documentation milestone preserves `c17301a` as the application checkpoint. Fresh byte comparison found 125 tracked application/asset/script/test/config files identical to it. No runtime scientific/audio/privacy/accessibility change is introduced. The current browser walkthrough reproduced Play, Flip, silent selection, native-keyboard Scratch, Mystery play/reveal and continuation without a console warning/error; it is not full regression or perceptual certification.
 
-The verified `c17301a` review archive records 64 passing unit tests, the production build and 112 passing Chromium cases. Those results are **prior checkpoint evidence**, not a newly rerun suite. Documentation accuracy, mapping spot checks, local links, official source pages, history and diff checks are the new verification. Human listening, physical Safari/Android, novice comprehension and manual accessibility checks remain open in [Issue #7](https://github.com/Yoriichi-0u0/earth-fm/issues/7).
+The verified `c17301a` review archive records 64 passing unit tests, the production build and 112 passing Chromium cases. Those results are **prior checkpoint evidence**, not a newly rerun suite. Documentation accuracy, mapping spot checks, local links, official source pages, history and diff checks are the new verification. Human listening, physical Safari/Android, novice comprehension and manual accessibility checks remain open in [Issue #7](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/issues/7).
 
 The prepared next action is a timed capture rehearsal of this story, followed by an actual audiovisual review when BoboMimi resumes listening checks. Do not expand the product merely to make the film more eventful. [The stack integration document](STACK-INTEGRATION.md) still governs a later, separately authorized release; this task performs no merge, retarget, deployment or platform change.

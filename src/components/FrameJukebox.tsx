@@ -46,7 +46,7 @@ export default function FrameJukebox({ climatePlaying, onStart, onPlayingChange,
     setExporting(true); setAnnouncement('');
     try {
       const snapshot = sample(); const blob = await imageSequenceWav(snapshot, { tempo, volume });
-      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `earth-fm-visual-${localFrame ? 'upload' : frame.id}.wav`; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `terrajuke-visual-${localFrame ? 'upload' : frame.id}.wav`; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 30000);
       setAnnouncement('Visual soundtrack downloaded. Video exports represent the frame visible when you clicked download.');
     } catch { setError('This visual could not be exported. Try another frame.'); }
     finally { setExporting(false); }

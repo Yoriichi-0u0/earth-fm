@@ -12,7 +12,7 @@ export default defineConfig({
   expect: { timeout: 7_000 },
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    // PLAYWRIGHT_BASE_URL tests a deployed build (for example https://earth-fm.vercel.app) instead of the local dev server.
+    // PLAYWRIGHT_BASE_URL tests a deployed build (for example https://terrajuke.vercel.app) instead of the local dev server.
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:5173',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
