@@ -39,12 +39,12 @@ function labelTexture(record:StageRecord,image?:HTMLImageElement){
 
 const SPACING=1.12;
 
-function Disc({record,index,offset,selected,playing,motion,onSelect}:{record:StageRecord;index:number;offset:{current:number};selected:boolean;playing:boolean;motion:boolean;onSelect:(id:string)=>void}){
+function Disc({record,index,offset,selected,playing,motion,onSelect,onLabel}:{record:StageRecord;index:number;offset:{current:number};selected:boolean;playing:boolean;motion:boolean;onSelect:(id:string)=>void;onLabel:()=>void}){
   const pose=useRef<Group>(null),spin=useRef<Group>(null);
   const [label,setLabel]=useState<Texture>(()=>labelTexture(record));
   useEffect(()=>{
-    if(!record.image)return;let alive=true;
-    new TextureLoader().load(record.image,tex=>{if(!alive)return;const next=labelTexture(record,tex.image as HTMLImageElement);setLabel(prev=>{prev.dispose();return next;});tex.dispose();});
+    if(!record.image){onLabel();return;}let alive=true;
+    new TextureLoader().load(record.image,tex=>{if(!alive)return;const next=labelTexture(record,tex.image as HTMLImageElement);setLabel(prev=>{prev.dispose();return next;});tex.dispose();onLabel();},undefined,()=>onLabel());
     return()=>{alive=false;};
   },[record]);
   useEffect(()=>()=>label.dispose(),[label]);
@@ -71,7 +71,7 @@ function Disc({record,index,offset,selected,playing,motion,onSelect}:{record:Sta
   </group>;
 }
 
-function Carousel({records,selected,motion,onSelect,playing}:Props&{playing:boolean}){
+function Carousel({records,selected,motion,onSelect,playing,onLabel}:Props&{playing:boolean;onLabel:()=>void}){
   const {invalidate}=useThree();
   const index=records.findIndex(r=>r.id===selected);
   const target=-(index<0?0:index)*SPACING;
@@ -90,7 +90,7 @@ function Carousel({records,selected,motion,onSelect,playing}:Props&{playing:bool
     {/* The cabinet arch: a classic jukebox silhouette in the record's colour. */}
     <mesh position={[0,-.62,-1.3]}><torusGeometry args={[1.85,.04,12,96,Math.PI]}/><meshBasicMaterial color={accent} toneMapped={false}/></mesh>
     <mesh position={[0,-.62,-1.35]}><torusGeometry args={[1.66,.012,8,96,Math.PI]}/><meshBasicMaterial color="#ffffff" transparent opacity={.3}/></mesh>
-    {records.map((r,i)=><Disc key={r.id} record={r} index={i} offset={offset} selected={r.id===selected} playing={playing} motion={motion} onSelect={onSelect}/>)}
+    {records.map((r,i)=><Disc key={r.id} record={r} index={i} offset={offset} selected={r.id===selected} playing={playing} motion={motion} onSelect={onSelect} onLabel={onLabel}/>)}
   </>;
 }
 
@@ -101,16 +101,19 @@ function webglAvailable(){
 export default function JukeboxStage(props:Props){
   const [failed,setFailed]=useState(()=>!webglAvailable());
   const [playing,setPlaying]=useState(false);
+  // All label images fetched: lets tests (and diagnostics) know the stage has no requests left to make.
+  const labels=useRef(0),[loaded,setLoaded]=useState(false);
+  const onLabel=()=>{labels.current++;if(labels.current>=props.records.length)setLoaded(true);};
   useEffect(()=>{
     const on=(e:Event)=>setPlaying(Boolean((e as CustomEvent<DeckEventDetail>).detail?.playing));
     window.addEventListener(DECK_EVENT,on);return()=>window.removeEventListener(DECK_EVENT,on);
   },[]);
   const records=useMemo(()=>props.records,[props.records]);
   if(failed)return null;
-  return <div className="jb-stage" aria-hidden="true" data-stage-playing={playing} data-stage-selected={props.selected}>
+  return <div className="jb-stage" aria-hidden="true" data-stage-playing={playing} data-stage-selected={props.selected} data-stage-labels={loaded?'loaded':'loading'}>
     <Boundary onFail={()=>setFailed(true)}>
       <Canvas camera={{position:[0,.38,4.3],fov:36}} dpr={[1,2]} frameloop="demand" gl={{alpha:true,antialias:true,powerPreference:'low-power'}} onCreated={({gl})=>gl.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();setFailed(true);})}>
-        <Carousel {...props} records={records} playing={playing}/>
+        <Carousel {...props} records={records} playing={playing} onLabel={onLabel}/>
       </Canvas>
     </Boundary>
   </div>;

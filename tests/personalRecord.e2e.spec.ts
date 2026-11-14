@@ -141,6 +141,8 @@ test('the image, filename and take stay out of storage and outbound requests; na
   await audit(page);const requests:{url:string;method:string;body:string|null}[]=[];
   page.on('request',request=>{if(!request.url().startsWith('blob:'))requests.push({url:request.url(),method:request.method(),body:request.postData()});});
   await page.goto('/');await expect(page.getByRole('button',{name:'Choose image',exact:true})).toBeVisible();
+  // The 3D jukebox fetches its public label images once; wait for them before the no-requests baseline.
+  await expect(page.locator('.jb-stage')).toHaveAttribute('data-stage-labels','loaded',{timeout:15000});
   const storage=()=>page.evaluate(async()=>({local:{...localStorage},session:{...sessionStorage},databases:await indexedDB.databases(),caches:await caches.keys()}));const before=await storage();requests.length=0;
   await input(page).setInputFiles({name:'PRIVATE-family-name-do-not-send.png',mimeType:'image/png',buffer:readFileSync(fixture())});await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();await scratch(page);
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('21');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();await loop(page).getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop(page).getByRole('status')).toHaveText('Your take has finished.');

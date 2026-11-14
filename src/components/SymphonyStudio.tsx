@@ -44,7 +44,7 @@ function StudioContent(){
       {page==='data'&&(activeStation==='arctic'?<ArcticDataPage/>:<DataPage settings={settings} setSettings={setSettings}/>)}
       {page==='about'&&<AboutPage/>}
     </main>
-    <footer className="sp-footer"><span>TerraJuke <small>{t('THE EARTH INFORMATION JUKEBOX')}</small></span><div><a href="/about" aria-current={page==='about'?'page':undefined} onClick={e=>link(e,'about')}>{t('About & sources')}</a><a href="/?legacy=1">{t('Original experience')} ↗</a><label><input type="checkbox" checked={motion} onChange={e=>setMotion(e.target.checked)}/>{t('Motion effects')}</label></div></footer>
+    <footer className="sp-footer"><span>TerraJuke <small>{t('THE EARTH INFORMATION JUKEBOX')}</small></span><div><a href="/about" aria-current={page==='about'?'page':undefined} onClick={e=>link(e,'about')}>{t('About & sources')}</a><label><input type="checkbox" checked={motion} onChange={e=>setMotion(e.target.checked)}/>{t('Motion effects')}</label></div></footer>
   </div>;
 }
 export default function SymphonyStudio(){return <StudioLanguageProvider><StudioContent/></StudioLanguageProvider>;}

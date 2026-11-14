@@ -438,7 +438,9 @@ test('five real pages keep the homepage simple, support history and direct reloa
   await page.getByRole('link',{name:'About & sources',exact:true}).click();
   await expect(page).toHaveURL(/\/about$/);
   await expect(page.getByRole('heading',{level:1})).toBeVisible();
-  await page.getByRole('link',{name:/Original experience/}).click();
+  // The legacy Earth FM view is no longer a front-door link; old bookmarks still open it.
+  await expect(page.getByRole('link',{name:/Original experience/})).toHaveCount(0);
+  await page.goto('/?legacy=1');
   await expect(page.getByRole('heading',{name:/A moment in time/})).toBeVisible();
   await page.goto('/#climate-spiral');await expect(page.locator('#climate-spiral .climate-measurement')).toContainText('+1.37°C');
 });
