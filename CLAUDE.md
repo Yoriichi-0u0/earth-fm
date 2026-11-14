@@ -89,6 +89,15 @@ React 19 + Vite + TypeScript, no backend. Everything (sound synthesis via Web Au
 
 Existing components and libraries are written in a dense style (many statements per line, short names). Match the surrounding file rather than reformatting it, and keep diffs focused.
 
+## Change records (rely on these)
+
+[CHANGELOG.md](CHANGELOG.md), [docs/releases/](docs/releases/) and [docs/DECISION-LOG.md](docs/DECISION-LOG.md) are the project's shared memory for every person and AI session. Read them before starting work and trust them without asking again; if they disagree with the code or the live site, fix the record.
+
+- Every pull request adds its changes under `## [Unreleased]` in CHANGELOG.md (Added / Changed / Fixed / Removed), in plain words a visitor or teammate understands.
+- Every product, science or process decision (a source choice, a scope cut, an approval) gets a dated entry in DECISION-LOG.md saying who decided and why. Never rewrite old entries; add new ones.
+- Every merge to `main` that changes the app is a release: move the entries to a version section, write `docs/releases/vX.Y.Z.md`, and run `gh release create vX.Y.Z --target <merge-sha>`. Steps and template: [docs/releases/README.md](docs/releases/README.md).
+- [docs/SOURCE-VERIFICATION.md](docs/SOURCE-VERIFICATION.md) records which records are verified NASA originals; update it whenever a record or its files change.
+
 ## Documentation
 
 `docs/` mixes current references (CONNECTIONS, DEPLOYMENT, DATA, FRAMES, SONIFICATION, NIGHT-LIGHTS, TERRAJUKE-*) with dated milestone and research records. Update the current references when behaviour changes; leave dated records as historical evidence. [docs/SUBMISSION.md](docs/SUBMISSION.md) is the submission draft and must match what the live app does.
