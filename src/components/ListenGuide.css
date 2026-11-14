@@ -1,0 +1,15 @@
+/* Spotlight ring and its card. Non-modal: the page stays usable underneath. */
+.lg-layer{position:fixed;inset:0;z-index:80;pointer-events:none}
+.lg-ring{position:fixed;border-radius:18px;box-shadow:0 0 0 3px var(--ef-accent,#2997ff),0 0 0 9999px #000000a6,0 0 40px 6px var(--ef-accent,#2997ff);transition:top .45s cubic-bezier(.6,0,.3,1),left .45s cubic-bezier(.6,0,.3,1),width .45s,height .45s}
+.lg-layer[data-motion=true] .lg-ring{animation:lg-pulse 1.8s ease-in-out infinite}
+.lg-layer[data-motion=false] .lg-ring{transition:none}
+.lg-card{position:fixed;width:min(320px,calc(100vw - 24px));pointer-events:auto;padding:16px 18px;border-radius:16px;background:var(--ef-panel,#1c1c1e);color:var(--ef-text,#f5f5f7);border:1px solid var(--ef-border,#38383a);box-shadow:0 18px 50px #0008}
+.lg-card:focus{outline:none}.lg-card:focus-visible{outline:2px solid var(--ef-focus,#2997ff);outline-offset:3px}
+.lg-count{margin:0 0 6px;font-size:.72rem;letter-spacing:.1em;color:var(--ef-secondary,#64d2ff)}
+.ss.ss-pages .lg-card h2{margin:0 0 6px;font-size:1.1rem;font-weight:650}
+.lg-card p#lg-body{margin:0;font-size:.92rem;line-height:1.55;color:var(--ef-muted,#a1a1a6)}
+.lg-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.ss.ss-pages .lg-actions button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--ef-control-border,#8e8e93);background:none;color:var(--ef-text,#f5f5f7);font-size:.86rem;cursor:pointer}
+.ss.ss-pages .lg-actions .lg-next{background:var(--tj-action,#0071e3);border-color:var(--tj-action,#0071e3);color:var(--tj-on-action,#fff);font-weight:600}
+.lg-actions button:first-child{margin-right:auto}
+@keyframes lg-pulse{50%{box-shadow:0 0 0 3px var(--ef-accent,#2997ff),0 0 0 9999px #000000a6,0 0 60px 14px var(--ef-accent,#2997ff)}}

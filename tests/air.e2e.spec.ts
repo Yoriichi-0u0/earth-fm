@@ -8,7 +8,7 @@ const announcer = (page: Page) => page.getByTestId('air-announcer');
 const caption = (page: Page) => page.getByTestId('air-caption');
 
 async function openAir(page: Page): Promise<void> {
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button', { name: 'Select record: The Air We Share' }).click();
   await expect(page.getByRole('heading', { name: 'The Air We Share', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Play the world' })).toBeEnabled({ timeout: 20_000 });

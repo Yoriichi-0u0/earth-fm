@@ -5,7 +5,7 @@ import AxeBuilder from '@axe-core/playwright';
 const announcer = (page: import('@playwright/test').Page) => page.getByTestId('show-announcer');
 
 test('Play the whole jukebox starts record 1 by itself, and Stop, Escape or choosing a record ends the show', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/listen');
   const start = page.getByRole('button', { name: 'Play the whole jukebox' });
   await start.click();
   await expect(announcer(page)).toHaveText('Now playing record 1 of 7: Climate Spiral, NASA SVS 5190.');
@@ -35,7 +35,7 @@ test('Play the whole jukebox starts record 1 by itself, and Stop, Escape or choo
 
 test('when a record finishes, the show hands over to the next one and plays it', { tag: ['@full', '@timing'] }, async ({ page }) => {
   test.setTimeout(75_000);
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button', { name: 'Play the whole jukebox' }).click();
   await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/, { timeout: 15_000 });
   await expect(announcer(page)).toHaveText('Now playing record 2 of 7: Night Lights, NASA SVS 5313 · EIC Version.', { timeout: 45_000 });

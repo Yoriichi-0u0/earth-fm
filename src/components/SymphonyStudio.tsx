@@ -1,11 +1,11 @@
 import {useEffect,useRef,useState} from 'react';
 import type {MouseEvent} from 'react';
-import StudioWelcome from './StudioWelcome';
+import HomeIntro from './HomeIntro';
+import JukeboxHome from './JukeboxHome';
 import AppearanceSelector from './AppearanceSelector';
 import GuidedStory from './GuidedStory';
 import {CreatePage,DataPage} from './pages/ClimatePages';
 import AboutPage from './pages/AboutPage';
-import StationLibrary from './pages/StationLibrary';
 import ArcticStation from './pages/ArcticStation';
 import ArcticDataPage from './pages/ArcticDataPage';
 import {stationFromSearch} from '../data/earthStations';
@@ -24,7 +24,9 @@ const ignorePlayback=(_value:boolean)=>{};
 function StudioContent(){
   const {t}=useStudioLanguage();
   const [route,setRoute]=useState(()=>location.pathname+location.search);
-  const page=pageForPath(route.split('?')[0]),station=stationFromSearch(route.split('?')[1]??''),activeStation=station==='arctic'?'arctic':'climate';
+  const page=pageForPath(route.split('?')[0]),search=new URLSearchParams(route.split('?')[1]??''),station=stationFromSearch(search.toString()),activeStation=station==='arctic'?'arctic':'climate';
+  // Listen is the jukebox with every player; an explicit ?station=climate|arctic (or ?visual=motion) opens a guided story.
+  const story=page==='listen'&&(['climate','arctic'].includes(search.get('station')??'')||search.get('visual')==='motion');
   const [motion,setMotion]=useState(()=>!matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [settings,setSettings]=useState<Settings>({...defaults});
   const content=useRef<HTMLElement>(null);
@@ -36,8 +38,9 @@ function StudioContent(){
   return <div className={`ss ss-pages ss-observatory${motion?' ss-motion':''}`} lang="en"><a className="sp-skip" href="#page-content">{t('Skip to content')}</a>
     <header className="sp-header"><a className="sp-brand" href="/" onClick={e=>link(e,'home')} aria-label={t('TerraJuke home')}><img className="sp-brand-icon" src="/brand/terrajuke.png" alt="" width="40" height="40"/><span>TerraJuke</span></a><nav className="sp-nav" aria-label={t('Main navigation')}>{(['home','listen','create','data','about'] as StudioPage[]).map(target=><a key={target} href={pageUrl(target,target==='listen'?'all':activeStation)} aria-current={page===target?'page':undefined} onClick={e=>link(e,target)}>{t(pageNames[target])}</a>)}</nav><div className="sp-preferences"><AppearanceSelector/></div></header>
     <main id="page-content" ref={content} className={`sp-page sp-page-${page}`}>
-      {page==='home'&&<StudioWelcome motion={motion} playing={false} onListen={()=>goToPage('listen')}/>}
-      {page==='listen'&&(station==='all'?<StationLibrary/>:station==='arctic'?<ArcticStation/>:<><div className="st-station-toolbar"><button className="sp-text-button" onClick={()=>goToPage('listen','all')}>← {t('Earth Stations')}</button><span>{t('STATION 01 · CLIMATE SPIRAL')}</span></div><header className="sp-page-heading sp-listen-heading"><p className="ss-kicker">{t('LISTEN / YOUR FIRST EARTH STORY')}</p><h1 tabIndex={-1}>{t('A little looking. A little listening.')}</h1><p>{t('Follow three short steps. No settings to learn. Sound starts only when you press Play.')}</p></header><GuidedStory key={route} initialMoving={new URLSearchParams(route.split('?')[1]).get('visual')==='motion'} motion={motion} onPlayingChange={ignorePlayback} onExplore={()=>goToPage('create')} onData={()=>goToPage('data')}/></>)}
+      {page==='home'&&<HomeIntro motion={motion}/>}
+      {page==='listen'&&!story&&<JukeboxHome motion={motion}/>}
+      {story&&(station==='arctic'?<ArcticStation/>:<><div className="st-station-toolbar"><button className="sp-text-button" onClick={()=>goToPage('listen')}>← {t('Back to the jukebox')}</button><span>{t('STATION 01 · CLIMATE SPIRAL')}</span></div><header className="sp-page-heading sp-listen-heading"><p className="ss-kicker">{t('LISTEN / YOUR FIRST EARTH STORY')}</p><h1 tabIndex={-1}>{t('A little looking. A little listening.')}</h1><p>{t('Follow three short steps. No settings to learn. Sound starts only when you press Play.')}</p></header><GuidedStory key={route} initialMoving={new URLSearchParams(route.split('?')[1]).get('visual')==='motion'} motion={motion} onPlayingChange={ignorePlayback} onExplore={()=>goToPage('create')} onData={()=>goToPage('data')}/></>)}
       {(page==='create'||page==='data')&&<label className="st-context-select">{t('Earth Station')}<select aria-label={t('Earth Station')} value={activeStation} onChange={e=>goToPage(page,e.target.value as 'climate'|'arctic')}><option value="climate">{t('Climate Spiral')}</option><option value="arctic">{t('Arctic September')}</option></select></label>}
       {page==='create'&&<CreatePage key={activeStation} station={activeStation} settings={settings} setSettings={setSettings}/>}
       {page==='data'&&(activeStation==='arctic'?<ArcticDataPage/>:<DataPage settings={settings} setSettings={setSettings}/>)}

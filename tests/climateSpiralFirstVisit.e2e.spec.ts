@@ -34,7 +34,7 @@ async function setup(page:Page){
       }
     };
   });
-  await page.goto('/');
+  await page.goto('/listen');
 }
 const notes=(page:Page)=>page.evaluate(()=>window.firstVisit.notes.slice());
 const heard=async(page:Page,value:number)=>(await notes(page)).some(note=>Math.abs(note-value)<.01);
@@ -50,7 +50,7 @@ test('the first scan waits for decoded pixels instead of reading a not-yet-decod
       return (draw as (...values:unknown[])=>void).apply(this,args);
     } as typeof draw;
   });
-  await page.goto('/');
+  await page.goto('/listen');
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
   const values=await page.locator('.jb-vinyl-fallback>.jb-grooveprint [data-groove-sector]').evaluateAll(nodes=>nodes.map(node=>Number(node.getAttribute('data-groove-value'))));
   expect(values).toHaveLength(48);
@@ -63,7 +63,7 @@ test('a rejected decode never becomes a ready scan with invented grooves',async(
   await page.addInitScript(()=>{
     HTMLImageElement.prototype.decode=function(){return Promise.reject(new DOMException('The source image cannot be decoded.','EncodingError'));};
   });
-  await page.goto('/');
+  await page.goto('/listen');
   await expect(page.locator('.jb-error')).toHaveText('This visual could not be read. Choose another frame or upload a local image.');
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeDisabled();
   await expect(page.locator('.jb-state')).toHaveText('Visual unavailable');
@@ -86,7 +86,7 @@ test('an image failure that lands before the player resets shows an error instea
       if(event.isTrusted&&event.target instanceof HTMLImageElement&&spiral(event.target))event.stopImmediatePropagation();
     },true);
   });
-  await page.goto('/');
+  await page.goto('/listen');
   await expect(page.locator('.jb-error')).toHaveText('The image could not load. Try another frame.');
   await expect(page.locator('.jb-state')).toHaveText('Visual unavailable');
   await expect(page.locator('.jb-media-loading')).toHaveCount(0);
@@ -171,7 +171,7 @@ test('a first visit plays Side A, hears one silent-inspected groove, flips and p
 });
 
 test('Side B opens on the 3D Climate Coil, keeps the observation readout, and switches to the 2D chart',async({page})=>{
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).tap();
   const art=page.locator('.jb-side-content:not([hidden]) .jb-data-art');
   await expect(art).toHaveAttribute('data-data-renderer','three',{timeout:15_000});
@@ -193,7 +193,7 @@ test('without WebGL, Side B shows the 2D chart and never offers a broken 3D view
       return Reflect.apply(original,this,[id,...args]);
     } as typeof original;
   });
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).tap();
   const art=page.locator('.jb-side-content:not([hidden]) .jb-data-art');
   await expect(art).toHaveAttribute('data-data-renderer','2d');
@@ -225,7 +225,7 @@ test('tapping a January bead on the Climate Coil selects it silently and keeps r
 
 test('on a phone the visual is full width, the record row sits below it, navigation is one line and Play stays reachable',async({page})=>{
   test.skip((page.viewportSize()?.width??1000)>640,'Phone layout only.');
-  await page.goto('/');await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  await page.goto('/listen');await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
   const box=(selector:string)=>page.locator(selector).first().boundingBox().then(b=>b!);
   const deck=await box('.jb-deck'),science=await box('.jb-artwork-paired .jb-science-window'),record=await box('.jb-artwork-paired .jb-earth-record');
   expect(science.width).toBeGreaterThan(deck.width*.95);
@@ -242,7 +242,7 @@ test('on a phone the visual is full width, the record row sits below it, navigat
 
 test('hovering a bead shows its January, anomaly and note, and the tip never outlives a switch to 2D',async({page})=>{
   test.skip(test.info().project.use.hasTouch===true&&test.info().project.name!=='chromium','Hover needs a fine pointer.');
-  await page.goto('/');
+  await page.goto('/listen');
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
   const coil=page.locator('.jb-side-content:not([hidden]) .jb-coil');
   await expect(coil).toHaveAttribute('data-coil-beads',/\d+,\d+/,{timeout:15_000});await page.waitForTimeout(300);

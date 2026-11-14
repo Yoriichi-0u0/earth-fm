@@ -18,7 +18,7 @@ Verify raw source/derived means, all mapping boundaries, fixed pitches across mi
 
 ## Implementation and self-review findings
 
-- `/listen?station=all` is the station directory; the existing `/listen` beginner route remains Climate Spiral. Arctic deep links use `?station=arctic` in Listen, Create and Explore Data. All stay inside the five existing pages and retain Back/Forward and direct refresh.
+- `/listen` is the jukebox (since 14 Nov 2026; the station directory was retired). `/listen?station=climate` opens the Climate Spiral beginner story. Arctic deep links use `?station=arctic` in Listen, Create and Explore Data. All stay inside the five existing pages and retain Back/Forward and direct refresh.
 - Synthesis now has a reusable compiled-frequency boundary. Climate observations still use the unchanged compiler; ice uses its own physical-unit mapping. No sea-ice number is disguised as a temperature anomaly. The same synthesis serves live playback and WAV export, including pure data, five tones and three styles.
 - Moving visuals are selected explicitly at `/listen?visual=motion`. Existing EIC video bytes and mirror attribution are reused. Each scheduled note stores the sampled frame time and strip data for a verifiable readout. The video shows its decoded frame, not an unrelated poster; scan position follows the contained image region.
 - Review found and fixed a decoded-media readiness race and a mobile table focus issue. Native readiness listeners handle already-cached media; scrollable scientific tables are keyboard focusable.
@@ -33,7 +33,7 @@ No dependency, backend, additional page or new scientific source file was introd
 
 Public review entry points:
 
-- [Earth Stations](https://terrajuke.vercel.app/listen?station=all)
+- [The jukebox](https://terrajuke.vercel.app/listen)
 - [Arctic September](https://terrajuke.vercel.app/listen?station=arctic)
 - [Live visual sound](https://terrajuke.vercel.app/listen?visual=motion)
 - [Arctic source trace](https://terrajuke.vercel.app/data?station=arctic)

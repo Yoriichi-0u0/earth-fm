@@ -4,7 +4,7 @@ import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const appearance=appearanceGroup;
-const pages=['/','/listen?station=all','/listen','/create','/data','/data?station=arctic','/about','/?legacy=1'];
+const pages=['/','/listen?station=climate','/listen','/create','/data','/data?station=arctic','/about','/?legacy=1'];
 const palette=async(page:Page)=>page.evaluate(()=>({
   effective:document.documentElement.dataset.theme,
   native:getComputedStyle(document.documentElement).colorScheme,
@@ -22,7 +22,7 @@ test('Auto resolves before the app appears and follows live system appearance wi
     });
     observer.observe(document,{childList:true,subtree:true});
   });
-  await page.goto('/');await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');
+  await page.goto('/listen');await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('html')).toHaveAttribute('data-theme','light');
   expect(await page.evaluate(()=>(window as unknown as {appearanceAtRoot?:string}).appearanceAtRoot)).toBe('light');
   const light=await palette(page);expect(light.native).toBe('light');expect(light.browser).toMatch(/^#[a-f\d]{6}$/i);
@@ -33,7 +33,7 @@ test('Auto resolves before the app appears and follows live system appearance wi
 });
 
 test('explicit appearance survives navigation, refresh and Legacy while overriding the system',async({page})=>{
-  await page.emulateMedia({colorScheme:'dark'});await page.goto('/');
+  await page.emulateMedia({colorScheme:'dark'});await page.goto('/listen');
   await chooseAppearance(page,'light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
   expect(await page.evaluate(()=>localStorage.getItem('terrajuke-appearance'))).toBe('light');
   await page.getByRole('link',{name:'Create',exact:true}).click();await expect(appearanceButton(page,'light')).toHaveAttribute('aria-pressed','true');
@@ -56,7 +56,7 @@ test('invalid or unavailable preference storage leaves the appearance controls u
           Storage.prototype.setItem=function(){throw new DOMException('Blocked for test','SecurityError');};
         }else localStorage.setItem('terrajuke-appearance','unrecognised-choice');
       },blocked);
-      await page.goto(new URL('/',test.info().project.use.baseURL).href);await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+      await page.goto(new URL('/listen',test.info().project.use.baseURL).href);await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
       await chooseAppearance(page,'dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(appearanceButton(page,'dark')).toHaveAttribute('aria-pressed','true');
       await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
       await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
@@ -71,7 +71,7 @@ test('theme changes preserve active audio, source pixels, mapped strip values an
     const audit={contexts:[] as AudioContext[]};(window as unknown as {appearanceAudio:typeof audit}).appearanceAudio=audit;
     const Original=AudioContext;window.AudioContext=class extends Original{constructor(){super();audit.contexts.push(this);}};
   });
-  await page.goto('/');await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
+  await page.goto('/listen');await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   const contexts=await page.evaluate(()=>(window as unknown as {appearanceAudio:{contexts:AudioContext[]}}).appearanceAudio.contexts.length);
   await chooseAppearance(page,'light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   await chooseAppearance(page,'dark');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
@@ -100,7 +100,7 @@ test('theme changes preserve active audio, source pixels, mapped strip values an
 
 test('optional 3D stays lazy and mounted through appearance changes',async({page})=>{
   const sceneRequests:string[]=[];page.on('request',request=>{if(request.url().includes('RecordScene'))sceneRequests.push(request.url());});
-  await page.goto('/');await expect(appearance(page)).toBeVisible();
+  await page.goto('/listen');await expect(appearance(page)).toBeVisible();
   await expect(page.locator('.jb-earth-record')).toHaveAttribute('data-record-renderer','2d');expect(sceneRequests).toEqual([]);
   await page.getByRole('button',{name:'Try 3D record',exact:true}).click();
   await expect(page.locator('.jb-earth-record')).toHaveAttribute('data-record-renderer','three',{timeout:15_000});expect(sceneRequests.length).toBeGreaterThan(0);
@@ -112,13 +112,13 @@ test('optional 3D stays lazy and mounted through appearance changes',async({page
 
 test('a missing WebGL context leaves the 2D instrument and audio usable in Light',async({page})=>{
   await page.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(id:string,...args:unknown[]){if(id==='webgl'||id==='webgl2'||id==='experimental-webgl')return null;return Reflect.apply(original,this,[id,...args]);} as typeof original;});
-  await page.goto('/');await chooseAppearance(page,'light');await page.getByRole('button',{name:'Try 3D record',exact:true}).click();
+  await page.goto('/listen');await chooseAppearance(page,'light');await page.getByRole('button',{name:'Try 3D record',exact:true}).click();
   await expect(page.getByText('2D active · 3D unavailable',{exact:true})).toBeVisible();await expect(page.locator('.jb-earth-record')).toHaveAttribute('data-record-renderer','2d');
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);await page.getByRole('button',{name:'Stop',exact:true}).click();
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} theme has no automated accessibility or contrast findings across the main pages and Legacy`,{tag:'@full'},async({page})=>{
-  test.setTimeout(90_000);await page.goto('/');await chooseAppearance(page,theme);
+  test.setTimeout(90_000);await page.goto('/listen');await chooseAppearance(page,theme);
   const results=[];
   for(const route of pages){
     await page.goto(route);await expect(appearanceButton(page,theme)).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
@@ -130,12 +130,12 @@ for(const theme of ['light','dark'] as const)test(`${theme} theme has no automat
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific explanations and disabled controls retain contrast`,{tag:'@full'},async({page})=>{
-  test.setTimeout(90_000);await page.goto('/');await chooseAppearance(page,theme);const results=[];
-  for(const route of ['/about','/create','/data','/listen']){
+  test.setTimeout(90_000);await page.goto('/listen');await chooseAppearance(page,theme);const results=[];
+  for(const route of ['/about','/create','/data','/listen?station=climate']){
     await page.goto(route);
     if(route==='/create')await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
     if(route==='/data')await page.getByRole('checkbox',{name:'Compare another year',exact:true}).check();
-    if(route==='/listen'){
+    if(route==='/listen?station=climate'){
       await page.getByRole('button',{name:'Continue to the real data →',exact:true}).click();
       await page.getByRole('button',{name:'Continue to the discovery →',exact:true}).click();
     }
@@ -153,8 +153,8 @@ for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific 
 for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}])test(`responsive appearance and keyboard controls fit ${viewport.width} × ${viewport.height}`,{tag:'@full'},async({page})=>{
   test.setTimeout(60_000);await page.setViewportSize(viewport);
   for(const theme of ['light','dark']){
-    await page.goto('/');await chooseAppearance(page,theme);
-    for(const route of ['/','/listen?station=all','/create','/data','/about']){
+    await page.goto('/listen');await chooseAppearance(page,theme);
+    for(const route of ['/','/listen?station=climate','/create','/data','/about']){
       if(route!=='/')await page.goto(route);
       await expect(appearanceButton(page,theme)).toHaveAttribute('aria-pressed','true');
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${theme} ${route}: no document overflow`).toBe(true);
@@ -199,7 +199,7 @@ test('the Appearance buttons, reduced motion and enlarged-text stress preserve u
 test('provisional identity and the primary Play action work at phone width', async({page})=>{
   await page.setViewportSize({width:320,height:568});
   await page.emulateMedia({reducedMotion:'reduce'});
-  await page.goto('/');
+  await page.goto('/listen');
   await expect(page).toHaveTitle('TerraJuke — The Earth Information Jukebox');
   const brand=page.getByRole('link',{name:'TerraJuke home',exact:true});
   await expect(brand).toBeVisible();
@@ -231,7 +231,7 @@ test('an appearance saved under the Earth FM key carries over to TerraJuke; an o
     if(sessionStorage.getItem('seeded'))return;sessionStorage.setItem('seeded','1');
     localStorage.clear();localStorage.setItem('earth-fm-appearance','dark');localStorage.setItem('earth-fm-studio-language','zh');
   });
-  await page.emulateMedia({colorScheme:'light'});await page.goto('/');
+  await page.emulateMedia({colorScheme:'light'});await page.goto('/listen');
   await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(appearanceButton(page,'dark')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('html')).toHaveAttribute('lang','en');await expect(page.getByRole('heading',{level:1})).toContainText('Your planet.');
   await chooseAppearance(page,'light');await page.reload();
