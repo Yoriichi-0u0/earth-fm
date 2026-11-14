@@ -1,0 +1,26 @@
+{
+  "title": "Change in Night Lights between 2012 and 2023 – EIC Version",
+  "svsId": 5313,
+  "page": "https://svs.gsfc.nasa.gov/5313",
+  "file": "svs5313_eic_02599_print.jpg",
+  "originalFilename": "nightlights_flat_series_and_change_wZooms_13_EIC.02599_print.jpg",
+  "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005300/a005313/nightlights_flat_series_and_change_wZooms_13_EIC.02599_print.jpg",
+  "routeUsed": "original",
+  "archiveUrl": "https://web.archive.org/web/20240921035039id_/https://svs.gsfc.nasa.gov/vis/a000000/a005300/a005313/nightlights_flat_series_and_change_wZooms_13_EIC.02599_print.jpg",
+  "archiveCaptureId": "20240921035039",
+  "width": 1024,
+  "height": 288,
+  "bytes": 63503,
+  "sha256": "6e3e92eae49ca666f2f694efaf17f342bf10c113ead2118f959e48d26e2581bc",
+  "archiveSha256": "6e3e92eae49ca666f2f694efaf17f342bf10c113ead2118f959e48d26e2581bc",
+  "identity": "verified-identical",
+  "identityNote": "Downloaded from the NASA SVS original URL (HTTP 200) and from the Internet Archive capture within the same minute; SHA-256 compared byte for byte and identical. The served file is the original download.",
+  "retrievedAt": "2026-11-14T09:10:16+08:00",
+  "credits": {
+    "producer": "NASA's Scientific Visualization Studio",
+    "visualizer": "Kel Elkins (USRA)",
+    "scientists": ["Zhuosen Wang (UMD)", "Miguel Román (Leidos)", "Ranjay Shrestha (SSAI)", "Srija Chakraborty (USRA)", "Virginia Kalb (NASA)"],
+    "dataset": "Black Marble (Next Generation), Suomi NPP VIIRS, NASA/NOAA",
+    "released": "2024-06-14"
+  }
+}
