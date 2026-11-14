@@ -319,7 +319,8 @@ test('Climate Explore selects real monthly values and schedules the mapped elect
   await expect(measurement).toContainText('−0.19°C'.replace('−', '-'));
   await expect(scene.locator('.climate-band-readout')).toContainText('BAND 2 OF 5');
   await expect.poll(() => page.evaluate(() => Math.abs((window as any).climateAudioEvidence.frequencies.at(-2) - 293.664768))).toBeLessThan(0.001);
-  expect(requests.every(url => url.startsWith('http://127.0.0.1:5173/') || url.startsWith('data:'))).toBeTruthy();
+  const origin = new URL(page.url()).origin; // local dev server or the deployed site under test
+  expect(requests.every(url => url.startsWith(origin + '/') || url.startsWith('data:'))).toBeTruthy();
   await scene.locator('summary').click();
   await expect(scene.getByRole('link', { name: 'Fixed source CSV' })).toHaveAttribute('href', '/data/sources/gistemp-global-monthly-2026-10-18.csv');
 });
@@ -605,6 +606,7 @@ test('Chinese Listen is simple and sound controls recover with blocked preferenc
 });
 
 test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation', async ({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await page.goto('/create');
   await expect(page.getByRole('group',{name:'Melody tone'})).toBeVisible();
   const result=await page.evaluate(async()=>{
