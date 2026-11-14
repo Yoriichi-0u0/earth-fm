@@ -47,3 +47,16 @@ test('the liner notes show the regional readings, and axe finds no violations', 
   const scan = await new AxeBuilder({ page }).include('.jb-player').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(scan.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) }))).toEqual([]);
 });
+
+for (const theme of ['light', 'dark'] as const) test(`${theme}: Currents of Heat fits phones and tablets without sideways scrolling`, { tag: '@full' }, async ({ page }) => {
+  await page.emulateMedia({ colorScheme: theme });
+  await openOcean(page);
+  for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${viewport.width}px`).toBe(true);
+    const map = (await page.getByRole('application', { name: /Ocean map/ }).boundingBox())!;
+    if (viewport.width <= 768) expect(map.width, 'on phones and tablets the map spans most of the screen').toBeGreaterThan(viewport.width * 0.5);
+  }
+  const scan = await new AxeBuilder({ page }).include('.jb-player').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  expect(scan.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) }))).toEqual([]);
+});
