@@ -34,7 +34,7 @@ export function CreatePage({settings,setSettings,station='climate'}:SoundProps&{
     <section className="sp-card sp-preview" aria-labelledby="preview-title"><p className="ss-kicker">{t('YOUR PREVIEW')}</p><h2 id="preview-title">{t(isArctic?'Twelve Septembers, in your style.':'A year of Earth, in your style.')}</h2><>{isArctic?<p className="st-tag">{t('Arctic September · 12 selected years · 1987–2022')}</p>:<YearSelect label="Choose a year" value={year} onChange={value=>{audio.stop();setYear(value);}}/>}</><div className={`sp-wave ${audio.playing?'is-playing':''}`} aria-hidden="true">{Array.from({length:30},(_,i)=><i key={i} style={{height:`${14+(i*17%48)}px`,animationDelay:`${i*.06}s`}}/>)}</div><div className="sp-preview-label"><strong>{t(settings.timbre)}</strong><span>{t(settings.dataOnly?'DATA ONLY':settings.style)}</span></div><p className="sp-current-date">{audio.audible?date(audio.audible.year,audio.audible.month,MONTHS[audio.audible.month-1]):isArctic?t('Twelve selected Septembers'): `${t('January to December')} ${year}`}</p><label className="sp-volume">{t('Volume')}<input aria-label={t('Master volume')} type="range" min="0" max="1" step=".05" value={settings.volume} onChange={e=>setSettings({...settings,volume:+e.target.value})}/></label><Status audible={audio.audible} status={audio.status}/><p className="sp-note">{t('Changing a sound stops the preview. Press Play when you are ready.')}</p><button className="sp-secondary sp-wide" disabled={exporting} onClick={()=>void download()}>{t(exporting?'Rendering…':'Download 25-second WAV')}</button><p className="sp-note" aria-live="polite">{t(notice)}</p></section></div><p className="sp-bottom-note">{t(isArctic?'All tones are synthesized. Accompaniment is decorative. The fixed Arctic extent mapping is the same as in Listen and Explore Data. Missing observations stay silent.':'All tones are synthesized. Drums, harmony and echo are musical choices; they do not add climate measurements. Missing months stay silent.')}</p></>;
 }
 function MonthlyChart({year,other,current}:{year:number;other:number|null;current:MonthlyObservation}){
-  const {t,language}=useStudioLanguage();
+  const {t}=useStudioLanguage();
   const [compact,setCompact]=useState(()=>matchMedia('(max-width:650px)').matches);
   useEffect(()=>{const query=matchMedia('(max-width:650px)');const update=()=>setCompact(query.matches);query.addEventListener('change',update);return()=>query.removeEventListener('change',update);},[]);
   const chartWidth=compact?340:790,right=compact?312:745;
@@ -44,11 +44,11 @@ function MonthlyChart({year,other,current}:{year:number;other:number|null;curren
     {[-1,0,1,1.5].map(v=><g key={v}><line x1="45" x2={right} y1={y(v)} y2={y(v)} stroke="#3b4d59" strokeDasharray="3 6"/><text x="2" y={y(v)+4} fill="#a8b9c6" fontSize="12">{v}°C</text></g>)}
     <path d={line(year)} fill="none" stroke="#d5f38b" strokeWidth="3"/>{other!==null&&<path d={line(other)} fill="none" stroke="#85ccdf" strokeWidth="2" strokeDasharray="6 4"/>}
     {current.anomaly!==null&&<circle cx={x(current.month)} cy={y(current.anomaly)} r="6" fill={current.year===year?'#d5f38b':'#85ccdf'}/>}
-    {MONTHS.map((name,i)=><text key={name} x={x(i+1)} y="198" textAnchor="middle" fill="#a8b9c6" fontSize="11">{compact?String(i+1):language==='zh'?t(name):name.slice(0,3)}</text>)}
+    {MONTHS.map((name,i)=><text key={name} x={x(i+1)} y="198" textAnchor="middle" fill="#a8b9c6" fontSize="11">{compact?String(i+1):name.slice(0,3)}</text>)}
   </svg><p><span className="sp-legend-a">● {year}</span>{other!==null&&<span className="sp-legend-b"> ┄ {other}</span>}</p></div>;
 }
 export function DataPage({settings,setSettings}:SoundProps){
-  const {t,date,language}=useStudioLanguage(),audio=useClimateTransport();
+  const {t,date}=useStudioLanguage(),audio=useClimateTransport();
   const [year,setYear]=useState(2025),[month,setMonth]=useState(1),[compare,setCompare]=useState(false),[yearB,setYearB]=useState(1880);
   const selected=getClimateMonth(year,month),current=audio.audible??selected,event=mapData(current),other=getClimateMonth(yearB,month);
   const dataSettings={...settings,dataOnly:true,tempo:60};

@@ -1,0 +1,59 @@
+{
+  "title": "GEOS Aerosols (2025)",
+  "svsId": 5669,
+  "page": "https://svs.gsfc.nasa.gov/5669/",
+  "doi": "10.5281/zenodo.21893141",
+  "released": "2026-08-10",
+  "moment": "2025-08-19T20:00:00Z",
+  "description": "Aerosols modeled by NASA's Goddard Earth Observing System (GEOS) on 19 August 2025, 20:00 UTC. NASA colours four types: sea salt (blue), dust (pink/magenta), smoke from fires (orange/red; 'Black Carbon' on the colour bar) and sulfates from pollution and volcanoes (green).",
+  "files": [
+    {
+      "file": "svs5669_aerosols_2025-08-19T20Z_1920x1080.png",
+      "role": "analysed: every sound is computed from these pixels",
+      "originalFilename": "Aerosols_2025-08-19T20_00_00_1920x1080.png",
+      "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005669/Aerosols_2025-08-19T20_00_00_1920x1080.png",
+      "routeUsed": "internet-archive",
+      "archiveUrl": "https://web.archive.org/web/20261011155159id_/https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005669/Aerosols_2025-08-19T20_00_00_1920x1080.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2768951,
+      "sha256": "0c6a8f6c46fb52a2f9a636bbd804fc6e5e23454dcb2f0d3fe04c653c772e8a7a",
+      "note": "8-bit RGB PNG with no colour profile or gamma chunk, so browsers decode exactly these bytes."
+    },
+    {
+      "file": "svs5669_aerosols_cbar.png",
+      "role": "analysed: the four aerosol colours are read from this colour bar",
+      "originalFilename": "Aerosols_cbar.png",
+      "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005669/Aerosols_cbar.png",
+      "routeUsed": "internet-archive",
+      "archiveUrl": "https://web.archive.org/web/20260825164136id_/https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005669/Aerosols_cbar.png",
+      "width": 1500,
+      "height": 300,
+      "bytes": 38691,
+      "sha256": "e3a280ef5b9598f6c9c765d43a5cc10fe4c9865b13cd471b1e80543643a11ec3"
+    },
+    {
+      "file": "svs5669_globe_2048x1024.jpg",
+      "role": "display only: texture for the spinning 3D globe",
+      "derivedFrom": "svs5669_aerosols_2025-08-19T20Z_1920x1080.png",
+      "method": "macOS sips: resampled to 2048 × 1024 (2:1 for a sphere), JPEG quality 85",
+      "sha256": "4cf212d6d6ceb58d5416603b912e4de76075476c2f0eae7237535f82dc1a9e23"
+    },
+    {
+      "file": "svs5669_poster_640x360.jpg",
+      "role": "display only: record sleeve on the shelf and the 3D jukebox",
+      "derivedFrom": "svs5669_aerosols_2025-08-19T20Z_1920x1080.png",
+      "method": "macOS sips: resampled to 640 × 360, JPEG quality 82",
+      "sha256": "b001b1902b71f80ebf0aceb68f3034816a63e0e28321b4f12088bbab155c9ffb"
+    }
+  ],
+  "retrievedAt": "2026-11-14T17:17:00+08:00",
+  "retrievalNote": "svs.gsfc.nasa.gov timed out from this network on 14 Nov 2026, so the files were retrieved from the Internet Archive's captures of NASA's original URLs (raw 'id_' responses). Re-verify the hashes against NASA's live files when reachable.",
+  "credits": {
+    "producer": "NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS)",
+    "visualizers": ["Joseph V. Ardizzone (NASA/GSFC)", "Helen-Nicole Kostis (Science and Technology Corporation)"],
+    "scientist": "Lesley Ott (NASA/GSFC)",
+    "dataset": "GEOS-FP 2Km Replay (GEOS Forward Processing 2Km Replay), model"
+  },
+  "limits": "GEOS is a model analysis that assimilates satellite observations, in situ measurements and about one million weather observations per hour; it is not a direct measurement. The colour bar has no numeric scale, so TerraJuke reports rendered colour strength, never aerosol optical depth or concentration."
+}

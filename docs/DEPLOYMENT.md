@@ -2,7 +2,7 @@
 
 Live website: [terrajuke.vercel.app](https://terrajuke.vercel.app/). `earth-fm.vercel.app` is an alias of the same Vercel project.
 
-Home (`/`) is the jukebox. Listen, Create, Explore Data and About have their own routes (`/listen`, `/create`, `/data`, `/about`); exact static rewrites in `vercel.json` support a direct refresh while preserving `/data/…` source files. English is the default, with an optional persistent Simplified Chinese choice. The original Earth FM app remains at `?legacy=1`, with old anchors and shared-mix links preserved.
+Home (`/`) is the jukebox. Listen, Create, Explore Data and About have their own routes (`/listen`, `/create`, `/data`, `/about`); exact static rewrites in `vercel.json` support a direct refresh while preserving `/data/…` source files. The interface is English only. The original Earth FM app remains at `?legacy=1`, with old anchors and shared-mix links preserved.
 
 TerraJuke has one production workflow: **`main` → Vercel production**. Preview deployments are disabled, and `vercel.json` permits automatic Git deployments only from `main`.
 

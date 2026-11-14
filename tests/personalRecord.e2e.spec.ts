@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {readFileSync} from 'node:fs';
@@ -42,7 +43,7 @@ test('PNG, JPEG and WebP make an explicitly personal record; native chooser rema
   await expect(page.locator('.jb-deck .jb-art-label')).not.toContainText('NASA');
   await expect(page.locator('.jb-source')).toContainText('not NASA imagery or scientific measurements');
   await expect(page.locator('.jb-source a')).toHaveCount(0);
-  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(5);
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(6);
   await expect(page.getByRole('button',{name:/Side B:/})).toHaveCount(0);
   for(const extension of ['jpg','webp'])await upload(page,fixture(extension));
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
@@ -155,7 +156,7 @@ test('the image, filename and take stay out of storage and outbound requests; na
 test('personal touch dragging scans the visible image while vertical gestures scroll and cancel audio',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
-    await page.goto('http://127.0.0.1:5173/');await upload(page);await scratch(page);
+    await page.goto(new URL('/',test.info().project.use.baseURL).href);await upload(page);await scratch(page);
     const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!,cdp=await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.3,y:bounds.y+bounds.height*.5,id:1}]});
     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.7,y:bounds.y+bounds.height*.5,id:1}]});
@@ -169,14 +170,14 @@ test('personal touch dragging scans the visible image while vertical gestures sc
   }finally{await context.close();}
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} personal record fits phone and tablet, remains bilingual and preserves a take through appearance changes`,async({page})=>{
-  test.setTimeout(60_000);await audit(page);await page.goto('/');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);await upload(page);
+for(const theme of ['light','dark'] as const)test(`${theme} personal record fits phone and tablet, and preserves a take through appearance changes`,async({page})=>{
+  test.setTimeout(60_000);await audit(page);await page.goto('/');await chooseAppearance(page,theme);await upload(page);
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
-  const count=await page.evaluate(()=>window.personalAudit.contexts.length);await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme==='light'?'dark':'light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);expect(await page.evaluate(()=>window.personalAudit.contexts.length)).toBe(count);await page.getByRole('button',{name:'Stop',exact:true}).click();await scratch(page);
+  const count=await page.evaluate(()=>window.personalAudit.contexts.length);await chooseAppearance(page,theme==='light'?'dark':'light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);expect(await page.evaluate(()=>window.personalAudit.contexts.length)).toBe(count);await page.getByRole('button',{name:'Stop',exact:true}).click();await scratch(page);
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('31');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
   const source=await page.locator('.jb-media img').getAttribute('src'),brightness=await page.locator('.jb-scratch').getAttribute('data-scratch-brightness');
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme==='light'?'dark':'light');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await expect(page.locator('.jb-media img')).toHaveAttribute('src',source!);await expect(page.locator('.jb-scratch')).toHaveAttribute('data-scratch-brightness',brightness!);
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await chooseAppearance(page,theme==='light'?'dark':'light');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await expect(page.locator('.jb-media img')).toHaveAttribute('src',source!);await expect(page.locator('.jb-scratch')).toHaveAttribute('data-scratch-brightness',brightness!);
+  await chooseAppearance(page,theme);
   for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900}]){
     await page.setViewportSize(viewport);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await expect.poll(()=>page.evaluate(()=>{
@@ -192,5 +193,5 @@ for(const theme of ['light','dark'] as const)test(`${theme} personal record fits
   }
   await slider(page).focus();await slider(page).press('Home');await slider(page).press('ArrowRight');await expect(slider(page)).toHaveValue('2');
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(result.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(page.getByRole('heading',{name:'你的唱片',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'更换图片',exact:true})).toBeVisible();await expect(page.getByRole('region',{name:'地球旋律录制',exact:true})).toHaveAttribute('data-loop-count','1');
+  await expect(page.getByRole('heading',{name:'Your Record',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Replace image',exact:true})).toBeVisible();await expect(page.getByRole('region',{name:'Earth Looper',exact:true})).toHaveAttribute('data-loop-count','1');
 });

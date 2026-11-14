@@ -1,0 +1,24 @@
+.rj{container-type:inline-size;--rj-accent:var(--record-accent,#64d2ff);margin:14px 0 0;padding:20px 20px 22px;border-radius:22px;background:var(--ef-panel,#0b0f14);color:var(--ef-text,#eef3f7);box-shadow:0 0 0 1px var(--ef-border,#ffffff10),var(--ef-shadow,0 8px 28px -12px #0008)}
+.rj header{display:grid;gap:2px;margin-bottom:14px}
+.rj-kicker{margin:0;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--ef-muted)}
+.rj h3{margin:0;font-size:18px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.rj-track{position:relative}
+.rj-line{position:absolute;left:0;right:0;top:17px;width:100%;height:4px;overflow:visible}
+.rj-path{fill:none;stroke:var(--rj-accent);stroke-width:2;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.55}
+.rj ol{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:12px;margin:0;padding:0;list-style:none}
+.rj-stop{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.rj-dot{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--ef-panel-raised,#141b23);color:var(--rj-accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--rj-accent) 45%,#0000),0 0 18px -4px var(--rj-accent)}
+.rj-stop strong{font-size:13px;font-weight:600;line-height:1.25;text-wrap:balance}
+.rj-stop small{font-size:11.5px;line-height:1.35;color:var(--ef-muted,#a8b4be);text-wrap:pretty}
+.rj-you .rj-dot{background:var(--rj-accent);color:#05080b}
+.rj-you strong{color:var(--ef-text)}
+.rj-you small{font-variant-numeric:tabular-nums}
+.rj.has-motion .rj-stop{opacity:0}
+@container (max-width:620px){
+  .rj ol{grid-auto-flow:row;grid-auto-columns:auto;gap:14px}
+  .rj-line{display:none}
+  .rj-stop{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:12px;row-gap:2px}
+  .rj-stop .rj-dot{grid-row:span 2}
+  .rj ol::before{content:"";position:absolute;left:17px;top:18px;bottom:18px;width:2px;background:color-mix(in srgb,var(--rj-accent) 45%,#0000);border-radius:2px}
+}
+@media(prefers-reduced-motion:reduce){.rj.has-motion .rj-stop{opacity:1}}

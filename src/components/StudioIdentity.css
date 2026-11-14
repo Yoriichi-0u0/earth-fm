@@ -74,7 +74,7 @@
 }
 
 .ss.ss-pages .sp-brand-icon {
-  width: clamp(28px, 7vw, 40px);
+  width: clamp(32px, 8vw, 44px);
   height: auto;
   flex: none;
 }
@@ -309,7 +309,7 @@
 
 @media (max-width: 410px) {
   .ss.ss-pages .sp-brand { gap: 3px; overflow-wrap: anywhere; }
-  .ss.ss-pages .sp-brand-icon { width: 27px; }
+  .ss.ss-pages .sp-brand-icon { width: 30px; }
   .ss.ss-pages .jb-home .jb-intro h1 { font-size: 1.88rem; }
   .ss.ss-pages .jb-intro>p { display: flex; flex-wrap: wrap; align-items: center; }
   .ss.ss-pages .jb-shelf-link { margin: 0 .65em 0 0; }

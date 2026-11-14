@@ -45,6 +45,6 @@ The app runs entirely in the browser and does not use Supabase yet. The hosted d
 
 ## Browser storage
 
-The app stores three preferences in the visitor's browser: `terrajuke-appearance`, `terrajuke-studio-language` and `terrajuke-saved` (favourites in the original app). When a TerraJuke key is empty, the app reads the matching `earth-fm-*` key once, so visitors from the Earth FM period keep their choices.
+The app stores two preferences in the visitor's browser: `terrajuke-appearance` and `terrajuke-saved` (favourites in the original app). When a TerraJuke key is empty, the app reads the matching `earth-fm-*` key, so visitors from the Earth FM period keep their choices. The language preference keys (`terrajuke-studio-language`, `earth-fm-studio-language`) are no longer read: the interface is English only.
 
 Use [DEPLOYMENT.md](DEPLOYMENT.md) for hosting and verification commands.

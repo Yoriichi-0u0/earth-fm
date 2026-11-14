@@ -1,8 +1,9 @@
 import {expect,test} from '@playwright/test';
+import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const appearance=(page:Page)=>page.getByRole('combobox',{name:'Appearance',exact:true});
+const appearance=appearanceGroup;
 const pages=['/','/listen?station=all','/listen','/create','/data','/data?station=arctic','/about','/?legacy=1'];
 const palette=async(page:Page)=>page.evaluate(()=>({
   effective:document.documentElement.dataset.theme,
@@ -21,27 +22,27 @@ test('Auto resolves before the app appears and follows live system appearance wi
     });
     observer.observe(document,{childList:true,subtree:true});
   });
-  await page.goto('/');await expect(appearance(page)).toHaveValue('auto');
+  await page.goto('/');await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('html')).toHaveAttribute('data-theme','light');
   expect(await page.evaluate(()=>(window as unknown as {appearanceAtRoot?:string}).appearanceAtRoot)).toBe('light');
   const light=await palette(page);expect(light.native).toBe('light');expect(light.browser).toMatch(/^#[a-f\d]{6}$/i);
   await page.emulateMedia({colorScheme:'dark'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
   const dark=await palette(page);expect(dark.native).toBe('dark');expect(dark.browser).not.toBe(light.browser);
-  await expect(appearance(page)).toHaveValue('auto');
+  await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');
   await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','light');
 });
 
 test('explicit appearance survives navigation, refresh and Legacy while overriding the system',async({page})=>{
   await page.emulateMedia({colorScheme:'dark'});await page.goto('/');
-  await appearance(page).selectOption('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await chooseAppearance(page,'light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
   expect(await page.evaluate(()=>localStorage.getItem('terrajuke-appearance'))).toBe('light');
-  await page.getByRole('link',{name:'Create',exact:true}).click();await expect(appearance(page)).toHaveValue('light');
-  await page.reload();await expect(appearance(page)).toHaveValue('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
-  await page.goto('/?legacy=1');await expect(appearance(page)).toHaveValue('light');
-  await appearance(page).selectOption('dark');await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
-  await page.goto('/data');await expect(appearance(page)).toHaveValue('dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
-  await appearance(page).selectOption('auto');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
-  await page.reload();await expect(appearance(page)).toHaveValue('auto');
+  await page.getByRole('link',{name:'Create',exact:true}).click();await expect(appearanceButton(page,'light')).toHaveAttribute('aria-pressed','true');
+  await page.reload();await expect(appearanceButton(page,'light')).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await page.goto('/?legacy=1');await expect(appearanceButton(page,'light')).toHaveAttribute('aria-pressed','true');
+  await chooseAppearance(page,'dark');await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await page.goto('/data');await expect(appearanceButton(page,'dark')).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await chooseAppearance(page,'auto');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await page.reload();await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');
   await page.emulateMedia({colorScheme:'dark'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
 });
 
@@ -55,8 +56,8 @@ test('invalid or unavailable preference storage leaves the appearance controls u
           Storage.prototype.setItem=function(){throw new DOMException('Blocked for test','SecurityError');};
         }else localStorage.setItem('terrajuke-appearance','unrecognised-choice');
       },blocked);
-      await page.goto('http://127.0.0.1:5173/');await expect(appearance(page)).toHaveValue('auto');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
-      await appearance(page).selectOption('dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(appearance(page)).toHaveValue('dark');
+      await page.goto(new URL('/',test.info().project.use.baseURL).href);await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+      await chooseAppearance(page,'dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(appearanceButton(page,'dark')).toHaveAttribute('aria-pressed','true');
       await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
       await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
       await page.getByRole('button',{name:'Stop',exact:true}).click();
@@ -72,14 +73,14 @@ test('theme changes preserve active audio, source pixels, mapped strip values an
   });
   await page.goto('/');await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   const contexts=await page.evaluate(()=>(window as unknown as {appearanceAudio:{contexts:AudioContext[]}}).appearanceAudio.contexts.length);
-  await appearance(page).selectOption('light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
-  await appearance(page).selectOption('dark');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
+  await chooseAppearance(page,'light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
+  await chooseAppearance(page,'dark');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   expect(await page.evaluate(()=>(window as unknown as {appearanceAudio:{contexts:AudioContext[]}}).appearanceAudio.contexts.length)).toBe(contexts);
   expect(await page.evaluate(()=>(window as unknown as {appearanceAudio:{contexts:AudioContext[]}}).appearanceAudio.contexts.every(c=>c.state==='running'))).toBe(true);
   await page.getByRole('button',{name:'Stop',exact:true}).click();await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
   const loop=page.getByRole('region',{name:'Earth Looper',exact:true}),slider=page.getByRole('slider',{name:'Image scan position',exact:true});
   await loop.getByRole('button',{name:'Record',exact:true}).click();await slider.fill('12');await expect(loop).toHaveAttribute('data-loop-count','1');
-  await appearance(page).selectOption('light');await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-count','1');
+  await chooseAppearance(page,'light');await expect(loop).toHaveAttribute('data-loop-phase','recording');await expect(loop).toHaveAttribute('data-loop-count','1');
   await slider.fill('31');await expect(loop).toHaveAttribute('data-loop-count','2');await loop.getByRole('button',{name:'Finish recording',exact:true}).click();
   const take=await loop.getAttribute('data-loop-duration');
   const sample=()=>page.evaluate(async()=>{
@@ -89,11 +90,11 @@ test('theme changes preserve active audio, source pixels, mapped strip values an
     return {src:image.currentSrc,steps:module.imageToSequence(context.getImageData(0,0,canvas.width,canvas.height),48)};
   });
   const before=await sample(),brightness=await page.locator('.jb-scratch').getAttribute('data-scratch-brightness'),frequency=await page.locator('.jb-deck').getAttribute('data-frequency');
-  await appearance(page).selectOption('dark');await expect(loop).toHaveAttribute('data-loop-count','2');await expect(loop).toHaveAttribute('data-loop-duration',take!);
+  await chooseAppearance(page,'dark');await expect(loop).toHaveAttribute('data-loop-count','2');await expect(loop).toHaveAttribute('data-loop-duration',take!);
   expect(await sample()).toEqual(before);await expect(page.locator('.jb-scratch')).toHaveAttribute('data-scratch-brightness',brightness!);await expect(page.locator('.jb-deck')).toHaveAttribute('data-frequency',frequency!);
   await expect(loop.getByRole('button',{name:'Replay take',exact:true})).toBeEnabled();
   await loop.getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop).toHaveAttribute('data-loop-phase','replaying');
-  await appearance(page).selectOption('light');await expect(loop).toHaveAttribute('data-loop-count','2');await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(loop.getByRole('status')).toHaveText('Your take has finished.');
+  await chooseAppearance(page,'light');await expect(loop).toHaveAttribute('data-loop-count','2');await expect(loop).toHaveAttribute('data-loop-phase','idle');await expect(loop.getByRole('status')).toHaveText('Your take has finished.');
   await test.info().attach('theme-science-invariance',{body:JSON.stringify({notice:'Chromium test fixture; no physical-device or acoustic-latency claim',source:before.src,stripCount:before.steps.length,samePixelsAndMapping:true,preservedTakeDurationMs:take}),contentType:'application/json'});
 });
 
@@ -104,23 +105,23 @@ test('optional 3D stays lazy and mounted through appearance changes',async({page
   await page.getByRole('button',{name:'Try 3D record',exact:true}).click();
   await expect(page.locator('.jb-earth-record')).toHaveAttribute('data-record-renderer','three',{timeout:15_000});expect(sceneRequests.length).toBeGreaterThan(0);
   await page.locator('.jb-three-canvas canvas').evaluate(canvas=>{(window as unknown as {themeCanvas:Element}).themeCanvas=canvas;});
-  await appearance(page).selectOption('dark');await appearance(page).selectOption('light');
+  await chooseAppearance(page,'dark');await chooseAppearance(page,'light');
   expect(await page.locator('.jb-three-canvas canvas').evaluate(canvas=>canvas===(window as unknown as {themeCanvas:Element}).themeCanvas)).toBe(true);
   await page.getByRole('button',{name:'Use 2D record',exact:true}).click();await expect(page.locator('.jb-three-canvas canvas')).toHaveCount(0);
 });
 
 test('a missing WebGL context leaves the 2D instrument and audio usable in Light',async({page})=>{
   await page.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(id:string,...args:unknown[]){if(id==='webgl'||id==='webgl2'||id==='experimental-webgl')return null;return Reflect.apply(original,this,[id,...args]);} as typeof original;});
-  await page.goto('/');await appearance(page).selectOption('light');await page.getByRole('button',{name:'Try 3D record',exact:true}).click();
+  await page.goto('/');await chooseAppearance(page,'light');await page.getByRole('button',{name:'Try 3D record',exact:true}).click();
   await expect(page.getByText('2D active · 3D unavailable',{exact:true})).toBeVisible();await expect(page.locator('.jb-earth-record')).toHaveAttribute('data-record-renderer','2d');
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);await page.getByRole('button',{name:'Stop',exact:true}).click();
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} theme has no automated accessibility or contrast findings across the main pages and Legacy`,async({page})=>{
-  test.setTimeout(90_000);await page.goto('/');await appearance(page).selectOption(theme);
+  test.setTimeout(90_000);await page.goto('/');await chooseAppearance(page,theme);
   const results=[];
   for(const route of pages){
-    await page.goto(route);await expect(appearance(page)).toHaveValue(theme);await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
+    await page.goto(route);await expect(appearanceButton(page,theme)).toHaveAttribute('aria-pressed','true');await expect(page.locator('html')).toHaveAttribute('data-theme',theme);
     const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
     results.push({route,violations:scan.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),contrast:scan.passes.filter(p=>p.id==='color-contrast').map(p=>({id:p.id,nodes:p.nodes.map(n=>({target:n.target,checks:n.any.map(c=>c.data)}))})),incomplete:scan.incomplete.filter(p=>p.id==='color-contrast').map(p=>({id:p.id,targets:p.nodes.map(n=>n.target)}))});
   }
@@ -129,7 +130,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} theme has no automat
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific explanations and disabled controls retain contrast`,async({page})=>{
-  test.setTimeout(90_000);await page.goto('/');await appearance(page).selectOption(theme);const results=[];
+  test.setTimeout(90_000);await page.goto('/');await chooseAppearance(page,theme);const results=[];
   for(const route of ['/about','/create','/data','/listen']){
     await page.goto(route);
     if(route==='/create')await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
@@ -152,10 +153,10 @@ for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific 
 for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}])test(`responsive appearance and keyboard controls fit ${viewport.width} × ${viewport.height}`,async({page})=>{
   test.setTimeout(60_000);await page.setViewportSize(viewport);
   for(const theme of ['light','dark']){
-    await page.goto('/');await appearance(page).selectOption(theme);
+    await page.goto('/');await chooseAppearance(page,theme);
     for(const route of ['/','/listen?station=all','/create','/data','/about']){
       if(route!=='/')await page.goto(route);
-      await expect(appearance(page)).toHaveValue(theme);
+      await expect(appearanceButton(page,theme)).toHaveAttribute('aria-pressed','true');
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${theme} ${route}: no document overflow`).toBe(true);
       if(route==='/'){
         const disc=await page.locator('.jb-vinyl-fallback').boundingBox(),toggle=await page.getByRole('button',{name:'Try 3D record',exact:true}).boundingBox();
@@ -178,19 +179,17 @@ for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,
   }
 });
 
-test('Chinese appearance names, reduced motion and enlarged-text stress preserve usable controls',async({page})=>{
+test('the Appearance buttons, reduced motion and enlarged-text stress preserve usable controls',async({page})=>{
   await page.setViewportSize({width:768,height:1024});await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/create');
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
-  const control=page.getByRole('combobox',{name:'外观',exact:true});await expect(control).toBeVisible();
-  // Native select popups are platform-owned. Verify tab order here and use
-  // Playwright's native select API for choices; real-device key menus stay in the manual protocol.
-  await page.getByRole('combobox',{name:'语言',exact:true}).focus();await page.keyboard.press('Tab');await expect(control).toBeFocused();
-  await control.selectOption('dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
-  await control.selectOption('auto');await expect(control).toHaveValue('auto');await control.selectOption('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
-  await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');
+  await expect(appearanceGroup(page)).toBeVisible();
+  // Keyboard: the last navigation link is followed by the three Appearance buttons, each one press.
+  await page.getByRole('navigation').getByRole('link',{name:'About',exact:true}).focus();await page.keyboard.press('Tab');await expect(appearanceButton(page,'auto')).toBeFocused();
+  await page.keyboard.press('Tab');await page.keyboard.press('Tab');await page.keyboard.press('Enter');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await expect(appearanceButton(page,'dark')).toHaveAttribute('aria-pressed','true');await expect(appearanceButton(page,'light')).toHaveAttribute('aria-pressed','false');
+  await chooseAppearance(page,'auto');await expect(appearanceButton(page,'auto')).toHaveAttribute('aria-pressed','true');await chooseAppearance(page,'light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
   await expect(page.getByRole('checkbox',{name:'Motion effects',exact:true})).not.toBeChecked();
   // Explicit text-enlargement stress fixture; not a claim of native browser zoom or physical OS text testing.
-  await page.evaluate(()=>{const elements=[...document.querySelectorAll<HTMLElement>('.sp-page button,.sp-page label,.sp-page p,.sp-header a,.sp-header select')].map(e=>({e,size:parseFloat(getComputedStyle(e).fontSize)}));for(const {e,size} of elements)e.style.fontSize=`${size*2}px`;});
+  await page.evaluate(()=>{const elements=[...document.querySelectorAll<HTMLElement>('.sp-page button,.sp-page label,.sp-page p,.sp-header a,.sp-header button')].map(e=>({e,size:parseFloat(getComputedStyle(e).fontSize)}));for(const {e,size} of elements)e.style.fontSize=`${size*2}px`;});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.getByRole('button',{name:'Mellow Reed',exact:true}).focus();await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:'Soft Glass',exact:true})).toBeFocused();
   const tone=await page.getByRole('button',{name:'Soft Glass',exact:true}).boundingBox(),dock=await page.locator('.sp-create-transport').boundingBox();expect(tone!.y).toBeGreaterThanOrEqual(dock!.y+dock!.height);expect(tone!.y+tone!.height).toBeLessThanOrEqual(1024);
@@ -218,25 +217,23 @@ test('provisional identity and the primary Play action work at phone width', asy
   await expect(player.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
   await expect(player.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
 
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
-  await expect(page).toHaveTitle('TerraJuke — 地球信息点唱机');
-  await page.getByRole('navigation').getByRole('link',{name:'关于',exact:true}).press('Enter');
+  
+  
+  await page.getByRole('navigation').getByRole('link',{name:'About',exact:true}).press('Enter');
   await expect(page).toHaveURL(/\/about$/);
-  await expect(page.getByRole('link',{name:'关于',exact:true})).toHaveAttribute('aria-current','page');
+  await expect(page.getByRole('link',{name:'About',exact:true})).toHaveAttribute('aria-current','page');
   await page.goto('/?legacy=1');
   await expect(page.getByRole('link',{name:'TerraJuke home',exact:true})).toBeVisible();
 });
 
-test('appearance and language saved under the Earth FM keys carry over to TerraJuke',async({page})=>{
+test('an appearance saved under the Earth FM key carries over to TerraJuke; an old language choice is ignored',async({page})=>{
   await page.addInitScript(()=>{
     if(sessionStorage.getItem('seeded'))return;sessionStorage.setItem('seeded','1');
     localStorage.clear();localStorage.setItem('earth-fm-appearance','dark');localStorage.setItem('earth-fm-studio-language','zh');
   });
   await page.emulateMedia({colorScheme:'light'});await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
-  await expect(page.locator('.sp-language select')).toHaveValue('zh');
-  await expect.poll(()=>page.evaluate(()=>localStorage.getItem('terrajuke-studio-language'))).toBe('zh');
-  await page.locator('.sp-language select').selectOption('en');await appearance(page).selectOption('light');
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme','light');await expect(page.locator('.sp-language select')).toHaveValue('en');
+  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(appearanceButton(page,'dark')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('html')).toHaveAttribute('lang','en');await expect(page.getByRole('heading',{level:1})).toContainText('Your planet.');
+  await chooseAppearance(page,'light');await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light');await expect(appearanceButton(page,'light')).toHaveAttribute('aria-pressed','true');
 });
