@@ -41,11 +41,11 @@ export const JOURNEYS:Record<JukeboxRecordId,readonly JourneyLink[]>={
     {icon:'archive',title:'earth.gov, via an attributed mirror',detail:'The originals now return 404; the archived copy is pinned by hash'},
     TERRAJUKE,
   ],
-  arctic:[
-    {icon:'satellite',title:'Passive-microwave satellites',detail:'Daily sea ice from space, through clouds and polar night (NSIDC-0051 and 0081)'},
-    {icon:'model',title:'NSIDC, Boulder, Colorado',detail:'Sea Ice Index, Version 3: daily Northern Hemisphere extent'},
-    {icon:'jukebox',title:'TerraJuke September means',detail:'Each September’s 30 daily extents averaged by this project'},
-    TERRAJUKE,
+  ice:[
+    {icon:'satellite',title:'GCOM-W1 “SHIZUKU” satellite, AMSR2',detail:'A JAXA microwave radiometer that sees sea ice through clouds and the polar night'},
+    {icon:'model',title:'JAXA sea ice concentration',detail:'10 km daily concentration, a 3-day running minimum; ice is drawn where at least 15% of the sea is frozen'},
+    {icon:'studio',title:SVS,detail:'SVS 5046, Daily Arctic Sea Ice, visualized by Trent L. Schindler over Blue Marble Next Generation land'},
+    EIC,TERRAJUKE,
   ],
   temperature:[
     {icon:'thermometer',title:'Thermometers on land and at sea',detail:'Weather stations (NOAA GHCN) and ship and buoy sea-surface readings (NOAA ERSST)'},

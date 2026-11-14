@@ -212,10 +212,10 @@ test('provisional identity and the primary Play action work at phone width', asy
   const playBounds=await play.boundingBox();
   expect(playBounds!.y+playBounds!.height).toBeLessThanOrEqual(568);
   await page.getByRole('link',{name:'Browse records',exact:true}).press('Enter');
-  await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).press('Enter');
+  await page.getByRole('button',{name:'Select record: The Ice Year',exact:true}).press('Enter');
   await expect(player).toBeFocused();
-  await expect(player.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
-  await expect(player.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+  await expect(player.getByRole('heading',{name:'The Ice Year',exact:true})).toBeVisible();
+  await expect(player.getByRole('button',{name:'Play the ice year',exact:true})).toBeEnabled();
 
   
   

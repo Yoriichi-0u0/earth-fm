@@ -125,8 +125,8 @@ test('rapid replacement, Remove, navigation and late image callbacks cannot rest
 test('a decode timeout releases its URL and choosing a curated record cancels pending decoding',async({page})=>{
   await audit(page);await page.goto('/listen');await page.clock.install();await page.evaluate(()=>{window.personalAudit.holdImages=true;});await input(page).setInputFiles(fixture());await expect.poll(()=>page.evaluate(()=>window.personalAudit.late.length)).toBe(1);
   await page.clock.runFor(10_050);await expect(page.getByRole('alert')).toContainText('could not be opened');await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
-  await input(page).setInputFiles(fixture());await expect(page.locator('.jb-personal-loading')).toBeVisible();await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).click();await page.evaluate(()=>{window.personalAudit.late.splice(0).forEach(fn=>fn());});
-  await expect(page.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
+  await input(page).setInputFiles(fixture());await expect(page.locator('.jb-personal-loading')).toBeVisible();await page.getByRole('button',{name:'Select record: The Ice Year',exact:true}).click();await page.evaluate(()=>{window.personalAudit.late.splice(0).forEach(fn=>fn());});
+  await expect(page.getByRole('heading',{name:'The Ice Year',exact:true})).toBeVisible();await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
 });
 
 test('pending audio startup and pending replay are cancelled when the personal source changes',{tag:'@timing'},async({page})=>{
