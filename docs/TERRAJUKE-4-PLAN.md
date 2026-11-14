@@ -43,6 +43,11 @@ Unit and e2e tests for every new behaviour, docs (`docs/AIR.md`, SUBMISSION, REA
 - **Meet the four instruments** on The Air We Share: each aerosol alone, rising from south to north.
 - Checked in emulated iPhone WebKit: the Air and Night Lights specs pass (21/21).
 
+## TerraJuke 6: Currents of Heat (14 Nov, night)
+
+- New record 04 from NASA SVS 3912: temperature read from NASA's numeric colour scale; pole to pole and touch-the-ocean sides. See `docs/OCEAN.md`.
+- The 3D record rack (Three.js, about 0.9 MB) now loads when the page is idle, and not at all under Save-Data.
+
 ## Not claimed
 
 GEOS is a model analysis that assimilates satellite and ground observations. It is not a direct measurement, and the colour bar carries no numeric scale, so TerraJuke reports rendered colour strength, never optical depth or concentrations. The still is one moment (19 Aug 2025, 20:00 UTC). Shares are of map pixels on an equirectangular map, not of area.

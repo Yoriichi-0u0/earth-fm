@@ -44,7 +44,7 @@ test('PNG, JPEG and WebP make an explicitly personal record; native chooser rema
   await expect(page.locator('.jb-deck .jb-art-label')).not.toContainText('NASA');
   await expect(page.locator('.jb-source')).toContainText('not NASA imagery or scientific measurements');
   await expect(page.locator('.jb-source a')).toHaveCount(0);
-  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(6);
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(7);
   await expect(page.getByRole('button',{name:/Side B:/})).toHaveCount(0);
   for(const extension of ['jpg','webp'])await upload(page,fixture(extension));
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);

@@ -19,8 +19,8 @@ class Boundary extends Component<{children:ReactNode;onFail:()=>void},{failed:bo
 }
 const webgl=()=>{try{const c=document.createElement('canvas');return Boolean(c.getContext('webgl2')??c.getContext('webgl'));}catch{return false;}};
 
-type Props={target:GlobeTarget;playing:boolean;pulse:number;motion:boolean;accent:string;caption:string};
-export default function AirTurntable({target,playing,pulse,motion,accent,caption}:Props){
+type Props={target:GlobeTarget;playing:boolean;pulse:number;motion:boolean;accent:string;caption:string;texture?:string};
+export default function AirTurntable({target,playing,pulse,motion,accent,caption,texture=GLOBE_TEXTURE_URL}:Props){
   const {t}=useStudioLanguage();
   const root=useRef<HTMLDivElement>(null);
   const [wanted,setWanted]=useState(true),[failed,setFailed]=useState(false),[ready,setReady]=useState(false),[visible,setVisible]=useState(true);
@@ -37,8 +37,8 @@ export default function AirTurntable({target,playing,pulse,motion,accent,caption
   const u=((target.lon+180)%360+360)%360/360;
   return <div ref={root} className={`air-turntable${playing&&motion?' is-playing':''}`} data-globe-renderer={three&&ready?'three':'2d'} data-globe-lon={target.lon.toFixed(2)}>
     <div className="air-globe" aria-hidden="true">
-      <span className="air-globe-2d" style={{backgroundImage:`url(${GLOBE_TEXTURE_URL})`,backgroundPosition:`${(2*u-.5)*100}% ${50-target.lat*.25}%`,opacity:three&&ready?0:1,transition:motion?'background-position .35s cubic-bezier(.2,.8,.2,1)':'none'}}/>
-      {three&&<span className="air-globe-3d"><Boundary onFail={fail}><Suspense fallback={null}><Scene target={target} playing={playing} pulse={pulse} motion={motion} accent={accent} onReady={onReady} onUnavailable={fail}/></Suspense></Boundary></span>}
+      <span className="air-globe-2d" style={{backgroundImage:`url(${texture})`,backgroundPosition:`${(2*u-.5)*100}% ${50-target.lat*.25}%`,opacity:three&&ready?0:1,transition:motion?'background-position .35s cubic-bezier(.2,.8,.2,1)':'none'}}/>
+      {three&&<span className="air-globe-3d"><Boundary onFail={fail}><Suspense fallback={null}><Scene target={target} playing={playing} pulse={pulse} motion={motion} accent={accent} texture={texture} onReady={onReady} onUnavailable={fail}/></Suspense></Boundary></span>}
       <span className="air-needle-tag" style={{color:accent}}>▼ {lonLabel(target.lon)}</span>
     </div>
     <p className="air-globe-caption">{caption}</p>

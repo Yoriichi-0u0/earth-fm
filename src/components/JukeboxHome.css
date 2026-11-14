@@ -229,3 +229,7 @@
 .ss .jb-home .jb-mystery-entry{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:500;line-height:1.4;border:1px solid var(--ef-control-border);border-radius:7px;color:var(--ef-text);background:var(--ef-panel-raised);white-space:normal}
 .ss .jb-home .jb-mystery-entry:hover{background:var(--ef-selected);color:var(--ef-accent);border-color:var(--ef-accent)}
 @media(max-width:650px){.jb-library-heading{gap:7px}.ss .jb-home .jb-mystery-entry{font-size:10px;padding-inline:7px}}
+
+/* Space held for the 3D record rack until it loads (idle) or when Save-Data skips it. */
+.jb-stage-wait{width:100%;height:230px;margin:0 0 12px;border-radius:16px;background:radial-gradient(120% 90% at 50% 0%,#1b2236 0%,#070a10 70%);border:1px solid #ffffff17}
+@media(max-width:760px){.jb-stage-wait{height:180px}}
