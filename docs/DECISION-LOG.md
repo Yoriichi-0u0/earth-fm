@@ -5,6 +5,12 @@ Treat entries as settled: do not re-ask unless new facts contradict them (then a
 Earlier decisions live in dated docs such as [TERRAJUKE-3-DECISIONS.md](TERRAJUKE-3-DECISIONS.md) and
 [TEAM-HANDOFF.md](TEAM-HANDOFF.md).
 
+## 2026-11-15 00:46 · Merge and deploy 8.0.0 without waiting for Chia's review
+- **Decided by:** Jacy ("Merge both and deploy").
+- **What:** PRs #29 (The Ice Year) and #30 (Sound setting) merged and deployed. TEAM-HANDOFF asked record rebuilds to
+  wait for review by Chia's Claude; Jacy chose to ship first. Chia's Claude can still review the merged PRs; fix
+  forward or revert `208d678` if a problem is found.
+
 ## 2026-11-15 00:30 · Sound: Note by note or Continuous
 - **Decided by:** Jacy (request: "user can either select the sound be like . . . . . or -----").
 - **What:** one shared setting for every jukebox record, stored as `terrajuke-articulation` (`notes` default, `flow`).

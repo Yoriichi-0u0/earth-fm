@@ -12,11 +12,12 @@ have git tags and GitHub releases. Times are MYT (UTC+8). How to cut a release: 
 
 ## [Unreleased]
 
-### Added
-- Change records: this changelog, release notes in `docs/releases/`, the decision log, and
-  [docs/SOURCE-VERIFICATION.md](docs/SOURCE-VERIFICATION.md) (all seven records checked on 14 Nov 2026).
-- CLAUDE.md rule: every pull request updates `[Unreleased]`; every merge to `main` that changes the app cuts a release.
+## [8.0.0] - 2026-11-15 00:46 · PRs #29, #30 · live
 
+The Ice Year, About this sound, and the Sound setting. Production: https://terrajuke.vercel.app, merge `208d678`,
+bundle `index-CFCACNwB.js`. Notes: [docs/releases/v8.0.0.md](docs/releases/v8.0.0.md).
+
+### Added
 - Record 06 **The Ice Year** from NASA SVS 5046 (*Daily Arctic Sea Ice*, JAXA AMSR2, 2024), replacing the
   NSIDC-derived *Arctic September*. Side A: twelve months, the ice area NASA drew north of 50°N (measured through
   NASA's own RenderMan camera) sets pitch: 13.6 million km² in March to 3.9 in September. Side B: touch or arrow-key
@@ -32,7 +33,14 @@ have git tags and GitHub releases. Times are MYT (UTC+8). How to cut a release: 
 - *Arctic September* from the shelf, the jukebox data deck and Mystery Record (Mystery now draws from Climate Spiral,
   Moving Earth and Temperature Through Time). The NSIDC series stays only in the Arctic guided story.
 
-## [7.0.0] - 2026-11-14 22:58 · PR #27 · live
+## [7.0.1] - 2026-11-14 23:22 · PR #28 · docs only
+
+### Added
+- Change records: this changelog, release notes in `docs/releases/`, the decision log, and
+  [docs/SOURCE-VERIFICATION.md](docs/SOURCE-VERIFICATION.md) (all seven records checked on 14 Nov 2026).
+- CLAUDE.md rule: every pull request updates `[Unreleased]`; every merge to `main` that changes the app cuts a release.
+
+## [7.0.0] - 2026-11-14 22:58 · PR #27
 
 Two-page redesign. Production: https://terrajuke.vercel.app, merge `8ec8e34`, bundle `index-MnTVyrhU.js`.
 Notes: [docs/releases/v7.0.0.md](docs/releases/v7.0.0.md).
@@ -123,5 +131,6 @@ Notes: [docs/releases/v7.0.0.md](docs/releases/v7.0.0.md).
 ## [1.0.0] - 2026-10-14 · Earth FM
 - First visual and climate sonification, connected to GitHub and Vercel; `main` is the single production branch.
 
-[Unreleased]: https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/compare/v7.0.0...main
+[Unreleased]: https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/compare/v8.0.0...main
+[8.0.0]: https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/releases/tag/v8.0.0
 [7.0.0]: https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/releases/tag/v7.0.0

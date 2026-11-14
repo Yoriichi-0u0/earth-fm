@@ -38,4 +38,5 @@ tests and docs. Rollback = revert the merge commit on `main` (Vercel redeploys);
 
 | Version | Date | Headline |
 |---|---|---|
+| [8.0.0](v8.0.0.md) | 2026-11-15 | The Ice Year (NASA SVS 5046), About this sound (5W1H), Sound: Note by note or Continuous |
 | [7.0.0](v7.0.0.md) | 2026-11-14 | Two-page redesign: Home introduces and guides, Listen holds every player |
