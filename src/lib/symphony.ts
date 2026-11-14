@@ -1,12 +1,14 @@
 import { compileClimateEvent } from './climateMapping';
 import type { MonthlyObservation } from './climateMapping';
+import { FlowVoice, getArticulation } from './articulation';
+import type { Articulation } from './articulation';
 export type Style = 'Ambient' | 'Electronic Pulse' | 'Cinematic';
 export const TIMBRES = ['Warm Keys', 'Velvet Pad', 'Soft Pluck', 'Mellow Reed', 'Soft Glass'] as const;
 export type Timbre = typeof TIMBRES[number];
 export const NOTES = ['C3','D3','E3','G3','A3','C4','D4','E4','G4','A4'];
 export const PROFILE = { id: 'symphony-ten-v1', frequenciesHz: [48,50,52,55,57,60,62,64,67,69].map(m => 440 * 2 ** ((m - 69) / 12)) };
 export const mapData = (point: MonthlyObservation) => compileClimateEvent(point, PROFILE);
-export type Settings = { style: Style; timbre: Timbre; dataOnly: boolean; drums: boolean; harmony: boolean; tempo: number; volume: number; space: number; brightness: number };
+export type Settings = { style: Style; timbre: Timbre; dataOnly: boolean; drums: boolean; harmony: boolean; tempo: number; volume: number; space: number; brightness: number; /** Defaults to the visitor's Sound setting. */ articulation?: Articulation };
 export const defaults: Settings = { style: 'Electronic Pulse', timbre: 'Warm Keys', dataOnly: false, drums: true, harmony: true, tempo: 60, volume: .6, space: .25, brightness: 2200 };
 
 /** All sounds are synthesized. The scientific fundamental is never transposed by style. */
@@ -69,16 +71,20 @@ export function renderPitchedScore(context: BaseAudioContext, destination: Audio
     gain.gain.setValueAtTime(0,time); gain.gain.linearRampToValueAtTime(level,time+.005); gain.gain.exponentialRampToValueAtTime(.00001,time+.22);
     osc.connect(gain); gain.connect(bus); osc.start(time); osc.stop(time+.23); sources.push(osc); nodes.push(osc,gain);
   }
+  // Continuous: one sustained melody voice glides from pitch to pitch; nulls are rests. Same partials, same pitches.
+  const flow = (settings.articulation ?? getArticulation()) === 'flow';
+  const flowVoice = flow ? new FlowVoice(context, filter, { partials: voices[settings.timbre ?? 'Warm Keys'].partials.map((weight, index) => ({ ratio: index + 1, weight })) }, start) : null;
+  if (flowVoice) sources.push(...flowVoice.sources);
   const pulse = settings.style === 'Electronic Pulse';
   const cinematic = settings.style === 'Cinematic';
   pitches.forEach((frequencyHz, i) => {
     const time = start + i * step;
-    if (frequencyHz === null) return;
-    melody(frequencyHz,time,step,.42);
+    if (frequencyHz === null) { flowVoice?.rest(time); return; }
+    if (flowVoice) flowVoice.note(frequencyHz, time, .26, { holdUntil: time + step * 1.02 });
+    else melody(frequencyHz,time,step,.42);
     if (settings.dataOnly) return;
-    // Soft syncopated repeats articulate the same measurement; they never invent pitches.
-    melody(frequencyHz,time+step*.375,step*.32,.13);
-    melody(frequencyHz,time+step*.75,step*.22,.09);
+    // Soft syncopated repeats articulate the same measurement; they never invent pitches. Continuous sound keeps the line unbroken instead.
+    if (!flowVoice) { melody(frequencyHz,time+step*.375,step*.32,.13); melody(frequencyHz,time+step*.75,step*.22,.09); }
     if (settings.harmony) {
       const chords = [[130.8128,164.8138,195.9977],[110,130.8128,164.8138],[87.3071,130.8128,174.6141],[97.9989,146.8324,195.9977]];
       const chord = chords[Math.floor(i/2)%chords.length];
@@ -99,6 +105,7 @@ export function renderPitchedScore(context: BaseAudioContext, destination: Audio
       if(pulse) kick(time+step*.875,.07);
     }
   });
+  flowVoice?.end(start + pitches.length * step + .05);
   return { duration: pitches.length * step + .8, setVolume: (value: number) => bus.gain.setTargetAtTime(Math.max(0, Math.min(1, value)) * .65, context.currentTime, .015), stop: () => { bus.gain.cancelScheduledValues(context.currentTime); bus.gain.setTargetAtTime(0, context.currentTime, .008); setTimeout(() => { for (const source of sources) { try { source.stop(); } catch {} } for (const node of nodes) node.disconnect(); }, 50); } };
 }
 

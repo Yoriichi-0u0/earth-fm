@@ -1,4 +1,6 @@
 /** Local, dependency-free sonification. No recordings or observations leave the browser. */
+import { FlowVoice } from './articulation'
+import type { Articulation } from './articulation'
 export type SonificationColor = { red: number; green: number; blue: number }
 export type SonificationPoint = { year: number; value: number; pan?: number; color?: SonificationColor }
 export type Soundscape = 'ambient' | 'piano' | 'pulse'
@@ -11,6 +13,8 @@ export type SonificationOptions = {
   pitchRange?: { min: number; max: number }
   /** Optional live observation provider, sampled at each note's scheduling boundary. */
   samplePoint?: (index: number) => SonificationPoint
+  /** 'flow' joins the notes into one gliding line (the jukebox's Sound setting); default 'notes'. */
+  articulation?: Articulation
 }
 export type MappedNote = {
   midi: number
@@ -169,6 +173,18 @@ export class EarthAudio {
     const startAt = context.currentTime + 0.025
     const endAt = startAt + (points.length - 1) * step + Math.max(step, duration) + 0.12
     if (options.soundscape === 'ambient') this.addDrone(context, run, startAt, endAt)
+    // Continuous: one voice glides note to note; colour still shapes its partials and pan still follows position.
+    let flow: FlowVoice | null = null
+    const flowNote = (note: MappedNote, at: number, point: SonificationPoint, index: number) => {
+      const parts = pointPartials(options.soundscape, point.color), total = parts.reduce((sum, p) => sum + p.weight, 0)
+      if (!flow) {
+        const out = context.createGain(); out.connect(run.dry); out.connect(run.send); run.nodes.add(out)
+        flow = new FlowVoice(context, out, { partials: parts.map(p => ({ ratio: p.multiplier, weight: p.weight, type: p.type, detune: p.cents })), pan: true }, at)
+        for (const o of flow.sources) { run.oscillators.add(o); run.nodes.add(o) }
+      }
+      const pan = point.pan !== undefined && Number.isFinite(point.pan) ? Math.max(-1, Math.min(1, point.pan)) : panForIndex(index)
+      flow.note(note.frequency, at, noteAmplitude(options.soundscape) * note.velocity * 0.75, { pan, weights: parts.map(p => p.weight / total), holdUntil: at + step * 1.02 })
+    }
     let nextIndex = 0
     const schedule = () => {
       if (!run.active || generation !== this.generation) return
@@ -191,7 +207,8 @@ export class EarthAudio {
         }
         if (!run.active || generation !== this.generation) return
         const note = mapValueToNote(point.value, min, max)
-        this.addNote(context, run, note, options.soundscape, at, duration, index, point)
+        if (options.articulation === 'flow') flowNote(note, at, point, index)
+        else this.addNote(context, run, note, options.soundscape, at, duration, index, point)
         this.timer(run, () => {
           if (run.active && generation === this.generation) options.onStep(index)
         }, Math.max(0, (at - context.currentTime) * 1000))
@@ -199,6 +216,7 @@ export class EarthAudio {
       if (nextIndex < points.length) {
         this.timer(run, schedule, 25)
       } else {
+        (flow as FlowVoice | null)?.end(startAt + points.length * step)
         this.timer(run, () => {
           if (!run.active || generation !== this.generation) return
           this.stop()

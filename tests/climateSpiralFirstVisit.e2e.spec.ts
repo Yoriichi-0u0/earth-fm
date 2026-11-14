@@ -245,6 +245,7 @@ test('hovering a bead shows its January, anomaly and note, and the tip never out
   await page.goto('/listen');
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
   const coil=page.locator('.jb-side-content:not([hidden]) .jb-coil');
+  await coil.scrollIntoViewIfNeeded();
   await expect(coil).toHaveAttribute('data-coil-beads',/\d+,\d+/,{timeout:15_000});await page.waitForTimeout(300);
   const [x,y]=(await coil.getAttribute('data-coil-beads'))!.split(';')[8].split(',').map(Number);
   const canvas=(await coil.locator('canvas').boundingBox())!;

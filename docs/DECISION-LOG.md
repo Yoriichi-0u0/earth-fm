@@ -5,6 +5,16 @@ Treat entries as settled: do not re-ask unless new facts contradict them (then a
 Earlier decisions live in dated docs such as [TERRAJUKE-3-DECISIONS.md](TERRAJUKE-3-DECISIONS.md) and
 [TEAM-HANDOFF.md](TEAM-HANDOFF.md).
 
+## 2026-11-15 00:30 · Sound: Note by note or Continuous
+- **Decided by:** Jacy (request: "user can either select the sound be like . . . . . or -----").
+- **What:** one shared setting for every jukebox record, stored as `terrajuke-articulation` (`notes` default, `flow`).
+  Continuous uses one sustained voice per line (`FlowVoice` in `src/lib/articulation.ts`) that glides to each new
+  pitch (45 ms time constant) and fades for rests. Engines read the setting when Play is pressed; single taps,
+  Scratch and the legacy `?legacy=1` app always strike notes. In Continuous, the Climate Spiral data melody drops its
+  decorative re-strikes; harmony and drums are unchanged.
+- **Why it is honest:** articulation is a musical choice like tempo. Every value still makes exactly the pitch its
+  fixed rule gives, at the same time; colour, shimmer, loudness and stereo channels still follow the data.
+
 ## 2026-11-14 23:20 · Keep a changelog and cut releases
 - **Decided by:** Jacy (request in chat).
 - **What:** [CHANGELOG.md](../CHANGELOG.md), release notes in [releases/](releases/), this log and GitHub releases

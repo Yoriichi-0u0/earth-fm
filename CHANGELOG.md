@@ -21,6 +21,10 @@ have git tags and GitHub releases. Times are MYT (UTC+8). How to cut a release: 
   NSIDC-derived *Arctic September*. Side A: twelve months, the ice area NASA drew north of 50°N (measured through
   NASA's own RenderMan camera) sets pitch: 13.6 million km² in March to 3.9 in September. Side B: touch or arrow-key
   any Arctic place to hear its ice season. [docs/ARCTIC-ICE.md](docs/ARCTIC-ICE.md).
+- **Sound: Note by note or Continuous** under Play on every record (remembered on the device). Note by note
+  strikes each value as its own note (• • •); Continuous joins them into one line that glides from value to value
+  (━━━), with rests where there is no value. Pitches, timing, loudness and stereo still come from each record's fixed
+  rules; only how notes join changes. Applies from the next Play; single taps and Scratch always strike.
 - **About this sound (5W1H)** under every record: What, Who, When, Where, Why and How, from each record's
   provenance (`src/data/soundStories.ts`).
 
