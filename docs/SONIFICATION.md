@@ -9,7 +9,7 @@ The current Home jukebox distinguishes pixel sound from fixed-band measurement s
 - **Arctic September:** selected project-derived September extent means use fixed 3–8 million km² bounds in 0.5-unit bands, with the same ten-note tuning. Equal pitches across different physical variables do not establish equal scientific quantities.
 - **Grooveprint:** A encodes existing strip brightness; B encodes existing temperature note bands. Equal angles encode order, not elapsed years. Inspection is silent. See [the mapping/geometry notes](GROOVEPRINT-RESEARCH.md) and [current showcase explanations](SHOWCASE.md).
 
-The visual-radio and Legacy climate sections below document the original `EarthAudio` path. Its shared D-minor scale and selected-range climate normalization do **not** describe every current Earth FM instrument. [The Studio notes](EARTH_SYMPHONY_STUDIO.md) cover its separate settings and arrangement; [resource readiness](NASA-RESOURCE-READINESS.md) records future-media limits.
+The visual-radio and Legacy climate sections below document the original `EarthAudio` path. Its shared D-minor scale and selected-range climate normalization do **not** describe every current TerraJuke instrument. [The Studio notes](EARTH_SYMPHONY_STUDIO.md) cover its separate settings and arrangement; [resource readiness](NASA-RESOURCE-READINESS.md) records future-media limits.
 
 ## Visual radio: the challenge’s core
 

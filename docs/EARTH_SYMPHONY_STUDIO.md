@@ -4,11 +4,11 @@ Current five-page release (2026-11-02): the five-page redesign supersedes the or
 
 The following original beta milestone and dated updates are retained as implementation history.
 
-Implemented 2026-11-01 in Yoriichi-0u0/earth-fm. The user explicitly approved committing and pushing this revision to main for production on 2026-11-01. Earlier no-push statements below record the local review milestones before that release approval. Original recordings and existing source snapshots were retained; environment and deployment settings were not changed.
+Implemented 2026-11-01 in Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox. The user explicitly approved committing and pushing this revision to main for production on 2026-11-01. Earlier no-push statements below record the local review milestones before that release approval. Original recordings and existing source snapshots were retained; environment and deployment settings were not changed.
 
 ## Open and listen
 
-Run `npm run dev -- --host 127.0.0.1 --port 5173`, then open http://127.0.0.1:5173/?studio=1 . Production entry: https://earth-fm.vercel.app/?studio=1 . The default URL retains the previous application and now links to Symphony Studio 2.0 in its navigation; Studio is lazy-loaded only on its route. The Studio header links back to 1.0. No backend, framework, package or credentials were added.
+Run `npm run dev -- --host 127.0.0.1 --port 5173`, then open http://127.0.0.1:5173/?studio=1 . Production entry: https://terrajuke.vercel.app/?studio=1 . The default URL retains the previous application and now links to Symphony Studio 2.0 in its navigation; Studio is lazy-loaded only on its route. The Studio header links back to 1.0. No backend, framework, package or credentials were added.
 
 Start with 2025, Warm Keys + Electronic Pulse, Play year. The 12-month sequence lasts 24.8 seconds at 60 BPM. Compare Electronic Pulse, Cinematic, and Hear Data Only. Export renders a fixed 24.8-second mono 44.1 kHz PCM WAV using the same engine, always at 60 BPM. Remix live playback follows the tempo control; export is deliberately fixed for comparable audition lengths. A/B plays twelve months of A then twelve of B on the same pitch scale and tempo (48.8 seconds).
 
@@ -35,7 +35,7 @@ Journey provides a short whole-year introduction. All modes expose five melody t
 
 SVG projects actual 3D numeric coordinates: month angle, linear anomaly radius, linear year height. Rotation and tilt are user-controlled; 2D removes height. Reduced-motion starts in 2D. This avoids WebGL and new graphics dependencies. Geometry is memoized across month ticks. Discrete monthly samples are joined within each year without invented year-end/missing-data connections. White is selected year, cyan is exact selected data coordinate, the static background halo is decorative. No audio-reactive deformation alters data.
 
-NASA SVS visual inspiration is credited separately from this Earth FM numeric rendering. It is not a pixel-matched NASA reproduction. SVG does not provide perspective/occlusion or ray-cast picking. Selection is through accessible month and year controls. Mobile layouts stack the figure and controls; curve labels are small on phones.
+NASA SVS visual inspiration is credited separately from this TerraJuke numeric rendering. It is not a pixel-matched NASA reproduction. SVG does not provide perspective/occlusion or ray-cast picking. Selection is through accessible month and year controls. Mobile layouts stack the figure and controls; curve labels are small on phones.
 
 ## Files changed in this revision
 
@@ -75,7 +75,7 @@ New browser acceptance test independently checks known mapped values against act
 
 ## English default + Simplified Chinese language pilot
 
-Added a persistent manual English / 简体中文 selector to Studio. Fresh sessions default to English regardless of browser language. Existing bilingual inline copy was split into separate English and Chinese messages. The Chinese locale covers controls, modes, timbres/styles, month names, playback/error/export statuses, data-to-sound explanations, table headings, source explanations and accessible labels. Earth FM/Earth Symphony Studio branding, NASA proper names, scientific units, note names, original scholarly citation, data identifiers and export formats remain stable.
+Added a persistent manual English / 简体中文 selector to Studio. Fresh sessions default to English regardless of browser language. Existing bilingual inline copy was split into separate English and Chinese messages. The Chinese locale covers controls, modes, timbres/styles, month names, playback/error/export statuses, data-to-sound explanations, table headings, source explanations and accessible labels. TerraJuke/Earth Symphony Studio branding, NASA proper names, scientific units, note names, original scholarly citation, data identifiers and export formats remain stable.
 
 A small React context and a local Chinese message dictionary are used, with no new dependency or backend. Language choice persists in localStorage when available, falls back to English for invalid preferences, and still works if storage is blocked. The document and Studio region language are updated to en or zh-Hans; the original NASA citation remains marked English. Switching language preserves year, month, timbre and mix and does not restart or stop active audio. The existing 1.0 route remains in English.
 

@@ -78,7 +78,7 @@ test('saved recordings survive reload and can be played from the collection', as
   await page.goto('/?legacy=1');
   await page.getByRole('button', { name: 'Save A warmer world', exact: true }).click();
   await page.getByRole('button', { name: 'Save The vanishing ice', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('earth-fm-saved') ?? '[]'))).toEqual(['temperature', 'sea-ice']);
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('terrajuke-saved') ?? '[]'))).toEqual(['temperature', 'sea-ice']);
   await page.reload();
   await expect(page.getByRole('button', { name: 'Remove A warmer world', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Remove The vanishing ice', exact: true })).toHaveAttribute('aria-pressed', 'true');
@@ -112,7 +112,7 @@ test('audio export downloads a playable stereo PCM WAV with real sample data', a
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download your track' }).click();
   const download = await downloadEvent;
-  expect(download.suggestedFilename()).toBe('earth-fm-temperature-2000-2002.wav');
+  expect(download.suggestedFilename()).toBe('terrajuke-temperature-2000-2002.wav');
   expect(await download.failure()).toBeNull();
   const wav = await readFile((await download.path())!);
   expect(wav.toString('ascii', 0, 4)).toBe('RIFF');
@@ -247,7 +247,7 @@ test('a visual soundtrack downloads a nonempty stereo RIFF WAV', async ({ page }
   const downloadEvent = page.waitForEvent('download');
   await visual.getByRole('button', { name: 'Download visual soundtrack' }).click();
   const download = await downloadEvent;
-  expect(download.suggestedFilename()).toBe('earth-fm-visual-night-lights.wav');
+  expect(download.suggestedFilename()).toBe('terrajuke-visual-night-lights.wav');
   expect(await download.failure()).toBeNull();
   const wav = await readFile((await download.path())!);
   expect(wav.toString('ascii', 0, 4)).toBe('RIFF');
@@ -439,7 +439,7 @@ test('five real pages keep the homepage simple, support history and direct reloa
   await page.getByRole('link',{name:'About & sources',exact:true}).click();
   await expect(page).toHaveURL(/\/about$/);
   await expect(page.getByRole('heading',{level:1})).toBeVisible();
-  // The legacy Earth FM view is no longer a front-door link; old bookmarks still open it.
+  // The original Earth FM view is no longer a front-door link; old bookmarks still open it.
   await expect(page.getByRole('link',{name:/Original experience/})).toHaveCount(0);
   await page.goto('/?legacy=1');
   await expect(page.getByRole('heading',{name:/A moment in time/})).toBeVisible();
@@ -503,7 +503,7 @@ test('Create separates musical choices, keeps volume live, stops on changes and 
   await expect(page.getByRole('button',{name:/Play my mix · 16s/})).toBeVisible();
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download 25-second WAV'}).click();
   const file=await pending;const data=await readFile((await file.path())!);
-  expect(file.suggestedFilename()).toBe('Earth-FM-2025-Soft-Pluck-Data-Only.wav');
+  expect(file.suggestedFilename()).toBe('TerraJuke-2025-Soft-Pluck-Data-Only.wav');
   expect(data.toString('ascii',0,4)).toBe('RIFF');expect(data.toString('ascii',8,12)).toBe('WAVE');expect(data.length).toBeGreaterThan(1000000);
   expect(data.some((value,i)=>i>44&&value!==0)).toBe(true);
   await page.getByRole('button',{name:'Reset sound',exact:true}).click();

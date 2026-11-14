@@ -1,4 +1,4 @@
-# Earth FM — five-page local review
+# TerraJuke — five-page local review
 
 Date: 2026-11-02. Status: after local review, the user explicitly approved committing and pushing this five-page revision together with the NASA observatory visual refinement to main for production.
 

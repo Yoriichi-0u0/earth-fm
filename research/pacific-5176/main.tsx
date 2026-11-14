@@ -57,7 +57,7 @@ function PacificMaps() {
   }
 
   return <main className="pacific pacific-maps">
-    <header className="lab-header"><span className="lab-brand">Earth FM</span><AppearanceSelector /></header>
+    <header className="lab-header"><span className="lab-brand">TerraJuke</span><AppearanceSelector /></header>
     <div className="lab-intro">
       <h1>Pacific Map Comparison</h1>
       <p>Listen to the same image strip on October 10, one year apart.</p>

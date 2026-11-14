@@ -1,4 +1,4 @@
-Earth FM — optional record graphics: third-party notices
+TerraJuke — optional record graphics: third-party notices
 
 @babel/runtime 7.29.13
 License: MIT

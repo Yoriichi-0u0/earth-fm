@@ -1,8 +1,8 @@
-# Earth FM — submission draft for the five-page revision
+# TerraJuke — submission draft for the five-page revision
 
 Status: five-page and NASA observatory release, 2026-11-02. The user approved publishing this revision through the existing main-to-production workflow after local review. This is submission material, not evidence that the team has submitted it or that any user study has been completed.
 
-**Project:** Earth FM — Hear Earth’s changing climate.
+**Project:** TerraJuke — Hear Earth’s changing climate.
 
 **Challenge:** The Earth Information Jukebox, NASA Space Apps 2026.
 
@@ -10,7 +10,7 @@ Status: five-page and NASA observatory release, 2026-11-02. The user approved pu
 
 ## One-sentence pitch
 
-Earth FM helps first-time learners explore one climate story through a NASA visual, live-generated sound and traceable measurements, then check what they understood.
+TerraJuke helps first-time learners explore one climate story through a NASA visual, live-generated sound and traceable measurements, then check what they understood.
 
 ## Problem, audience and contribution
 
@@ -35,20 +35,20 @@ Detailed challenge requirements and the complete 2026 central judging guide have
 
 ## Proposed 90-second pitch and demo
 
-- **0:00–0:10 — Purpose.** “A graph can show change. Can sound help a new learner notice and understand it? We are BoboMimi, and this is Earth FM.” Open the canonical Studio homepage and start the guided story.
+- **0:00–0:10 — Purpose.** “A graph can show change. Can sound help a new learner notice and understand it? We are BoboMimi, and this is TerraJuke.” Open the canonical Studio homepage and start the guided story.
 - **0:10–0:30 — Respond to the challenge.** Play the NASA Climate Spiral scan. “The browser creates this sound from the visible image in real time. Brightness becomes pitch. This is a visual pattern—not a temperature measurement.” Identify the NASA source.
 - **0:30–0:58 — Explain the scientific difference.** Move to the twelve selected Januaries and play the data-only comparison. “Now the measurements set the notes. We keep the same month, tone and pitch scale across years.” Point to a date, original anomaly and frequency. Mention gaps and equal-duration notes.
 - **0:58–1:12 — Demonstrate transparency.** Contrast 1880 January at −0.19°C/G3 with 2025 January at +1.37°C/A4. “Different values within a band can still share a note, so the exact numbers remain visible.”
 - **1:12–1:23 — Learning and inclusion.** Show the understanding check, optional Chinese, and data-only controls. “We have a working prototype and a real-user test protocol. We have not yet established learning effectiveness.”
-- **1:23–1:30 — Close.** “See it, hear it, then explain what changed. Earth FM makes the mapping visible so the music can become a path into Earth science.”
+- **1:23–1:30 — Close.** “See it, hear it, then explain what changed. TerraJuke makes the mapping visible so the music can become a path into Earth science.”
 
 This is a proposed demo length, not a verified 2026 video-length rule. The team should confirm its actual event's submission requirements before recording final materials.
 
 ## Evidence, sources and limits
 
-- Repository: https://github.com/Yoriichi-0u0/earth-fm/tree/main
-- Canonical public entry: https://earth-fm.vercel.app/
-- Direct Studio alias: https://earth-fm.vercel.app/?studio=1
+- Repository: https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/tree/main
+- Canonical public entry: https://terrajuke.vercel.app/
+- Direct Studio alias: https://terrajuke.vercel.app/?studio=1
 - Official challenge summary on the official site: https://www.spaceappschallenge.org/2026/find-a-team/proteas/
 - NASA visual: https://svs.gsfc.nasa.gov/5190/
 - EIC-related gallery: https://svs.gsfc.nasa.gov/gallery/climate-vital-signs-dashboard/

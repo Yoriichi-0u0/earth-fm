@@ -1,4 +1,4 @@
-# Earth FM stacked integration readiness
+# TerraJuke stacked integration readiness
 
 Planning only: this document authorizes no merge, retargeting or deployment. `main` automatically deploys production. PR #8 and PR #9 remain draft and unmerged.
 

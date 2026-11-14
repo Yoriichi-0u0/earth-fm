@@ -1,4 +1,4 @@
-# Earth FM — NASA observatory visual refinement
+# TerraJuke — NASA observatory visual refinement
 
 2026-11-02. Following local review, the user explicitly approved committing and pushing the five-page and NASA observatory revision to main through the existing production workflow. The five-page structure remains.
 
@@ -10,7 +10,7 @@ A concise NASA GISTEMP v4 record strip makes the data source and 1880–2026 cov
 
 Listen presents the NASA Climate Spiral as the main exhibition piece, with a compact side column explaining brightness → pitch, colour → tone and scan position → stereo position. Playback, scan and volume remain functional. On phones the Play/Stop control comes before the visual, making the first action easy to find. The measurement step identifies NASA GISTEMP separately from the pixel sound. About contains the new image source and provenance. Create and Explore Data inherit the restrained blue theme while preserving their separate tasks.
 
-English remains the default and the new visible copy is translated into Simplified Chinese. No NASA insignia was added as Earth FM branding. This remains an independent project using clearly attributed NASA material.
+English remains the default and the new visible copy is translated into Simplified Chinese. No NASA insignia was added as TerraJuke branding. This remains an independent project using clearly attributed NASA material.
 
 ## Historical image and rendering
 
@@ -26,4 +26,4 @@ The GISTEMP snapshot, numeric mapping and sound engine were unchanged. Original 
 
 Desktop and 390px mobile screenshots were inspected. This is local Chromium evidence; physical iPhone/Safari and subjective appearance remain for real-device/user review. The additional globe asset is bundled and requires no runtime third-party request.
 
-Production entry: https://earth-fm.vercel.app/ . The original entry remains https://earth-fm.vercel.app/?legacy=1 . Local development uses http://127.0.0.1:5173/ .
+Production entry: https://terrajuke.vercel.app/ . The original entry remains https://terrajuke.vercel.app/?legacy=1 . Local development uses http://127.0.0.1:5173/ .

@@ -94,7 +94,7 @@ function PacificLab() {
   return (
     <main className="pacific">
       <header className="lab-header">
-        <span className="lab-brand">Earth FM</span>
+        <span className="lab-brand">TerraJuke</span>
         <div className="lab-preferences">
           <label className="appearance-selector">
             <span>{language === 'zh' ? '语言' : 'Language'}</span>

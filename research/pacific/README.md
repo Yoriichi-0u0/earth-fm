@@ -1,6 +1,6 @@
 # Pacific Listening Lab
 
-**11 November 2026, Asia/Kuching.** Local research on [draft PR #11](https://github.com/Yoriichi-0u0/earth-fm/pull/11), stacked on [NASA resource discovery PR #10](https://github.com/Yoriichi-0u0/earth-fm/pull/10) at `9b547805` and application research PR #9 at `a99cb1d`.
+**11 November 2026, Asia/Kuching.** Local research on [draft PR #11](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/pull/11), stacked on [NASA resource discovery PR #10](https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/pull/10) at `9b547805` and application research PR #9 at `a99cb1d`.
 
 Start the existing Vite development server from the repository root, then open the lab.
 
@@ -10,7 +10,7 @@ npm run dev -- --host 127.0.0.1 --port 5182 --strictPort
 
 [Open the local Pacific Listening Lab](http://127.0.0.1:5182/research/pacific/)
 
-The two dated globes share one strip marker. **Hear 2025** and **Hear 2026** audition that strip in one action each and select the year for the next full scan. This removes the separate radio-selection step when comparing notes. The slider stays silent, and switching years keeps the same relative position. Stop and source switching cancel the previous audio. The original image and legend open below the comparison. Earth FM’s existing appearance and language controls also work in this 2D lab. Its separate entry lives outside the application’s normal navigation and production build.
+The two dated globes share one strip marker. **Hear 2025** and **Hear 2026** audition that strip in one action each and select the year for the next full scan. This removes the separate radio-selection step when comparing notes. The slider stays silent, and switching years keeps the same relative position. Stop and source switching cancel the previous audio. The original image and legend open below the comparison. TerraJuke’s existing appearance and language controls also work in this 2D lab. Its separate entry lives outside the application’s normal navigation and production build.
 
 ## What the comparison measures
 
@@ -35,13 +35,13 @@ The first extraction from the source movie’s last five seconds held the final 
 
 The five-second derivative is 768 × 384, H.264/yuv420p, 12 fps, 60 decoded frames and 400,357 bytes. SHA-256 is `42002e9c380f9e550fcb5e2169dfa441997849e9558db918641c1ec9212c2356`. Its parent is SVS media 1206159 with HTTP ETag `"469effd-66000c7fbf43c"` and Last-Modified November 11, 2026 at 14:12:11 UTC. The prior movie ETag failed the conditional request. FFmpeg sought into the current asset over HTTPS and produced the smaller derivative from the relevant range. The whole high-resolution source movie was not downloaded or fully decoded. [NASA source MP4](https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_3340x1670_latest.mp4)
 
-FFmpeg decoded the full derivative. Earth FM’s existing local video upload played it in Chromium’s iPhone 13 viewport with 60 total and zero dropped frames in the measured run. The live spectrum changed and Pause stopped the image and sound. Ready took about 439 ms locally. Two changing images and a moving strip make it harder to isolate why a note changed. The still comparison is the clearest first experience. Keep this clip as a separate motion study with dated captions.
+FFmpeg decoded the full derivative. TerraJuke’s existing local video upload played it in Chromium’s iPhone 13 viewport with 60 total and zero dropped frames in the measured run. The live spectrum changed and Pause stopped the image and sound. Ready took about 439 ms locally. Two changing images and a moving strip make it harder to isolate why a note changed. The still comparison is the clearest first experience. Keep this clip as a separate motion study with dated captions.
 
 ## Official resources
 
 The [official challenge Resources tab](https://www.spaceappschallenge.org/2026/challenges/the-earth-information-jukebox/?tab=resources) returned HTTP 200 on November 11 and 12. Both responses showed the November 13 notice and zero resource links in `resourcesTabContent`. The existing November 13 check is scheduled for 10:00 p.m. Asia/Kuching. NASA identifies SVS 5688 as EIC-related public material. Challenge inclusion remains unconfirmed. [NASA SVS 5688](https://svs.gsfc.nasa.gov/5688/)
 
-When the list appears, record every published title, URL and explicit requirement. Follow any collection links to the supplied frames or datasets, then match their identifiers and versions to the [existing Earth FM source inventory](../../docs/NASA-RESOURCE-DISCOVERY-2026-11.md). Keep the asset’s published credit, terms and render date with the exact bytes selected for the lab. Verify whether a listed collection actually contains 5688 before treating it as an official match. Record an official replacement or newer version separately from the frozen image.
+When the list appears, record every published title, URL and explicit requirement. Follow any collection links to the supplied frames or datasets, then match their identifiers and versions to the [existing TerraJuke source inventory](../../docs/NASA-RESOURCE-DISCOVERY-2026-11.md). Keep the asset’s published credit, terms and render date with the exact bytes selected for the lab. Verify whether a listed collection actually contains 5688 before treating it as an official match. Record an official replacement or newer version separately from the frozen image.
 
 Retain the Pacific Lab as research. The dated SVS 5688 still remains the strongest public candidate for a future Pacific station because its two panels support a repeatable listening comparison with the existing engine. Prefer the still for a first integration if the supplied resources support this use. Keep the original legend and pixel interpretation visible. Check source-specific credits and derivative terms before adding an official asset. [NASA media guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/)
 

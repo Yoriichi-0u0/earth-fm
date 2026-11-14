@@ -1,10 +1,10 @@
-# Earth FM 2.0 — local Electronic Explore milestone
+# TerraJuke (then TerraJuke 2.0) — local Electronic Explore milestone
 
 Status: implemented locally on main, not committed, pushed, or deployed. BoboMimi authorized local audio analysis, implementation and reasonable testing on 2026-10-18. Competition eligibility discussions are deferred at the team's direction. Publication of family instrument recordings remains unapproved.
 
 ## User experience
 
-Open `http://127.0.0.1:5173/#climate-spiral` after starting the existing local development command with `--host 127.0.0.1 --port 5173`. The new Climate Spiral panel appears before the preserved Earth FM 1.0 content.
+Open `http://127.0.0.1:5173/#climate-spiral` after starting the existing local development command with `--host 127.0.0.1 --port 5173`. The new Climate Spiral panel appears before the preserved original 1.0 content.
 
 Choose a year and month, or use the month slider with the keyboard. A valid selection displays the signed anomaly and auditions one 0.9-second Electronic data note. Hear this month repeats the audition; Stop note cancels it. Volume changes do not change the scientific event. Starting an existing player stops the new audition, and starting an audition stops existing climate/visual playback. Hiding the page stops an audition.
 
@@ -33,7 +33,7 @@ NASA SVS 5190: https://svs.gsfc.nasa.gov/5190/
 
 Exact downloaded English/Celsius image URL and byte hash are in the provenance JSON. The local image is `public/frames/climate-spiral-svs5190-2026-10-18.jpg`. It displays 2026; the source page lists an update on 2026-09-11. NASA's EIC gallery links the Climate Vital Signs Dashboard, which explicitly lists this production.
 
-Credits: NASA's Scientific Visualization Studio; Mark SubbaRao and Ed Hawkins; see the source page for complete production credits. NASA media guidance and any asset-specific terms remain applicable; Earth FM does not imply NASA endorsement.
+Credits: NASA's Scientific Visualization Studio; Mark SubbaRao and Ed Hawkins; see the source page for complete production credits. NASA media guidance and any asset-specific terms remain applicable; TerraJuke does not imply NASA endorsement.
 
 The later numeric snapshot and published visual are related GISTEMP v4 products. Exact numerical revision matching has not been verified. The overlaid ring marks a month label, not an exact point on a historical curve. The selected numeric year is displayed outside the original image. No temperatures are inferred from image pixels. An anomaly is not an absolute temperature, local temperature, forecast, or anomaly relative to a pre-industrial baseline. Uncertainty is not encoded in the note.
 

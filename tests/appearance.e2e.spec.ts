@@ -34,7 +34,7 @@ test('Auto resolves before the app appears and follows live system appearance wi
 test('explicit appearance survives navigation, refresh and Legacy while overriding the system',async({page})=>{
   await page.emulateMedia({colorScheme:'dark'});await page.goto('/');
   await appearance(page).selectOption('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
-  expect(await page.evaluate(()=>localStorage.getItem('earth-fm-appearance'))).toBe('light');
+  expect(await page.evaluate(()=>localStorage.getItem('terrajuke-appearance'))).toBe('light');
   await page.getByRole('link',{name:'Create',exact:true}).click();await expect(appearance(page)).toHaveValue('light');
   await page.reload();await expect(appearance(page)).toHaveValue('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
   await page.goto('/?legacy=1');await expect(appearance(page)).toHaveValue('light');
@@ -53,7 +53,7 @@ test('invalid or unavailable preference storage leaves the appearance controls u
         if(blocked){
           Storage.prototype.getItem=function(){throw new DOMException('Blocked for test','SecurityError');};
           Storage.prototype.setItem=function(){throw new DOMException('Blocked for test','SecurityError');};
-        }else localStorage.setItem('earth-fm-appearance','unrecognised-choice');
+        }else localStorage.setItem('terrajuke-appearance','unrecognised-choice');
       },blocked);
       await page.goto('http://127.0.0.1:5173/');await expect(appearance(page)).toHaveValue('auto');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
       await appearance(page).selectOption('dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(appearance(page)).toHaveValue('dark');
@@ -225,4 +225,18 @@ test('provisional identity and the primary Play action work at phone width', asy
   await expect(page.getByRole('link',{name:'关于',exact:true})).toHaveAttribute('aria-current','page');
   await page.goto('/?legacy=1');
   await expect(page.getByRole('link',{name:'TerraJuke home',exact:true})).toBeVisible();
+});
+
+test('appearance and language saved under the Earth FM keys carry over to TerraJuke',async({page})=>{
+  await page.addInitScript(()=>{
+    if(sessionStorage.getItem('seeded'))return;sessionStorage.setItem('seeded','1');
+    localStorage.clear();localStorage.setItem('earth-fm-appearance','dark');localStorage.setItem('earth-fm-studio-language','zh');
+  });
+  await page.emulateMedia({colorScheme:'light'});await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await expect(page.locator('.sp-language select')).toHaveValue('zh');
+  await expect.poll(()=>page.evaluate(()=>localStorage.getItem('terrajuke-studio-language'))).toBe('zh');
+  await page.locator('.sp-language select').selectOption('en');await appearance(page).selectOption('light');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light');await expect(page.locator('.sp-language select')).toHaveValue('en');
 });

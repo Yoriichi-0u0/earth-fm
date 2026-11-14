@@ -1,14 +1,22 @@
-# Earth FM
+# TerraJuke — The Earth Information Jukebox
 
 **Our planet. A thousand stories. One soundtrack.**
 
-Earth FM is BoboMimi’s prototype for the NASA Space Apps Earth Information Jukebox challenge. The reviewed Studio combines a guided NASA Climate Spiral visual-to-sound experience, a transparent comparison of real January temperature observations, a personal learning check and free exploration/remixing. The primary audience is first-time learners; educational effectiveness has not yet been established by a user study.
+TerraJuke is BoboMimi’s prototype for the NASA Space Apps 2026 challenge *The Earth Information Jukebox*. Until 13 November 2026 it was called **Earth FM**. Live at [terrajuke.vercel.app](https://terrajuke.vercel.app/).
 
-The Studio is organized into five pages: Home (`/`), Listen (`/listen`), Create (`/create`), Explore Data (`/data`) and About (`/about`). The homepage offers one guided entry and a slowly rotating illustrative globe. The NASA observatory visual follow-up adds an attributed Blue Marble globe, clearer NASA source identity and a more prominent Climate Spiral. See [the visual review](docs/NASA_OBSERVATORY_REFINEMENT.md) and [five-page review notes](docs/FIVE_PAGE_REDESIGN.md). The user approved publishing the five-page and NASA observatory revision through main on 2026-11-02.
+TerraJuke is a jukebox. Each NASA Earth visualization is a **record**: choose it, put it on, hear it, flip it and explore it. Side A turns the picture's pixels into sound in real time. Side B plays the measurements behind it on a fixed pitch scale. Pixels are never presented as measurements. The primary audience is first-time learners; educational effectiveness has not yet been established by a user study.
 
-The Studio now offers two curated **Earth Stations** within Listen: [Climate Spiral](https://earth-fm.vercel.app/listen) and [Arctic September](https://earth-fm.vercel.app/listen?station=arctic). [Browse stations](https://earth-fm.vercel.app/listen?station=all) or [try moving-image sonification](https://earth-fm.vercel.app/listen?visual=motion). Each station pairs listening with readable scientific evidence. Arctic September adds a first-prediction → observation → explanation loop, a fixed extent-to-pitch scale, CSV trace, creative mix and optional private reflection export. No participant study or proven learning gain is claimed. See [the plan, design review and verification notes](docs/EARTH_STATIONS.md).
+| # | Record | Source |
+| --- | --- | --- |
+| 01 | Climate Spiral | NASA SVS 5190 (Side A) and GISTEMP v4 January anomalies (Side B), with the Three.js Climate Coil |
+| 02 | Night Lights | NASA SVS 5313, EIC Version: change map and NASA's twelve annual frames, cross-checked against SVS 5276 |
+| 03 | Moving Earth | EIC exhibit animation from an attributed earth.gov mirror ([provenance](docs/FRAMES.md)) |
+| 04 | Arctic September | Project-derived means of NSIDC September extent, not an EIC visual |
+| 05 | Temperature Through Time | The Side B GISTEMP measurements on their own |
 
-The guided Studio is the canonical entry. Open `/` for the canonical Studio, `/?studio=1` for the same Studio alias, or `/?legacy=1` for the preserved original app. Old climate/visual anchors and shared-mix query parameters remain compatible. See [the current submission draft](docs/SUBMISSION.md) and [the actual-user pilot protocol](docs/USER_TEST_PROTOCOL.md).
+Around the shelf: a Three.js jukebox stage, Grooveprint, Scratch and Earth Looper, Your Record (a personal image that stays on the device), Mystery Record, Mystery Place (hear a region's decade of night lights, guess where it is, then see it on NASA's map), Light and Dark appearance, and English or Simplified Chinese. See [the TerraJuke 3 decisions](docs/TERRAJUKE-3-DECISIONS.md), [Night Lights](docs/NIGHT-LIGHTS.md) and [the design notes](docs/TERRAJUKE-DESIGN.md).
+
+The pages are Home (`/`, the jukebox), Listen (`/listen`), Create (`/create`), Explore Data (`/data`) and About (`/about`). `/listen?station=arctic` and `/listen?station=all` open the curated [Earth Stations](docs/EARTH_STATIONS.md). `/?legacy=1` still opens the original Earth FM app for old bookmarks; old climate/visual anchors and shared-mix query parameters remain compatible. See [the submission draft](docs/SUBMISSION.md) and [the actual-user pilot protocol](docs/USER_TEST_PROTOCOL.md).
 
 | Team BoboMimi | Role | Username |
 | --- | --- | --- |
@@ -26,13 +34,13 @@ npm ci
 npm run dev
 ```
 
-Open the address printed by Vite. Click **Start the experience** to open Listen, then **Play visual sound**, continue, and **Play the data melody** to start browser audio. Headphones reveal the spatial scan. No credentials or API keys are needed. The app’s fonts, visuals, and observation snapshots are bundled; there are no runtime data requests or uploads.
+Open the address printed by Vite, choose a record and press **Play**. Sound starts only when you press Play. Headphones reveal the spatial scan. No credentials or API keys are needed. The app’s fonts, visuals, and observation snapshots are bundled; there are no runtime data requests or uploads.
 
 In this cloud workspace, use `npm --cache /workspace/.npm-cache ci` if the default home cache is not writable. The existing checkout is already isolated; a separate worktree is unnecessary.
 
-## What works
+## The original Earth FM app
 
-The five-page Studio separates guided listening, music controls and numerical exploration. The following broader collection and visual tools remain available through **Original experience** (`/?legacy=1`).
+The original Earth FM app is no longer linked from the site, and still opens at `/?legacy=1`. It keeps these broader collection and visual tools:
 
 - **Visual radio:** three attributed earth.gov mirror assets: NASA/NOAA nighttime imagery, an EIC exhibit photograph, and an EIC immersive animation. A 48-strip scan generates D-minor pentatonic notes. Brightness controls pitch, RGB blends harmonics, and scan position controls stereo pan. Animation pixels are resampled at each note’s scheduling boundary.
 - **Bring your own frame:** PNG, JPEG, WebP, GIF, MP4, and WebM files up to 20 MB are decoded and analyzed in the browser. Files stay on the device. MP4/WebM support depends on the browser’s codecs. GIF scanning may use the decoder’s current/poster frame; use a video for reliable temporal sampling.
@@ -44,14 +52,9 @@ Visual sonification interprets displayed pixels, not calibrated physical measure
 
 ## Production workflow
 
-```sh
-git switch main
-git add <changed-files>
-git commit -m "Describe the change"
-git push origin main
-```
+Work on a branch and open a draft pull request early (see [CLAUDE.md](CLAUDE.md)). `npm run check` runs the unit tests, the build and the Playwright suite.
 
-Publish only after the user approves that release. The current five-page and NASA observatory revision was explicitly approved for release on 2026-11-02. All work stays on `main`. Vercel builds each push and publishes directly to [Earth FM](https://earth-fm.vercel.app/). Preview deployments and testing workflows are not used. For an explicit terminal deployment, run `vercel deploy --prod --yes --scope chia-0u0-s-projects` from this linked checkout.
+Only `main` deploys. Merge to `main` once `npm run check` passes; Vercel then builds the push and publishes [terrajuke.vercel.app](https://terrajuke.vercel.app/). Deployments from other branches and preview deployments are disabled. For an explicit terminal deployment, run `vercel deploy --prod --yes --scope chia-0u0-s-projects` from this linked checkout. See [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 `npm run data:refresh` verifies the checked-in source hashes and deterministically rebuilds the observation data. `node scripts/refresh-data.mjs --download` restores the same pinned versions using verified HTTPS and recorded hashes; it does not silently refresh to a moving upstream branch.
 

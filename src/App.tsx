@@ -76,7 +76,7 @@ export default function App() {
   const [activePlayer, setActivePlayer] = useState<'climate' | 'visual' | 'spiral' | null>(null);
   const [playIndex, setPlayIndex] = useState(0);
   const [modal, setModal] = useState<'about' | 'mix' | 'saved' | null>(null);
-  const [saved, setSaved] = useState<string[]>(() => { try { const v = JSON.parse(localStorage.getItem('earth-fm-saved') ?? '[]'); return Array.isArray(v) ? v.filter(id => typeof id === 'string' && tracks.some(t => t.id === id)) : []; } catch { return []; } });
+  const [saved, setSaved] = useState<string[]>(() => { try { const v = JSON.parse(localStorage.getItem('terrajuke-saved') ?? localStorage.getItem('earth-fm-saved') ?? '[]'); return Array.isArray(v) ? v.filter(id => typeof id === 'string' && tracks.some(t => t.id === id)) : []; } catch { return []; } });
   const [notice, setNotice] = useState('');
   const [exporting, setExporting] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -95,7 +95,7 @@ export default function App() {
 
   useEffect(() => { audioRef.current = new EarthAudio(); return () => { session.current++; audioRef.current?.dispose(); }; }, []);
   useEffect(() => { audioRef.current?.setVolume(volume); }, [volume]);
-  useEffect(() => { try { localStorage.setItem('earth-fm-saved', JSON.stringify(saved)); } catch { /* Storage is optional. */ } }, [saved]);
+  useEffect(() => { try { localStorage.setItem('terrajuke-saved', JSON.stringify(saved)); } catch { /* Storage is optional. */ } }, [saved]);
   useEffect(() => { if (!notice) return; const timer = window.setTimeout(() => setNotice(''), 5000); return () => window.clearTimeout(timer); }, [notice]);
   useEffect(() => {
     if (!modal) return;
@@ -141,7 +141,7 @@ export default function App() {
     setExporting(true);
     try {
       const blob = await exportWav(points, { soundscape, tempo, volume });
-      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `earth-fm-${track.id}-${points[0].year}-${points.at(-1)!.year}.wav`; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `terrajuke-${track.id}-${points[0].year}-${points.at(-1)!.year}.wav`; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 30000);
       setNotice('Your WAV is ready. The same data, the same notes, yours to keep.');
     } catch { setNotice('Audio export failed. Please try a shorter year range.'); }
     finally { setExporting(false); }

@@ -1,4 +1,4 @@
-# Earth FM — improvements following the simulated judging review
+# TerraJuke — improvements following the simulated judging review
 
 Date: 2026-11-02. Status: following local review, the user explicitly approved committing and pushing this guided-learning revision to main for the existing production workflow. Earlier local-review notes describe the completed pre-release verification.
 
