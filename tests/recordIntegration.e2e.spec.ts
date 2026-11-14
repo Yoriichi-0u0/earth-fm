@@ -150,7 +150,7 @@ for(const owner of ['personal','mystery'])test(`leaving Home during ${owner} pla
   await page.getByRole('link',{name:'About & sources',exact:true}).click();
   await closed(page);await noLateNotes(page);
   await expect.poll(()=>page.evaluate(()=>window.integrationAudit.created.every(url=>window.integrationAudit.revoked.includes(url)))).toBe(true);
-  await page.getByRole('navigation').getByRole('link',{name:'Home',exact:true}).click();
+  await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();
   await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
   await expect(page.locator('.mr-record')).toHaveCount(0);
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);

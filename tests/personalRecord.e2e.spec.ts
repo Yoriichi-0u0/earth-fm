@@ -119,7 +119,7 @@ test('rapid replacement, Remove, navigation and late image callbacks cannot rest
   await input(page).setInputFiles(fixture());await expect(page.locator('.jb-personal-loading')).toBeVisible();
   await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();await page.evaluate(()=>{window.personalAudit.late.splice(0).forEach(fn=>fn());});
   await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
-  await page.getByRole('navigation').getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
+  await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
 });
 
 test('a decode timeout releases its URL and choosing a curated record cancels pending decoding',async({page})=>{
@@ -151,7 +151,7 @@ test('the image, filename and take stay out of storage and outbound requests; na
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('21');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();await loop(page).getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop(page).getByRole('status')).toHaveText('Your take has finished.');
   expect(await storage()).toEqual(before);expect(requests).toEqual([]);expect(await page.locator('body').innerText()).not.toContain('PRIVATE-family');
   await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
-  await page.getByRole('navigation').getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
+  await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
   await upload(page);await page.reload();await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);expect(await storage()).toEqual(before);
 });
 

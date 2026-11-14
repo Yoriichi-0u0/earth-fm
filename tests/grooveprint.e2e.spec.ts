@@ -225,7 +225,7 @@ test('inspection cancels pending/active playback, and explicit Play resumes the 
   await page.waitForTimeout(650);await expect(print(page)).toHaveAttribute('data-groove-index','8');
   await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();await expect(inspect(page)).toHaveCount(0);
   await expect.poll(()=>page.evaluate(()=>window.grooveAudit.contexts.every(c=>c.state==='closed'))).toBe(true);
-  await page.getByRole('navigation').getByRole('link',{name:'Home',exact:true}).click();await expect(print(page)).toHaveAttribute('data-groove-index','0');
+  await page.getByRole('navigation').getByRole('link',{name:'Listen',exact:true}).click();await expect(print(page)).toHaveAttribute('data-groove-index','0');
 });
 
 test('both CSS-flipped faces keep clockwise screen order and the same selected source index',async({page})=>{

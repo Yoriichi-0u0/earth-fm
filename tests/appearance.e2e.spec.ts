@@ -131,11 +131,11 @@ for(const theme of ['light','dark'] as const)test(`${theme} theme has no automat
 
 for(const theme of ['light','dark'] as const)test(`${theme} expanded scientific explanations and disabled controls retain contrast`,{tag:'@full'},async({page})=>{
   test.setTimeout(90_000);await page.goto('/listen');await chooseAppearance(page,theme);const results=[];
-  for(const route of ['/about','/create','/data','/listen']){
+  for(const route of ['/about','/create','/data','/listen?station=climate']){
     await page.goto(route);
     if(route==='/create')await page.getByRole('checkbox',{name:/Hear Data Only/}).check();
     if(route==='/data')await page.getByRole('checkbox',{name:'Compare another year',exact:true}).check();
-    if(route==='/listen'){
+    if(route==='/listen?station=climate'){
       await page.getByRole('button',{name:'Continue to the real data →',exact:true}).click();
       await page.getByRole('button',{name:'Continue to the discovery →',exact:true}).click();
     }
