@@ -72,6 +72,7 @@ React 19 + Vite + TypeScript, no backend. Everything (sound synthesis via Web Au
 - `src/lib/climateMapping.ts`, `symphony.ts`, `useSequenceTransport.ts`: measurement melodies on fixed ten-band pitch scales (`PROFILE` in `symphony.ts`); Create's styles and timbres are layered on top.
 - `src/lib/audio.ts` (`EarthAudio`): the legacy app's engine.
 - `src/lib/air/` + `AirEngine`: The Air We Share, a four-track aerosol score (one Web Audio track gain per aerosol for live Mute/Solo) with a lookahead scheduler; see [docs/AIR.md](docs/AIR.md).
+- `src/lib/ocean/` + `OceanEngine`: Currents of Heat, temperature read from NASA's numeric 0–32 °C colour bar by lightness-normalised chromaticity; see [docs/OCEAN.md](docs/OCEAN.md). The aerosol and ocean decks share `AirTurntable` (pass `texture`).
 - `src/lib/nightLights/`: framework-free Night Lights science (legend reading in OKLab, frozen masks, cell analysis, decade measure, sound rules, Mystery Place), wrapped by `useNightLightsModel.ts` and `NightLightsDeck.tsx`. See [docs/NIGHT-LIGHTS.md](docs/NIGHT-LIGHTS.md).
 
 **Motion.** Anime.js (`animejs` 4.5) drives the mixer meters and the Record Journey (`RecordJourney.tsx`, data in `src/data/journeys.ts`); Three.js via react-three-fiber drives the jukebox stage, the vinyl, the Climate Coil and the aerosol globe. Every animation is off under reduced motion, and 3D always has a 2D fallback.

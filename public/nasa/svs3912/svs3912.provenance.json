@@ -1,0 +1,18 @@
+{
+  "title": "Global Sea Surface Currents and Temperature",
+  "svsId": 3912,
+  "page": "https://svs.gsfc.nasa.gov/3912/",
+  "released": "2012-03-16",
+  "frame": { "number": 25000, "time": "2007-06-19T12:00Z", "source": "flat_ecco2_dates.txt on the SVS page" },
+  "description": "Sea surface current flows from the ECCO2 project (MIT/JPL; MITgcm synthesizing satellite and in-situ data), coloured by corresponding sea surface temperature. NASA's colour bar: Sea Surface Temp (°C), 0 to 32, linear.",
+  "files": [
+    { "file": "svs3912_ecco2_sst_flow_2007-06-19_2048x1024.jpg", "role": "display: the map and the globe texture", "originalFilename": "flat_global_ecco2_2028x1024.25000.jpg", "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003912/flat_global_ecco2_2028x1024.25000.jpg", "routeUsed": "internet-archive", "archiveUrl": "https://web.archive.org/web/2026id_/https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003912/flat_global_ecco2_2028x1024.25000.jpg", "width": 2048, "height": 1024, "bytes": 1026047, "sha256": "dcfd17864c2940f9ce1cf406e866818379991d57b0e900f9b8812f0c7cf72e3c" },
+    { "file": "svs3912_sst_cbar.png", "role": "analysed: the temperature scale is read from this colour bar", "originalFilename": "sst_ecco2_cbar.png", "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003912/sst_ecco2_cbar.png", "routeUsed": "internet-archive", "width": 310, "height": 95, "bytes": 8867, "sha256": "7c4c25f9ca51bb458c100ca4d31f452b8dfdbce8898e2945b7042729d55404c5" },
+    { "file": "svs3912_analysis_1024x512.png", "role": "analysed: every temperature and note is computed from these pixels", "derivedFrom": "svs3912_ecco2_sst_flow_2007-06-19_2048x1024.jpg", "method": "Decoded once with macOS sips 316 and resampled to 1024 × 512, stored as PNG with only IHDR/IDAT/IEND so browsers and tests read identical pixels", "sha256": "d614de7d4a195fd3cddae00ee807fdc0f8cefd1dc141449fc48fa777caac9edd" },
+    { "file": "svs3912_poster_720x360.jpg", "role": "display only: record sleeve", "derivedFrom": "svs3912_ecco2_sst_flow_2007-06-19_2048x1024.jpg", "method": "macOS sips: 720 × 360, JPEG quality 82", "sha256": "cbe78c560dfe07cf123462e83eaa7aa27daf28ef95afad68d01af2c231e8dd1f" }
+  ],
+  "retrievedAt": "2026-11-14T20:10:00+08:00",
+  "retrievalNote": "svs.gsfc.nasa.gov timed out from this network, so the files were retrieved from the Internet Archive's raw captures of NASA's original URLs. Re-verify the hashes against NASA's live files when reachable.",
+  "credits": { "producer": "NASA's Scientific Visualization Studio", "visualizer": "Greg Shirah", "model": "ECCO2: Estimating the Circulation and Climate of the Ocean, Phase II (MIT/JPL), MITgcm" },
+  "limits": "Model temperatures as rendered, read back from colour (about 1 °C precision); one moment, 19 June 2007; traces show where currents flow, not their speed."
+}

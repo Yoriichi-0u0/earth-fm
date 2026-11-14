@@ -35,6 +35,7 @@ const EarthGlobe=lazy(()=>import('./EarthGlobe'));
 const MysteryRecord=lazy(()=>import('./MysteryRecord'));
 const NightLightsDeck=lazy(()=>import('./NightLightsDeck'));
 const AirDeck=lazy(()=>import('./AirDeck'));
+const OceanDeck=lazy(()=>import('./OceanDeck'));
 const RecordJourney=lazy(()=>import('./RecordJourney'));
 const ShowCard=lazy(()=>import('./ShowCard'));
 type Show={index:number;phase:'intro'|'playing';cue:number|null};
@@ -161,6 +162,15 @@ export default function JukeboxHome({motion}:{motion:boolean}){
   const [selected,setSelected]=useState<JukeboxRecordId|'personal'|'mystery'>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
   const personal=usePersonalImage(),fileInput=useRef<HTMLInputElement>(null),player=useRef<HTMLDivElement>(null);
   const shelf=useRef<HTMLDivElement>(null),[edges,setEdges]=useState({left:false,right:false});
+  // The 3D record rack is decorative and pulls in Three.js (~0.9 MB): fetch it once the page is idle
+  // after first paint, and not at all when the visitor asks to save data.
+  const [stageReady,setStageReady]=useState(false);
+  useEffect(()=>{
+    if((navigator as unknown as {connection?:{saveData?:boolean}}).connection?.saveData)return;
+    const w=window as unknown as {requestIdleCallback?:(cb:()=>void,o?:{timeout:number})=>number;cancelIdleCallback?:(id:number)=>void};
+    if(w.requestIdleCallback){const id=w.requestIdleCallback(()=>setStageReady(true),{timeout:2500});return()=>w.cancelIdleCallback?.(id);}
+    const timer=window.setTimeout(()=>setStageReady(true),1200);return()=>window.clearTimeout(timer);
+  },[]);
   // ---- Jukebox Show: every NASA record in turn --------------------------------------------
   const [show,setShow]=useState<Show|null>(null),[deckEpoch,setDeckEpoch]=useState(0),[showMessage,setShowMessage]=useState('');
   const showNow=useRef<Show|null>(null),cueSerial=useRef(0);showNow.current=show;
@@ -174,7 +184,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
   const onEnded=(cue:number)=>{
     const s=showNow.current;if(!s||s.cue!==cue)return;
     const next=s.index+1;
-    if(next>=jukeboxRecords.length){setShow(null);setShowMessage(t('That was the whole jukebox: six records from NASA’s view of Earth.'));return;}
+    if(next>=jukeboxRecords.length){setShow(null);setShowMessage(`${t('That was the whole jukebox:')} ${jukeboxRecords.length} ${t('records from NASA’s view of Earth.')}`);return;}
     setSelected(jukeboxRecords[next].id);setShow({index:next,phase:'intro',cue:null});announce(next);
   };
   const onStopped=(cue:number)=>{const s=showNow.current;if(s&&s.cue===cue){setShow(null);setShowMessage(t('Show stopped.'));}};
@@ -207,17 +217,17 @@ export default function JukeboxHome({motion}:{motion:boolean}){
         <ShowContext.Provider value={{cue:show?.phase==='playing'?show.cue:null,onEnded,onStopped}}>
         {show?.phase==='intro'&&<Suspense fallback={null}><ShowCard key={show.index} record={jukeboxRecords[show.index]} index={show.index} total={jukeboxRecords.length} motion={motion} onDone={introDone}/></Suspense>}
         {selected==='personal'&&personal.error&&<p className="jb-personal-error" role="alert">{t(personal.error)}{personal.image&&<> {t('Your previous image is still available. Its take has been cleared.')}</>}</p>}
-        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='nightlights'?<Suspense fallback={<p role="status">{t('Loading Night Lights…')}</p>}><NightLightsDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.id==='air'?<Suspense fallback={<p role="status">{t('Loading The Air We Share…')}</p>}><AirDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.kind==='visual'?<VisualDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
+        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='nightlights'?<Suspense fallback={<p role="status">{t('Loading Night Lights…')}</p>}><NightLightsDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.id==='ocean'?<Suspense fallback={<p role="status">{t('Loading Currents of Heat…')}</p>}><OceanDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.id==='air'?<Suspense fallback={<p role="status">{t('Loading The Air We Share…')}</p>}><AirDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.kind==='visual'?<VisualDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
         {!optional&&<Suspense fallback={null}><RecordJourney key={record.id} recordId={record.id} motion={motion}/></Suspense>}
         </ShowContext.Provider>
       </div>
       <div className="jb-record-shelf">
-        <Suspense fallback={null}><JukeboxStage records={stageRecords} selected={selected} motion={motion} onSelect={id=>selectRecord(id as JukeboxRecordId)}/></Suspense>
+        {stageReady?<Suspense fallback={<div className="jb-stage-wait" aria-hidden="true"/>}><JukeboxStage records={stageRecords} selected={selected} motion={motion} onSelect={id=>selectRecord(id as JukeboxRecordId)}/></Suspense>:<div className="jb-stage-wait" aria-hidden="true"/>}
         <section className="jb-library" id="record-shelf" tabIndex={-1} aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>selectRecord('mystery')}><Disc3 aria-hidden="true" size={14}/>{t('Mystery Record')}</button></div>
           <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
             <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
               <span className={`jb-sleeve jb-sleeve-${item.id}`} aria-hidden="true">{item.id==='spiral'?<img src={item.frame!.imageUrl} alt=""/>:item.posterUrl?<img src={item.posterUrl} alt=""/>:<span>{item.id==='arctic'?'↘':'↗'}</span>}<i/></span>
-              <span className="jb-record-copy"><small>{t(item.id==='spiral'||item.id==='nightlights'||item.id==='air'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
+              <span className="jb-record-copy"><small>{t(item.id==='spiral'||item.id==='nightlights'||item.id==='air'||item.id==='ocean'?'SIDES A + B':item.kind==='visual'?'Visual':'Measurements')}</small><strong>{t(item.title)}</strong><span>{t(item.id==='motion'?'Still from the archived animation':item.subtitle)}</span></span><span className="jb-record-indicator" aria-hidden="true">{selected===item.id?<AudioLines size={17}/>:<ArrowUpRight size={17}/>}</span>
             </button>)}</div>
             {edges.left&&<button className="jb-shelf-arrow jb-shelf-previous" type="button" aria-label={t('Previous records')} onClick={()=>moveShelf(-1)}><ChevronLeft size={17}/></button>}
             {edges.right&&<button className="jb-shelf-arrow jb-shelf-next" type="button" aria-label={t('More records')} onClick={()=>moveShelf(1)}><ChevronRight size={17}/></button>}

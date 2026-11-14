@@ -16,16 +16,17 @@ NASA's Earth Information Center shows the planet on giant screens, but a picture
 
 ## What TerraJuke does
 
-Every NASA visualization is a **record**. Side A turns the picture's pixels into sound live in the browser; Side B, where one exists, plays the measurements or the story behind it. Six records:
+Every NASA visualization is a **record**. Side A turns the picture's pixels into sound live in the browser; Side B, where one exists, plays the measurements or the story behind it. Seven records:
 
 | # | Record | NASA source | What you hear |
 |---|---|---|---|
 | 01 | Climate Spiral | SVS 5190 (Climate Vital Signs, EIC) + GISTEMP v4 | A: brightness → pitch across 48 strips. B: twelve Januaries, 1880–2025, on a fixed temperature scale |
 | 02 | Night Lights | SVS 5313, EIC Version (Black Marble, VIIRS) | A: purple rises, orange falls, read on NASA's own legend. B: NASA's twelve yearly frames as a melody; Mystery Place guessing game |
 | 03 | **The Air We Share** | SVS 5669, GEOS Aerosols | Four aerosols become four instruments on a mixing desk while a Three.js Earth turns under the needle; Side B plays NASA's six stories |
-| 04 | Moving Earth | EIC exhibit animation | Video pixels resampled on every note |
-| 05 | Arctic September | NSIDC Sea Ice Index | September extent → pitch (measurements) |
-| 06 | Temperature Through Time | NASA GISS GISTEMP v4 | The Side B measurements on their own |
+| 04 | **Currents of Heat** | SVS 3912, ECCO2 currents and temperature | Each current's colour read back to °C on NASA's numeric scale: pole to pole, warm water high; touch any place to hear its temperature |
+| 05 | Moving Earth | EIC exhibit animation | Video pixels resampled on every note |
+| 06 | Arctic September | NSIDC Sea Ice Index | September extent → pitch (measurements) |
+| 07 | Temperature Through Time | NASA GISS GISTEMP v4 | The Side B measurements on their own |
 
 **The Air We Share** is the headline. NASA describes this resource as suited to *multi-track experimentation*, so TerraJuke reads NASA's colour bar from NASA's own image and gives each aerosol an instrument: smoky brass (fire smoke), desert strings (dust), an ocean bed (sea salt) and glass bells (sulfate). Earth is literally the record. Each slice of longitude that turns under the needle is one step of the groove: how much of each aerosol sets loudness, where it sits north or south sets pitch, and where there is none the instrument rests. Over Africa all four play at once. Mute or solo any track to pick out the Saharan dust river or the smoke from southern Africa. Side B tells NASA's own six stories, from Hurricane Erin's sea-salt spirals to Kilauea's sulfate stream.
 
@@ -43,11 +44,11 @@ Around the shelf: the **Record Journey**, an animated "from orbit to your ears" 
 | Balance data with musicality | Fixed scales from the data; shared pentatonic scales so layers harmonise; tempo, tone and mixer are musical choices that never change a note |
 | Accessibility for blind and low-vision users | Every map is a keyboard instrument with spoken descriptions; captions and screen-reader announcements on every note; Android vibration patterns; reduced motion; 2D fallbacks for all 3D; automated WCAG checks in light and dark |
 | Tell the story | NASA's own stories on Side B, liner notes with the method and limits, and the Record Journey from instrument to listener |
-| Use the Resources | EIC Content Database (SVS 5190, SVS 5313 EIC Version) and the listed GEOS Aerosols (SVS 5669); the Caldwell 73 sonification informed the scanning design |
+| Use the Resources | EIC Content Database (SVS 5190, SVS 5313 EIC Version) and the listed GEOS Aerosols (SVS 5669) and Global Sea Surface Currents and Temperature (SVS 3912); the Caldwell 73 sonification informed the scanning design |
 
 ## Validity
 
-Every NASA file is pinned with its source URL and SHA-256. Every mapping is a fixed rule with unit tests: 119 unit tests and 145 browser tests at this checkpoint. For The Air We Share, tests check that each of NASA's six stories is dominated by the aerosol NASA names, at least twice the next one, and that grey land and Antarctica stay silent. Night Lights is cross-checked against NASA's separately published SVS 5276 series (r = 0.999 for the world).
+Every NASA file is pinned with its source URL and SHA-256. Every mapping is a fixed rule with unit tests: 119 unit tests and 145 browser tests at this checkpoint. For The Air We Share, tests check that each of NASA's six stories is dominated by the aerosol NASA names, at least twice the next one, and that grey land and Antarctica stay silent. Night Lights is cross-checked against NASA's separately published SVS 5276 series (r = 0.999 for the world). Currents of Heat reads temperature from NASA's numeric colour scale, and its readings behave like the real ocean: the western Pacific warm pool at 29.5 °C, the Labrador Sea at 2.8 °C, and warming from each pole toward the equator.
 
 Each record states its limits: pixels are not measurements; GEOS is a model analysis; colour strength is not optical depth; one aerosol moment, not a live feed; equal note lengths do not encode elapsed time. No user study has been run, and TerraJuke claims no learning gains.
 

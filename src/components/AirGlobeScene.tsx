@@ -5,14 +5,14 @@ import {useEffect,useMemo,useRef} from 'react';
 import {Canvas,useFrame,useLoader,useThree} from '@react-three/fiber';
 import {AdditiveBlending,BackSide,BufferGeometry,Float32BufferAttribute,SRGBColorSpace,TextureLoader} from 'three';
 import type {Group,Mesh,MeshBasicMaterial} from 'three';
-import {GLOBE_TEXTURE_URL,STEP_DEG,type GlobeTarget} from './AirTurntable';
+import {STEP_DEG,type GlobeTarget} from './AirTurntable';
 
 const RAD=Math.PI/180;
 /** Rotation that puts longitude `lon` in front of the camera (three.js maps texture u=0.25, lon −90°, to +z). */
 const yawFor=(lon:number)=>-(lon+90)*RAD;
 const shortest=(d:number)=>{const t=Math.PI*2;return ((d%t)+t*1.5)%t-t/2;};
 
-type Props={target:GlobeTarget;playing:boolean;pulse:number;motion:boolean;accent:string;onReady:(invalidate:()=>void)=>void;onUnavailable:()=>void};
+type Props={target:GlobeTarget;playing:boolean;pulse:number;motion:boolean;accent:string;texture:string;onReady:(invalidate:()=>void)=>void;onUnavailable:()=>void};
 
 function Stars(){
   const geometry=useMemo(()=>{
@@ -25,9 +25,9 @@ function Stars(){
   return <points geometry={geometry}><pointsMaterial color="#cfe3ff" size={0.035} sizeAttenuation transparent opacity={0.75}/></points>;
 }
 
-function Globe({target,playing,pulse,motion,accent,onReady,onUnavailable}:Props){
+function Globe({target,playing,pulse,motion,accent,texture:textureUrl,onReady,onUnavailable}:Props){
   const {invalidate,gl}=useThree();
-  const texture=useLoader(TextureLoader,GLOBE_TEXTURE_URL);
+  const texture=useLoader(TextureLoader,textureUrl);
   useMemo(()=>{texture.colorSpace=SRGBColorSpace;texture.anisotropy=4;},[texture]);
   const tilt=useRef<Group>(null),spin=useRef<Mesh>(null),needle=useRef<Mesh>(null),glow=useRef<Mesh>(null),stars=useRef<Group>(null);
   const pulseAt=useRef(0);

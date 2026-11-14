@@ -414,7 +414,7 @@ test('five real pages keep the homepage simple, support history and direct reloa
   await page.goto('/');
   await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Your planet. On the record.');
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
-  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(6);
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(7);
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
   await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','data');
   await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');

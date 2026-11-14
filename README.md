@@ -11,9 +11,10 @@ TerraJuke is a jukebox. Each NASA Earth visualization is a **record**: choose it
 | 01 | Climate Spiral | NASA SVS 5190 (Side A) and GISTEMP v4 January anomalies (Side B), with the Three.js Climate Coil |
 | 02 | Night Lights | NASA SVS 5313, EIC Version: change map and NASA's twelve annual frames, cross-checked against SVS 5276 |
 | 03 | The Air We Share | NASA SVS 5669, GEOS Aerosols: four aerosols become four instruments on a mixing desk while a Three.js Earth turns under the needle; Side B plays NASA's six stories ([details](docs/AIR.md)) |
-| 04 | Moving Earth | EIC exhibit animation from an attributed earth.gov mirror ([provenance](docs/FRAMES.md)) |
-| 05 | Arctic September | Project-derived means of NSIDC September extent, not an EIC visual |
-| 06 | Temperature Through Time | The Side B GISTEMP measurements on their own |
+| 04 | Currents of Heat | NASA SVS 3912, ECCO2 currents coloured by temperature: each trace's colour is read back to °C on NASA's own 0–32 °C scale; pole to pole, warm water plays high ([details](docs/OCEAN.md)) |
+| 05 | Moving Earth | EIC exhibit animation from an attributed earth.gov mirror ([provenance](docs/FRAMES.md)) |
+| 06 | Arctic September | Project-derived means of NSIDC September extent, not an EIC visual |
+| 07 | Temperature Through Time | The Side B GISTEMP measurements on their own |
 
 **Play the whole jukebox** runs every record in turn, like a real jukebox: an animated title card and a spoken announcement introduce each one, and it plays itself (Escape or Stop ends the show). Every NASA record ends with its journey, *from orbit to your ears*: the instrument, the NASA team, the visualizers and finally you, in your own time zone. Around the shelf: a Three.js jukebox stage, Grooveprint, Scratch and Earth Looper, Your Record (a personal image that stays on the device), Mystery Record, Mystery Place (hear a region's decade of night lights, guess where it is, then see it on NASA's map), and an Auto / Light / Dark appearance switch. The interface is English only. See [the TerraJuke 3 decisions](docs/TERRAJUKE-3-DECISIONS.md), [Night Lights](docs/NIGHT-LIGHTS.md) and [the design notes](docs/TERRAJUKE-DESIGN.md).
 

@@ -29,6 +29,13 @@ export const JOURNEYS:Record<JukeboxRecordId,readonly JourneyLink[]>={
     {icon:'center',title:'NASA Space Apps 2026',detail:'Listed as a resource for The Earth Information Jukebox challenge'},
     TERRAJUKE,
   ],
+  ocean:[
+    {icon:'satellite',title:'Satellites and ocean floats',detail:'Sea-surface height, temperature and thousands of drifting Argo floats measuring the ocean'},
+    {icon:'model',title:'ECCO2, MIT and NASA JPL',detail:'The MIT general circulation model reconstructs every current, down to individual eddies'},
+    {icon:'studio',title:'NASA Scientific Visualization Studio',detail:'SVS 3912, traced and coloured by temperature by Greg Shirah, for hyperwall displays'},
+    {icon:'center',title:'NASA Space Apps 2026',detail:'Listed as a resource for The Earth Information Jukebox challenge'},
+    {icon:'jukebox',title:'TerraJuke',detail:'Pixels and numbers become music live in your browser. Nothing is uploaded.'},
+  ],
   motion:[
     {icon:'center',title:'NASA Earth Information Center',detail:'An immersive Earth animation from the exhibit in Washington, DC'},
     {icon:'archive',title:'earth.gov, via an attributed mirror',detail:'The originals now return 404; the archived copy is pinned by hash'},

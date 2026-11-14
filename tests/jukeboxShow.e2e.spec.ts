@@ -8,9 +8,9 @@ test('Play the whole jukebox starts record 1 by itself, and Stop, Escape or choo
   await page.goto('/');
   const start = page.getByRole('button', { name: 'Play the whole jukebox' });
   await start.click();
-  await expect(announcer(page)).toHaveText('Now playing record 1 of 6: Climate Spiral, NASA SVS 5190.');
+  await expect(announcer(page)).toHaveText('Now playing record 1 of 7: Climate Spiral, NASA SVS 5190.');
   const bar = page.getByRole('group', { name: 'Jukebox show' });
-  await expect(bar).toContainText('01 / 06');
+  await expect(bar).toContainText('01 / 07');
   await expect(page.getByRole('button', { name: 'Stop the show' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/, { timeout: 15_000 });
   const scan = await new AxeBuilder({ page }).include('.jb-show-bar').include('.jb-intro').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
@@ -38,10 +38,10 @@ test('when a record finishes, the show hands over to the next one and plays it',
   await page.goto('/');
   await page.getByRole('button', { name: 'Play the whole jukebox' }).click();
   await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/, { timeout: 15_000 });
-  await expect(announcer(page)).toHaveText('Now playing record 2 of 6: Night Lights, NASA SVS 5313 · EIC Version.', { timeout: 45_000 });
+  await expect(announcer(page)).toHaveText('Now playing record 2 of 7: Night Lights, NASA SVS 5313 · EIC Version.', { timeout: 45_000 });
   await expect(page.getByRole('heading', { name: 'Night Lights', exact: true })).toBeVisible();
   await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/, { timeout: 20_000 });
-  await expect(page.getByRole('group', { name: 'Jukebox show' })).toContainText('02 / 06');
+  await expect(page.getByRole('group', { name: 'Jukebox show' })).toContainText('02 / 07');
   await page.getByRole('button', { name: 'Stop the show' }).click();
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
 });
