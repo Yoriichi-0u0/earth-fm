@@ -17,10 +17,14 @@ import {beatMs,beatPosition,clampBpm,decadeSeries,decadeTrend,frameUrl,rhythmPla
 import {IMAGE_HEIGHT,IMAGE_WIDTH,INSETS,LEGEND_BAR,maskReason} from '../lib/nightLights/layout';
 import type {Rect} from '../lib/nightLights/raster';
 import {cellPosition,decadeSentence,directionWords,eventCaption,pct,trendWords,yearCaption} from '../lib/nightLights/describe';
+import {chooseMystery,mysteryPool,revealSentence,MYSTERY_LABEL,type MysteryAnswer} from '../lib/nightLights/mysteryPlace';
 import crosscheck from '../../validation/svs5276-crosscheck.json';
 import './NightLightsDeck.css';
 
 type Place={id:string;label:string;rect:Rect;change:RegionStats|null};
+/** How a sound is presented: normally the place itself; in a Mystery Place round, concealed. */
+type View={label:string;rect:Rect};
+type Mystery={answer:MysteryAnswer;phase:'playing'|'guessing'|'revealed';guess:string|null;sentence?:string};
 type Shown={id:number;text:string;direction:Direction;rect:Rect;pulses:number;litFraction:number;note:string;hz:number|null;at:number};
 const FULL:Rect={x0:0,y0:0,x1:IMAGE_WIDTH-1,y1:IMAGE_HEIGHT-1};
 const CHANGE_POSITION=2024;
@@ -57,6 +61,8 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
   const audio=useRef<AudioEngine|null>(null),timer=useRef<number|undefined>(undefined),serial=useRef(0);
   const placeRef=useRef<Place|null>(null);
   const [place,setPlaceState]=useState<Place|null>(null);
+  const [mystery,setMystery]=useState<Mystery|null>(null);
+  const lastMystery=useRef<string|undefined>(undefined);
 
   useEffect(()=>{audio.current=new AudioEngine();window.terrajukeNightLights={events:[]};return()=>{window.clearTimeout(timer.current);audio.current?.dispose();};},[]);
   useEffect(()=>{audio.current?.setVolume(volume);},[volume]);
@@ -86,11 +92,11 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
   }
 
   // ---- Side A: the change map ------------------------------------------------------
-  function playChange(p:Place,origin:'user'|'auto',label=p.label){
+  function playChange(p:Place,origin:'user'|'auto',label=p.label,rect=p.rect){
     const s=p.change;
     const plan=s&&s.direction?planFor(s,centreX(p.rect),IMAGE_WIDTH):null;
     if(!s||!plan){const text=`${label} · ${s?t('no lit map pixels'):t('covered by graphics on the change map')} · ${t('silent')}`;setShown(prev=>prev&&{...prev,text});if(origin==='user')setMessage(text);return;}
-    emit(plan,eventCaption(label,s,plan),p.rect,plan.direction,s.litFraction,origin);
+    emit(plan,eventCaption(label,s,plan),rect,plan.direction,s.litFraction,origin);
   }
   function insetUnder(c:Cell){const cx=(c.rect.x0+c.rect.x1)>>1,cy=(c.rect.y0+c.rect.y1)>>1;return INSETS.findIndex(i=>cx>=i.frame.x0&&cx<=i.frame.x1&&cy>=i.frame.y0&&cy<=i.frame.y1);}
   function placeForCell(c:Cell):Place{
@@ -128,27 +134,53 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
 
   // ---- Side B: the decade -----------------------------------------------------------
   const decadeFor=(p:Place)=>model.decade?decadeSeries(model.decade,p.rect):null;
-  function emitYear(p:Place,series:readonly YearStats[],i:number,origin:'user'|'auto',inRhythm=false){
+  function emitYear(p:Place,series:readonly YearStats[],i:number,origin:'user'|'auto',inRhythm=false,view:View={label:p.label,rect:p.rect}){
     const cur=series[i],prev=i>0?series[i-1]:undefined,dir=yearDirection(prev,cur);
     const pos=beatPosition(i,rhythm.current.meter);
     if(inRhythm){setBeat({bar:pos.bar,beat:pos.beat});if(rhythm.current.metronome)audio.current?.click(pos.downbeat);}
-    const text=yearCaption(p.label,cur,series.find(s=>s.light>0),dir,prev?prev.year:null)+(inRhythm?` · ${t('bar')} ${pos.bar}, ${t('beat')} ${pos.beat}`:'');
+    const text=yearCaption(view.label,cur,series.find(s=>s.light>0),dir,prev?prev.year:null)+(inRhythm?` · ${t('bar')} ${pos.bar}, ${t('beat')} ${pos.beat}`:'');
     const base=yearPlan(cur,startLight(series),dir,centreX(p.rect));
     if(!base){setShown(prevShown=>prevShown&&{...prevShown,text});if(origin==='user')setMessage(text);return;}
-    emit(inRhythm?rhythmPlan(base,pos.downbeat,rhythm.current.bpm):base,text,p.rect,dir,cur.litFraction,origin);
+    emit(inRhythm?rhythmPlan(base,pos.downbeat,rhythm.current.bpm):base,text,view.rect,dir,cur.litFraction,origin);
   }
-  function startDecade(p:Place|null=placeRef.current??world){
+  /** The decade of a place. A Mystery Place round passes a concealed view and its own ending. */
+  function startDecade(p:Place|null=placeRef.current??world,conceal?:{view:View;onEnd:()=>void}){
     const series=p&&decadeFor(p);
     if(!p||!series)return;
-    stopAll(false);audio.current?.unlock();setPlace(p);setMode('decade');setCompleted(false);setRequestAt(performance.now());
-    setMessage(`${t('The decade for')} ${p.label}: ${t('NASA’s yearly frames from 2012 to 2023, one note each, then NASA’s change map.')}`);
+    stopAll(false);audio.current?.unlock();if(!conceal){setPlace(p);setMystery(null);}setMode('decade');setCompleted(false);setRequestAt(performance.now());
+    const view=conceal?.view??{label:p.label,rect:p.rect};
+    setMessage(conceal?t('Mystery Place: listen to twelve years and NASA’s change map, then guess where it is.'):`${t('The decade for')} ${p.label}: ${t('NASA’s yearly frames from 2012 to 2023, one note each, then NASA’s change map.')}`);
     const trend=decadeTrend(series);let i=0;
     const next=()=>{
-      if(i<series.length){setYear(series[i].year);emitYear(p,series,i,'auto',true);i++;setProgress(i/(series.length+1));timer.current=window.setTimeout(next,beatMs(rhythm.current.bpm));}
-      else if(i===series.length){setYear(null);setBeat(null);playChange(p,'auto',`${t('NASA’s change map')} · ${p.label}`);i++;setProgress(1);timer.current=window.setTimeout(next,TOUR_STEP_MS);}
-      else{setMode('idle');setCompleted(true);setMessage(decadeSentence(p.label,series,trend,p.change?.direction??null,series[0].mapPixels<SMALL_PLACE_PIXELS));}
+      if(i<series.length){setYear(series[i].year);emitYear(p,series,i,'auto',true,view);i++;setProgress(i/(series.length+1));timer.current=window.setTimeout(next,beatMs(rhythm.current.bpm));}
+      else if(i===series.length){setYear(null);setBeat(null);playChange(p,'auto',`${t('NASA’s change map')} · ${view.label}`,view.rect);i++;setProgress(1);timer.current=window.setTimeout(next,TOUR_STEP_MS);}
+      else{setMode('idle');setCompleted(true);if(conceal)conceal.onEnd();else setMessage(decadeSentence(p.label,series,trend,p.change?.direction??null,series[0].mapPixels<SMALL_PLACE_PIXELS));}
     };
     timer.current=window.setTimeout(next,200);
+  }
+
+  // ---- Mystery Place --------------------------------------------------------------------
+  const pool=useMemo(()=>model.decade&&world?mysteryPool([world,...regions].map(p=>({id:p.id,label:p.label,rect:p.rect,change:p.change?.direction??null})),model.decade):[],[model.decade,world,regions]);
+  const placeOf=(id:string)=>[world,...regions].find(p=>p?.id===id)??null;
+  function playMystery(answer:MysteryAnswer){
+    const p=placeOf(answer.id);if(!p)return;
+    setMystery(m=>({answer,phase:'playing',guess:m&&m.answer.id===answer.id?m.guess:null}));
+    startDecade(p,{view:{label:t(MYSTERY_LABEL),rect:FULL},onEnd:()=>{setMystery(m=>m&&m.phase==='playing'?{...m,phase:'guessing'}:m);setMessage(t('Which place did you hear? Choose one, then reveal.'));}});
+  }
+  function newMystery(){
+    if(pool.length<2)return;
+    const answer=chooseMystery(pool,lastMystery.current);lastMystery.current=answer.id;
+    setYear(null);playMystery(answer);
+  }
+  function reveal(){
+    if(!mystery)return;
+    stopAll(false);
+    const p=placeOf(mystery.answer.id);
+    const guess=mystery.guess?pool.find(c=>c.id===mystery.guess)??null:null;
+    const sentence=revealSentence({...mystery.answer,label:t(mystery.answer.label)},guess&&{...guess,label:t(guess.label)});
+    setMystery({...mystery,phase:'revealed',sentence});
+    if(p){setPlace(p);playChange(p,'auto',`${t('Revealed')} · ${p.label}`);}
+    setMessage(sentence);
   }
   function playYear(p:Place,y:number,origin:'user'|'auto'){
     const series=decadeFor(p);if(!series)return;
@@ -157,7 +189,8 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
 
   // ---- Choosing places ---------------------------------------------------------------
   function choose(p:Place){
-    stopAll(false);audio.current?.unlock();setPlace(p);setRequestAt(performance.now());
+    if(mystery&&mystery.phase!=='revealed')return;
+    stopAll(false);audio.current?.unlock();setPlace(p);setMystery(null);setRequestAt(performance.now());
     if(side==='a')playChange(p,'user');
     else if(year!==null)playYear(p,year,'user');
     else startDecade(p);
@@ -183,7 +216,7 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
     if(col<0||row<0||col>=COLS||row>=ROWS||!model.cells.length)return;
     chooseCell(cellAt(col,row));
   }
-  function changeSide(next:RecordSide){if(next===side)return;stopAll(false);setYear(null);setSide(next);setCompleted(false);setProgress(0);}
+  function changeSide(next:RecordSide){if(next===side)return;stopAll(false);setYear(null);setMystery(null);setSide(next);setCompleted(false);setProgress(0);}
   function onYear(value:number){
     stopAll(false);audio.current?.unlock();
     if(value===CHANGE_POSITION){setYear(null);if(current)playChange(current,'user',`${t('NASA’s change map')} · ${current.label}`);return;}
@@ -201,6 +234,7 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
 
   // ---- Console state --------------------------------------------------------------------
   const ready=model.status==='ready'&&(side==='a'||model.decadeStatus==='ready');
+  const concealed=Boolean(mystery&&mystery.phase!=='revealed');
   const playing=mode!=='idle';
   const signal:RecordSignal={playing,note:shown?.note??'—',frequency:shown?.hz??null,event:shown?{serial:shown.id,at:shown.at,index:0}:null};
   const position=side==='b'?(year!==null?`${year} · ${mode==='decade'&&beat?`${t('bar')} ${beat.bar}, ${t('beat')} ${beat.beat}`:`${YEARS.indexOf(year as (typeof YEARS)[number])+1} / 12`}`:t('Change map')):current?current.label:'—';
@@ -214,7 +248,7 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
       <button type="button" aria-label={t('Side B: hear the decade')} aria-pressed={side==='b'} onClick={()=>changeSide('b')}><b>B</b><span>{t('Hear the decade')}<small>{t('NASA’s 12 yearly frames')}</small></span></button>
     </div>
     <div className="nl-places" role="group" aria-label={t('Choose a place')}>
-      {[world,...regions].filter((p):p is Place=>Boolean(p)).map(p=><button key={p.id} type="button" aria-pressed={current?.id===p.id} disabled={!ready} onClick={()=>choose(p)}>{t(p.id==='world'?'Whole map':p.label.replace(' map region',''))}</button>)}
+      {[world,...regions].filter((p):p is Place=>Boolean(p)).map(p=><button key={p.id} type="button" aria-pressed={!concealed&&current?.id===p.id} disabled={!ready||concealed} onClick={()=>choose(p)}>{t(p.id==='world'?'Whole map':p.label.replace(' map region',''))}</button>)}
     </div>
     {side==='a'?<div className="jb-science-cue"><p>{t('Purple (more light) rises. Orange (less light) falls. White is one tone.')}</p><button className="jb-manual-toggle" type="button" disabled={model.status!=='ready'} aria-pressed={mode==='legend'} onClick={()=>mode==='legend'?stopAll():startLegend()}>{t(mode==='legend'?'Stop the legend':'Listen to the legend')}</button></div>
       :<div className="nl-year"><label htmlFor="nl-year">{t('NASA yearly frame')}</label><input id="nl-year" type="range" min={YEARS[0]} max={CHANGE_POSITION} step={1} value={year??CHANGE_POSITION} disabled={model.decadeStatus!=='ready'} aria-valuetext={year===null?t('Change map, 2012 to 2023'):String(year)} onChange={e=>onYear(Number(e.target.value))}/><output htmlFor="nl-year">{year===null?t('Change map'):year}</output></div>}
@@ -224,6 +258,21 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
       <label className="nl-click"><input type="checkbox" checked={metronome} onChange={e=>toggleMetronome(e.target.checked)}/>{t('Metronome click')}</label>
       <div className="nl-beats" aria-hidden="true">{Array.from({length:meter},(_,k)=><i key={k} className={`${k===0?'is-down':''}${mode==='decade'&&beat&&beat.beat===k+1?' is-on':''}`}/>)}</div>
     </div>}
+    {side==='b'&&<section className="nl-mystery" aria-labelledby="nl-mystery-title" data-mystery-phase={mystery?.phase??'idle'}>
+      <div className="nl-mystery-head"><h3 id="nl-mystery-title">{t('Mystery Place')}</h3><p>{t('Hear a decade without its name. Can you tell where the lights grew, or faded?')}</p></div>
+      {!mystery?<button type="button" className="nl-mystery-play" disabled={pool.length<2} onClick={newMystery}>{t('Play a Mystery Place')}</button>:<>
+        <fieldset className="nl-mystery-guess" disabled={mystery.phase==='revealed'}>
+          <legend>{t('Which place do you hear?')}</legend>
+          {pool.map(c=><label key={c.id}><input type="radio" name="nl-mystery-guess" value={c.id} checked={mystery.guess===c.id} onChange={()=>setMystery(m=>m&&{...m,guess:c.id})}/>{t(c.label)}</label>)}
+        </fieldset>
+        <div className="nl-mystery-actions">
+          {mystery.phase!=='revealed'&&<button type="button" onClick={reveal}>{t('Reveal the place')}</button>}
+          {mystery.phase!=='revealed'&&<button type="button" disabled={mode==='decade'} onClick={()=>playMystery(mystery.answer)}>{t('Replay')}</button>}
+          {mystery.phase==='revealed'&&<button type="button" className="nl-mystery-play" onClick={newMystery}>{t('Another Mystery Place')}</button>}
+        </div>
+        {mystery.phase==='revealed'&&<p className="nl-mystery-answer" data-testid="nl-mystery-answer">{mystery.sentence}</p>}
+      </>}
+    </section>}
     {canVibrate()&&<label className="nl-vibrate"><input type="checkbox" checked={vibrate} onChange={e=>setVibrate(e.target.checked)}/><Vibrate size={14}/>{t('Feel each note (supported Android browsers)')}</label>}
   </>;
 
@@ -233,8 +282,8 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
       <img src={CHANGE_MAP_URL} width={IMAGE_WIDTH} height={IMAGE_HEIGHT} alt={t('NASA world map of night-light change from 2012 to 2023: purple for more light, orange for less light, with four magnified insets and a legend.')} draggable={false}/>
       {year!==null&&<img className="nl-year-frame" src={frameUrl(year)} width={IMAGE_WIDTH} height={IMAGE_HEIGHT} alt={`${t('NASA’s annual night-light average for')} ${year}`} draggable={false}/>}
       {year!==null&&<span className="nl-year-badge" aria-hidden="true">{year}</span>}
-      {current&&current.id!=='world'&&<span className="nl-place-box" style={pctBox(current.rect)} aria-hidden="true"/>}
-      <span className="nl-focus" style={pctBox(focusRect)} aria-hidden="true"/>
+      {current&&current.id!=='world'&&!concealed&&<span className="nl-place-box" style={pctBox(current.rect)} aria-hidden="true"/>}
+      {!concealed&&<span className="nl-focus" style={pctBox(focusRect)} aria-hidden="true"/>}
       {shown&&<span key={shown.id} className={`nl-ring nl-${shown.direction}${motion?'':' nl-static'}${shown.rect.x1-shown.rect.x0>300?' nl-area':''}`} style={(()=>{const r=shown.rect,w=r.x1-r.x0+1,h=r.y1-r.y0+1,s=Math.max(w,h)*(.7+Math.min(.9,shown.litFraction*9)),wide=w>300,bw=wide?w:s,bh=wide?h:s,cx=r.x0+w/2,cy=r.y0+h/2;return {left:`${(cx-bw/2)/IMAGE_WIDTH*100}%`,top:`${(cy-bh/2)/IMAGE_HEIGHT*100}%`,width:`${bw/IMAGE_WIDTH*100}%`,height:`${bh/IMAGE_HEIGHT*100}%`,animationIterationCount:shown.pulses};})()} data-event-id={shown.id} data-direction={shown.direction} aria-hidden="true"/>}
     </div>
     <p className="nl-caption" data-testid="nl-caption">{shown?.text??t(model.status==='ready'?'Choose a place, tap the map or press Play.':model.status==='error'?'The NASA image could not be analysed.':'Analysing NASA’s image in your browser…')}</p>
@@ -265,7 +314,7 @@ export default function NightLightsDeck({record,motion,volume,onVolume}:{record:
     <DeckConsole record={sideRecord} labels={{input:'PLACE',position:side==='b'?'YEAR':'WHERE',count:side==='b'?'12 years + change map':'4 NASA regions + whole map',duration:side==='b'?`~${Math.round(12*60/bpm+1.3)} s`:'~7 s'}}
       playing={playing} starting={false} ready={ready} completed={completed} progress={progress}
       note={shown?.note??'—'} frequency={shown?.hz?`${shown.hz.toFixed(2)} Hz`:'—'} position={position}
-      input={current?`${t(current.label)}${current.change?.direction?` · ${t(directionWords(current.change.direction))}`:''}`:'—'}
+      input={concealed?t(MYSTERY_LABEL):current?`${t(current.label)}${current.change?.direction?` · ${t(directionWords(current.change.direction))}`:''}`:'—'}
       onPlay={()=>playing?stopAll():side==='a'?startTour():startDecade()}
       playLabel={side==='a'?'Play the four regions':'Hear the decade'}
       signal={signal} requestAt={requestAt} error={error} side={side}

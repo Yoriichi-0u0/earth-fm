@@ -178,3 +178,43 @@ test('the 3D jukebox follows the chosen record and knows when it plays; it is hi
   await page.getByRole('button', { name: 'Stop', exact: true }).click();
   await expect(stage).toHaveAttribute('data-stage-playing', 'false');
 });
+
+test('Mystery Place conceals the place while it plays, then reveals it with the clue that was in the sound', async ({ page }) => {
+  // Draw the last place in the pool (whole map, Western Europe, India): India.
+  await page.addInitScript(() => { Math.random = () => 0.9; });
+  await openNightLights(page, true);
+  await page.getByRole('button', { name: 'Side B: hear the decade' }).click();
+  await page.getByRole('button', { name: 'Play a Mystery Place' }).click();
+  const panel = page.getByRole('region', { name: 'Mystery Place' });
+  await expect(panel).toHaveAttribute('data-mystery-phase', 'playing');
+  await expect(caption(page)).toContainText('Mystery place', { timeout: 5_000 });
+  // Nothing gives the answer away while it plays.
+  for (const where of [caption(page), page.getByTestId('nl-announcer'), page.locator('.jb-readout')]) await expect(where).not.toContainText('India');
+  await expect(page.locator('.nl-place-box')).toHaveCount(0);
+  await expect(page.locator('.nl-ring')).toHaveClass(/nl-area/);
+  await expect(page.getByRole('button', { name: 'India', exact: true })).toBeDisabled();
+  await expect(panel).toHaveAttribute('data-mystery-phase', 'guessing', { timeout: 15_000 });
+  await expect(page.getByTestId('nl-announcer')).toContainText('Which place did you hear?');
+  await expect(panel.getByRole('radio')).toHaveCount(3);
+  await panel.getByRole('radio', { name: 'India map region' }).check();
+  await panel.getByRole('button', { name: 'Reveal the place' }).click();
+  await expect(page.getByTestId('nl-mystery-answer')).toHaveText(/^Yes: it was India map region\. Its brightness in 2023 was 1\.8× that of 2012, so you heard a melody that climbs\. NASA’s change map closes the record with more light\.$/);
+  await expect(page.locator('.nl-place-box')).toHaveCount(1);
+  await expect(caption(page)).toContainText('Revealed · India map region · more light');
+});
+
+test('a wrong Mystery Place guess is answered kindly, and the next round is a different place', async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 0.4; }); // Western Europe first
+  await openNightLights(page, true);
+  await page.getByRole('button', { name: 'Side B: hear the decade' }).click();
+  await page.getByRole('button', { name: 'Play a Mystery Place' }).click();
+  const panel = page.getByRole('region', { name: 'Mystery Place' });
+  await panel.getByRole('radio', { name: 'India map region' }).check();
+  await panel.getByRole('button', { name: 'Reveal the place' }).click();
+  await expect(page.getByTestId('nl-mystery-answer')).toContainText('It was Western Europe map region, not India map region.');
+  await expect(page.getByTestId('nl-mystery-answer')).toContainText('a melody that steps down');
+  await panel.getByRole('button', { name: 'Another Mystery Place' }).click();
+  await expect(panel).toHaveAttribute('data-mystery-phase', 'playing');
+  await panel.getByRole('button', { name: 'Reveal the place' }).click();
+  await expect(page.getByTestId('nl-mystery-answer')).not.toContainText('Western Europe');
+});
