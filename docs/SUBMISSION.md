@@ -48,7 +48,7 @@ Around the shelf: the **Record Journey**, an animated "from orbit to your ears" 
 
 ## Validity
 
-Every NASA file is pinned with its source URL and SHA-256. Every mapping is a fixed rule with unit tests: 119 unit tests and 145 browser tests at this checkpoint. For The Air We Share, tests check that each of NASA's six stories is dominated by the aerosol NASA names, at least twice the next one, and that grey land and Antarctica stay silent. Night Lights is cross-checked against NASA's separately published SVS 5276 series (r = 0.999 for the world). Currents of Heat reads temperature from NASA's numeric colour scale, and its readings behave like the real ocean: the western Pacific warm pool at 29.5 °C, the Labrador Sea at 2.8 °C, and warming from each pole toward the equator.
+Every NASA file is pinned with its source URL and SHA-256. Every mapping is a fixed rule with unit tests: 128 unit tests and 154 browser tests at this checkpoint. For The Air We Share, tests check that each of NASA's six stories is dominated by the aerosol NASA names, at least twice the next one, and that grey land and Antarctica stay silent. Night Lights is cross-checked against NASA's separately published SVS 5276 series (r = 0.999 for the world). Currents of Heat reads temperature from NASA's numeric colour scale, and its readings behave like the real ocean: the western Pacific warm pool at 29.5 °C, the Labrador Sea at 2.8 °C, and warming from each pole toward the equator.
 
 Each record states its limits: pixels are not measurements; GEOS is a model analysis; colour strength is not optical depth; one aerosol moment, not a live feed; equal note lengths do not encode elapsed time. No user study has been run, and TerraJuke claims no learning gains.
 
