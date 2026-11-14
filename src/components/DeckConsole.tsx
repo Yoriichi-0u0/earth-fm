@@ -1,6 +1,8 @@
 // The record player's console: title, transport, progress, artwork, readouts and source.
 // Shared by every record on the jukebox (moved out of JukeboxHome.tsx unchanged).
+import {useEffect} from 'react';
 import type {ReactNode} from 'react';
+import {announceDeck} from '../lib/deckEvents';
 import {ArrowUpRight,Play,Square,Volume2} from 'lucide-react';
 import type {JukeboxRecord,JukeboxRecordId} from '../data/jukeboxRecords';
 import {useStudioLanguage} from '../lib/studioLanguage';
@@ -13,6 +15,8 @@ export type ConsoleProps=DeckState&{labels?:ConsoleLabels;record:VisualRecord;ar
 
 export default function DeckConsole({labels,record,artwork,playing,starting,ready,completed,progress,note,frequency,position,input,onPlay,volume,onVolume,error,extra,side,sideControls,recordObject,recordNote,signal,requestAt,playLabel,manual,performanceControls}:ConsoleProps){
   const {t}=useStudioLanguage();const active=playing||starting;
+  useEffect(()=>{announceDeck(active);},[active]);
+  useEffect(()=>()=>announceDeck(false),[]);
   return <article className={`jb-deck ${active?'is-playing':''}${side?' jb-two-sided':''}${manual?' jb-manual':''}`} aria-labelledby="jb-record-title" data-record-kind={record.kind} data-record-side={side} data-play-mode={manual?'manual':'automatic'} data-note-serial={signal.event?.serial??0} data-note-at={signal.event?.at??0} data-play-request-at={requestAt} data-frequency={signal.frequency??''}>
     <header className="jb-deck-header">
       <div className="jb-record-heading"><h2 id="jb-record-title" tabIndex={-1}>{t(record.title)}</h2></div>

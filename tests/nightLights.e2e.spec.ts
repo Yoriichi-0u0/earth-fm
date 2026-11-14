@@ -163,3 +163,18 @@ test('tempo and beats per bar change timing and accents only: 60 BPM, 3 per bar,
   // Pitch is unchanged by tempo: the same twelve notes as at the default tempo.
   expect(years[11].hz / years[0].hz).toBeGreaterThan(1.5);
 });
+
+test('the 3D jukebox follows the chosen record and knows when it plays; it is hidden from assistive technology', async ({ page }) => {
+  await page.goto('/');
+  const stage = page.locator('.jb-stage');
+  await expect(stage).toHaveAttribute('data-stage-selected', 'spiral');
+  await expect(stage).toHaveAttribute('aria-hidden', 'true');
+  await expect(stage.locator('canvas')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Select record: Night Lights' }).click();
+  await expect(stage).toHaveAttribute('data-stage-selected', 'nightlights');
+  await expect(page.getByRole('button', { name: 'India', exact: true })).toBeEnabled({ timeout: 15_000 });
+  await page.getByRole('button', { name: 'Play the four regions' }).click();
+  await expect(stage).toHaveAttribute('data-stage-playing', 'true');
+  await page.getByRole('button', { name: 'Stop', exact: true }).click();
+  await expect(stage).toHaveAttribute('data-stage-playing', 'false');
+});

@@ -32,6 +32,7 @@ const noop=()=>{};
 const EarthGlobe=lazy(()=>import('./EarthGlobe'));
 const MysteryRecord=lazy(()=>import('./MysteryRecord'));
 const NightLightsDeck=lazy(()=>import('./NightLightsDeck'));
+const JukeboxStage=lazy(()=>import('./JukeboxStage'));
 function useVisualRecord(record:VisualRecord,motion:boolean,volume:number){
   const {t}=useStudioLanguage();const [animate,setAnimate]=useState(true),[requestAt,setRequestAt]=useState(0);
   const frame=record.frame!;
@@ -162,6 +163,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
   },[]);
   const record=jukeboxRecords.find(r=>r.id===selected)??jukeboxRecords[0],station=record.id==='arctic'?'arctic':'climate';
   const optional=selected==='personal'||selected==='mystery';
+  const stageRecords=useMemo(()=>jukeboxRecords.map(r=>({id:r.id,title:r.title,number:r.number,accent:r.accent,image:r.frame?.imageUrl??r.posterUrl,focus:r.id==='nightlights'?[.855,.72] as [number,number]:undefined})),[]);
   function selectRecord(id:JukeboxRecordId|'mystery'){
     personal.cancel();
     setSelected(id);
@@ -181,6 +183,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
         {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='nightlights'?<Suspense fallback={<p role="status">{t('Loading Night Lights…')}</p>}><NightLightsDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
       </div>
       <div className="jb-record-shelf">
+        <Suspense fallback={null}><JukeboxStage records={stageRecords} selected={selected} motion={motion} onSelect={id=>selectRecord(id as JukeboxRecordId)}/></Suspense>
         <section className="jb-library" id="record-shelf" tabIndex={-1} aria-label={t('Choose an Earth record')}><div className="jb-library-heading"><h2>{t('Choose a record')}</h2><button className="jb-mystery-entry" type="button" aria-label={t('Open Mystery Record')} aria-pressed={selected==='mystery'} onClick={()=>selectRecord('mystery')}><Disc3 aria-hidden="true" size={14}/>{t('Mystery Record')}</button></div>
           <div className={`jb-shelf-wrap${edges.left?' has-previous':''}${edges.right?' has-next':''}`}>
             <div className="jb-records" ref={shelf}>{jukeboxRecords.map((item,index)=><button key={item.id} className={`jb-record ${selected===item.id?'is-selected':''}`} aria-pressed={selected===item.id} aria-label={`${t('Select record')}: ${t(item.title)}`} onClick={()=>selectRecord(item.id)} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=shelf.current?.querySelectorAll<HTMLButtonElement>('.jb-record');const next=e.key==='Home'?0:e.key==='End'?jukeboxRecords.length-1:(index+(e.key==='ArrowRight'?1:-1)+jukeboxRecords.length)%jukeboxRecords.length;buttons?.[next]?.focus();}}>
