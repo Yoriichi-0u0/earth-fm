@@ -2,6 +2,7 @@
 // octave and a fifth above (how much of the band NASA's current traces cover). Lookahead scheduling
 // on the audio clock; the UI hears about each step when it sounds.
 import type { OceanNote } from './sonify.ts';
+import { FlowVoice, getArticulation } from '../articulation.ts';
 
 const MASTER = 0.5;
 export type OceanPlay = { getStepSeconds: () => number; onStep: (index: number) => void; onEnd: () => void };
@@ -49,11 +50,15 @@ export class OceanEngine {
     this.stop(); const ctx = this.unlock();
     if (!ctx || !score.length) { opts.onEnd(); return; }
     let index = 0, when = ctx.currentTime + 0.06;
+    // Continuous: one warm voice glides band to band; shimmer (trace coverage) and stereo still follow each band.
+    const flow = getArticulation() === 'flow' ? new FlowVoice(ctx, this.master!, { partials: [{ ratio: 1, weight: 0.32, type: 'triangle' }, { ratio: 2, weight: 0.08 }, { ratio: 3, weight: 0.05 }], pan: true }, when) : null;
+    if (flow) for (const o of flow.sources) { this.sources.add(o); o.onended = () => this.sources.delete(o); }
     const tick = () => {
       while (when < ctx.currentTime + 0.12) {
-        if (index >= score.length) { this.timers.push(window.setTimeout(opts.onEnd, Math.max(0, (when - ctx.currentTime) * 1000))); window.clearInterval(this.ticker); this.ticker = undefined; return; }
+        if (index >= score.length) { flow?.end(when); this.timers.push(window.setTimeout(opts.onEnd, Math.max(0, (when - ctx.currentTime) * 1000))); window.clearInterval(this.ticker); this.ticker = undefined; return; }
         const i = index, dur = opts.getStepSeconds(), n = score[i];
-        if (n) this.note(n, when, dur);
+        if (flow) { if (n) flow.note(n.hz, when, 0.3, { pan: n.pan, weights: [0.711, 0.178, 0.111 * n.shimmer], holdUntil: when + dur * 1.02 }); else flow.rest(when); }
+        else if (n) this.note(n, when, dur);
         this.timers.push(window.setTimeout(() => opts.onStep(i), Math.max(0, (when - ctx.currentTime) * 1000)));
         when += dur; index++;
       }

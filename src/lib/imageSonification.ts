@@ -1,4 +1,5 @@
 import { EarthAudio, exportWav, type SonificationOptions, type SonificationPoint } from './audio'
+import { getArticulation } from './articulation'
 
 export type FrameStep = {
   year: number
@@ -95,6 +96,7 @@ export class FrameAudio {
       ...playbackOptions,
       soundscape: 'ambient',
       pitchRange: { min: 0, max: 1 },
+      articulation: getArticulation(),
       samplePoint: sampleStep ? index => framePoint(sampleStep(index)) : undefined,
     })
   }

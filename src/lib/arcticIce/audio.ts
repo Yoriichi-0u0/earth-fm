@@ -1,6 +1,7 @@
 // Web Audio for The Ice Year: a glass-bell note for ice, a filtered-noise ocean wash for open water.
 // Lookahead scheduling on the audio clock; the UI hears about each step when it sounds.
 import type {IceNote} from './sonify.ts';
+import {FlowVoice, getArticulation} from '../articulation.ts';
 
 const MASTER = 0.5;
 export type IcePlay = {getStepSeconds: () => number; onStep: (index: number) => void; onEnd: () => void};
@@ -61,17 +62,34 @@ export class IceEngine {
     this.stop(); const ctx = this.unlock();
     if (!ctx || !score.length) { opts.onEnd(); return; }
     let index = 0, when = ctx.currentTime + 0.06;
+    // Continuous: one gliding glass tone for the ice and one unbroken sea under it.
+    const flow = getArticulation() === 'flow' ? this.flow(ctx, when) : null;
     const tick = () => {
       while (when < ctx.currentTime + 0.12) {
-        if (index >= score.length) { this.timers.push(window.setTimeout(opts.onEnd, Math.max(0, (when - ctx.currentTime) * 1000))); window.clearInterval(this.ticker); this.ticker = undefined; return; }
-        const i = index, dur = opts.getStepSeconds();
-        this.note(score[i], when, dur);
+        if (index >= score.length) { flow?.end(when); this.timers.push(window.setTimeout(opts.onEnd, Math.max(0, (when - ctx.currentTime) * 1000))); window.clearInterval(this.ticker); this.ticker = undefined; return; }
+        const i = index, dur = opts.getStepSeconds(), n = score[i];
+        if (flow) flow.step(n, when, dur); else this.note(n, when, dur);
         this.timers.push(window.setTimeout(() => opts.onStep(i), Math.max(0, (when - ctx.currentTime) * 1000)));
         when += dur; index++;
       }
       if (this.timers.length > 64) this.timers.splice(0, this.timers.length - 64);
     };
     tick(); this.ticker = window.setInterval(tick, 25);
+  }
+
+  private flow(ctx: AudioContext, start: number) {
+    const bell = new FlowVoice(ctx, this.master!, {partials: [{ratio: 1, weight: 0.3}, {ratio: 2, weight: 0.05}, {ratio: 3, weight: 0.02}]}, start);
+    for (const o of bell.sources) this.track(o);
+    const sea = this.track(ctx.createBufferSource()), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    sea.buffer = this.noise; sea.loop = true; f.type = 'lowpass'; f.frequency.value = 520; f.Q.value = 0.4; g.gain.setValueAtTime(0, start);
+    sea.connect(f); f.connect(g); g.connect(this.master!); sea.start(start);
+    return {
+      step: (n: IceNote, when: number, dur: number) => {
+        if (n.ice) bell.note(n.hz, when, 0.24, {holdUntil: when + dur * 1.02}); else bell.rest(when);
+        g.gain.setTargetAtTime(0.16 * n.water, when, dur * 0.3);
+      },
+      end: (when: number) => { bell.end(when); g.gain.setTargetAtTime(0, when, 0.15); try { sea.stop(when + 1); } catch { /* stopped */ } },
+    };
   }
 
   stop(): void {

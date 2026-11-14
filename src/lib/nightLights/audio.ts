@@ -1,6 +1,7 @@
 // Web Audio synthesis. One voice manager: a new event replaces the one still sounding,
 // and stop() silences everything. All sound is generated live; there are no samples.
 import type { NotePlan } from './sonify.ts';
+import { FlowVoice, getArticulation } from '../articulation.ts';
 
 const MASTER_LEVEL = 0.22;
 /** Metronome clicks sit far above the data notes (A2–A5) so they never read as data. */
@@ -13,6 +14,8 @@ type Ctx = AudioContext;
 export class AudioEngine {
   private ctx: Ctx | null = null;
   private voices: { osc: OscillatorNode; gain: GainNode }[] = [];
+  /** Continuous sound: one voice held across events, gliding to each new pitch. */
+  private flow: { voice: FlowVoice; waveform: OscillatorType } | null = null;
   private master: GainNode | null = null;
   private level = 1;
   muted = false;
@@ -73,6 +76,7 @@ export class AudioEngine {
   }
 
   play(plan: NotePlan): void {
+    if (getArticulation() === 'flow') { this.playFlow(plan); return; }
     this.stop();
     if (this.muted) return;
     const ctx = this.unlock();
@@ -115,7 +119,30 @@ export class AudioEngine {
     }
   }
 
+  private playFlow(plan: NotePlan): void {
+    this.stopStruck();
+    if (this.muted) { this.endFlow(); return; }
+    const ctx = this.unlock();
+    if (!ctx || !this.master) return;
+    const t0 = ctx.currentTime + 0.01;
+    if (this.flow && this.flow.waveform !== plan.waveform) this.endFlow();
+    if (!this.flow) this.flow = { waveform: plan.waveform, voice: new FlowVoice(ctx, this.master, { partials: [{ ratio: 1, weight: 1, type: plan.waveform }], lowpassHz: plan.waveform === 'sawtooth' ? SAWTOOTH_CUTOFF_HZ : undefined, pan: true }, t0) };
+    const peak = plan.gain * (plan.waveform === 'sawtooth' ? 0.6 : 1) * 0.7;
+    for (const note of plan.notes) this.flow.voice.note(note.hz, t0 + note.at, peak, { pan: plan.pan, holdUntil: t0 + note.at + note.duration + 1.2 });
+  }
+
+  private endFlow(): void {
+    if (!this.flow) return;
+    try { this.flow.voice.end(this.ctx?.currentTime ?? 0); } catch { /* context closed */ }
+    this.flow = null;
+  }
+
   stop(): void {
+    this.stopStruck();
+    this.endFlow();
+  }
+
+  private stopStruck(): void {
     for (const { osc, gain } of this.voices) {
       try {
         osc.stop();
@@ -155,6 +182,6 @@ export class AudioEngine {
   }
 
   get activeVoices(): number {
-    return this.voices.length;
+    return this.voices.length + (this.flow ? 1 : 0);
   }
 }

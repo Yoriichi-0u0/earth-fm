@@ -48,3 +48,13 @@ Files, pixel buffers, favorites, and sound are processed locally. A shared clima
 - `src/components/EarthGlobe.tsx`: interactive orthographic SVG with bundled public-domain geography.
 
 The app is a static React/TypeScript application built by Vite. Hosting needs no database, secret, or server process. Supabase could support opt-in shared collections in a future iteration; it is not required for this version.
+
+## Sound shape: Note by note or Continuous (since 15 Nov 2026)
+
+Every jukebox record has a **Sound** control under Play. *Note by note* (default) strikes each value as its own note.
+*Continuous* plays the same values as one line: a sustained voice (`FlowVoice`, `src/lib/articulation.ts`) glides
+to each new pitch with a 45 ms time constant, holds until the next value, and fades for a rest or when nothing
+follows. The partials, per-note colour weights, loudness and stereo position are the record's own; only the joins
+between notes change. The setting is stored on the device (`terrajuke-articulation`) and read when Play is pressed.
+Tests: `tests/articulation.test.ts` (exact pitches, storage) and `tests/soundShape.e2e.spec.ts` (every record glides
+in Continuous and strikes in Note by note).

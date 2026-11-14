@@ -43,7 +43,7 @@ Around the shelf: the **Record Journey**, an animated "from orbit to your ears" 
 | EIC visual frames + sonification generated in real time | Every visual record is analysed and synthesized live in the browser from pinned NASA files; no recordings |
 | Select or experience a specific visualization with its soundscape | A jukebox shelf and 3D rack: one press to choose, one press to play |
 | Map colour, brightness, shape or pixel density to sound | Brightness → pitch; RGB → timbre; NASA legend position → pitch; aerosol colour → instrument; colour strength → loudness; density → rhythm (rests where there is nothing) |
-| Balance data with musicality | Fixed scales from the data; shared pentatonic scales so layers harmonise; tempo, tone and mixer are musical choices that never change a note |
+| Balance data with musicality | Fixed scales from the data; shared pentatonic scales so layers harmonise; tempo, tone, mixer and the Sound setting (note by note, or one continuous gliding line) are musical choices that never change a note |
 | Accessibility for blind and low-vision users | Every map is a keyboard instrument with spoken descriptions; captions and screen-reader announcements on every note; Android vibration patterns; reduced motion; 2D fallbacks for all 3D; automated WCAG checks in light and dark |
 | Tell the story | NASA's own stories on Side B, liner notes with the method and limits, and the Record Journey from instrument to listener |
 | Use the Resources | EIC Content Database (SVS 5190, SVS 5313 EIC Version) and the listed GEOS Aerosols (SVS 5669) and Global Sea Surface Currents and Temperature (SVS 3912); the Caldwell 73 sonification informed the scanning design |

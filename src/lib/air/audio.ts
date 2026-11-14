@@ -3,6 +3,7 @@
 // hears about each step when it actually sounds.
 import { AEROSOLS, type Aerosol } from './analyze.ts';
 import { VOICES, stepSeconds, type Chord, type TrackNote } from './sonify.ts';
+import { FlowVoice, getArticulation, type FlowSpec } from '../articulation.ts';
 
 const MASTER_LEVEL = 0.5;
 const VOICE_LEVEL: Record<Aerosol, number> = { seaSalt: 0.32, blackCarbon: 0.22, dust: 0.3, sulfate: 0.2 };
@@ -105,14 +106,20 @@ export class AirEngine {
     const ctx = this.unlock();
     if (!ctx || !score.length) { options.onEnd(); return; }
     let index = start, when = ctx.currentTime + 0.06;
+    // Continuous: four sustained lines, one per aerosol, each through its own Mute/Solo track.
+    const flow = getArticulation() === 'flow' ? this.flowLines(ctx, when) : null;
     const tick = () => {
       while (when < ctx.currentTime + LOOKAHEAD_S) {
         if (index >= score.length) {
-          if (!options.loop) { const done = window.setTimeout(options.onEnd, Math.max(0, (when - ctx.currentTime) * 1000)); this.timers.push(done); window.clearInterval(this.ticker); this.ticker = undefined; return; }
+          if (!options.loop) { if (flow) for (const line of flow.values()) line.end(when); const done = window.setTimeout(options.onEnd, Math.max(0, (when - ctx.currentTime) * 1000)); this.timers.push(done); window.clearInterval(this.ticker); this.ticker = undefined; return; }
           index = 0;
         }
         const i = index, chord = score[i], dur = stepSeconds(options.getBpm());
-        this.chordAt(chord, when, dur);
+        if (flow) for (const a of AEROSOLS) {
+          const note = chord.notes.find(n => n.aerosol === a), line = flow.get(a)!;
+          if (note && note.loudness > 0) line.note(note.hz, when, VOICE_LEVEL[a] * note.loudness * 0.75, { pan: chord.pan, holdUntil: when + dur * 1.02 });
+          else line.rest(when);
+        } else this.chordAt(chord, when, dur);
         this.timers.push(window.setTimeout(() => options.onStep(i, chord), Math.max(0, (when - ctx.currentTime) * 1000)));
         when += dur; index++;
       }
@@ -120,6 +127,22 @@ export class AirEngine {
     };
     tick();
     this.ticker = window.setInterval(tick, TICK_MS);
+  }
+
+  private flowLines(ctx: Ctx, start: number): Map<Aerosol, FlowVoice> {
+    const specs: Record<Aerosol, FlowSpec> = {
+      seaSalt: { partials: [{ ratio: 1, weight: 1, detune: -5 }, { ratio: 1, weight: 0.7, detune: 5 }], pan: true },
+      blackCarbon: { partials: [{ ratio: 1, weight: 1, type: VOICES.blackCarbon.wave }, { ratio: 0.5, weight: 0.4, type: VOICES.blackCarbon.wave, detune: 7 }], lowpassHz: 900, pan: true },
+      dust: { partials: [{ ratio: 1, weight: 1, type: 'triangle', detune: -7 }, { ratio: 1, weight: 0.8, type: 'triangle', detune: 7 }], pan: true },
+      sulfate: { partials: [{ ratio: 1, weight: 1 }, { ratio: 2.76, weight: 0.18 }, { ratio: 5.4, weight: 0.06 }], pan: true },
+    };
+    const lines = new Map<Aerosol, FlowVoice>();
+    for (const a of AEROSOLS) {
+      const line = new FlowVoice(ctx, this.tracks.get(a)!, specs[a], start);
+      for (const o of line.sources) { this.sources.add(o); o.onended = () => this.sources.delete(o); }
+      lines.set(a, line);
+    }
+    return lines;
   }
 
   stop(): void {
