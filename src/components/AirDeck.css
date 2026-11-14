@@ -1,0 +1,74 @@
+/* The Air We Share (NASA SVS 5669). NASA's still keeps its 16:9 shape; the globe is the record. */
+.jb-deck[data-record-kind="visual"] .air-media{height:auto;padding:34px 0 30px;background:#03060a}
+.air-map{position:relative;line-height:0;margin:0 14px;cursor:crosshair;touch-action:manipulation;outline:none;border-radius:6px;overflow:hidden}
+.air-map:focus-visible{box-shadow:0 0 0 2px var(--record-accent,#c19adc)}
+.air-map img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.air-needle{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(#fff0,#fff 18%,#fff 82%,#fff0);box-shadow:0 0 10px #fff,0 0 22px var(--record-accent,#c19adc);pointer-events:none;transition-property:left;transition-timing-function:linear;opacity:.85}
+.air-needle.is-playing{opacity:1}
+.air-story-box{position:absolute;border:1.5px dashed color-mix(in srgb,var(--track) 70%,#fff0);border-radius:4px;pointer-events:none;opacity:.5;transition:opacity .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.air-story-box.is-on{opacity:1;border-style:solid;box-shadow:0 0 0 1px #0008,0 0 18px var(--track)}
+.air-caption{margin:10px 16px 0;min-height:2.6em;line-height:1.35;font-size:13px;font-weight:600;color:#f4f1fb;font-variant-numeric:tabular-nums;text-wrap:pretty;overflow-wrap:anywhere}
+
+/* Story chips */
+.air-stories{display:flex;flex-wrap:wrap;gap:6px;padding:12px 23px 0}
+.air-stories button{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:6px 13px 6px 10px;border-radius:999px;border:1px solid var(--ef-control-border,#ffffff26);background:var(--ef-panel,#ffffff0b);color:var(--ef-text,inherit);font:inherit;font-size:12px;cursor:pointer;transition:transform .2s cubic-bezier(.2,.8,.2,1),background .2s,border-color .2s}
+.air-stories button i{width:9px;height:9px;border-radius:50%;background:var(--track);box-shadow:0 0 8px var(--track)}
+.air-stories button:hover:not(:disabled){background:color-mix(in srgb,var(--ef-text,#fff) 7%,var(--ef-panel,#0000))}
+.air-stories button:active:not(:disabled){transform:scale(.97)}
+.air-stories button[aria-pressed="true"]{border-color:var(--track);background:color-mix(in srgb,var(--track) 18%,#0000)}
+.air-stories button:disabled{opacity:.45;cursor:not-allowed}
+
+.air-tempo{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 23px 0}
+.air-tempo label,.air-tempo output{color:var(--ef-text,inherit)}
+.air-tempo label{font-size:12px;font-weight:600}
+.air-tempo input{flex:1 1 180px;min-height:36px;accent-color:var(--record-accent,#c19adc)}
+.air-tempo output{min-width:8ch;font-variant-numeric:tabular-nums;font-size:12px}
+
+/* Mixer */
+.air-mixer{display:grid;gap:6px;margin:12px 18px 2px;padding:10px;border-radius:18px;color:var(--ef-text,#eef3f7);background:color-mix(in srgb,var(--ef-text,#fff) 4%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ef-text,#fff) 10%,transparent)}
+.air-strip{display:grid;grid-template-columns:12px minmax(0,1.3fr) minmax(60px,1fr) 34px auto;align-items:center;gap:10px;min-height:44px;padding:4px 6px 4px 10px;border-radius:10px;background:color-mix(in srgb,var(--ef-text,#fff) 3%,transparent);transition:opacity .3s,background .3s}
+.air-strip.is-sounding{background:color-mix(in srgb,var(--track) 12%,transparent)}
+.air-strip.is-silent{opacity:.42}
+.air-strip-swatch{width:12px;height:12px;border-radius:50%;background:var(--track);box-shadow:0 0 10px var(--track)}
+.air-strip-name{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.air-strip-name strong{font-size:13px;font-weight:600}
+.air-strip-name small{font-size:11px;color:var(--ef-muted,#a6b3bd);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.air-strip-meter{height:8px;border-radius:999px;background:color-mix(in srgb,var(--ef-text,#fff) 10%,transparent);overflow:hidden}
+.air-strip-meter>span{display:block;height:100%;width:100%;border-radius:inherit;background:linear-gradient(90deg,color-mix(in srgb,var(--track) 70%,#000),var(--track));transform-origin:left center;transform:scaleX(.02)}
+.air-strip-note{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center;color:var(--ef-text,#dfe7ee)}
+.air-strip-buttons{display:flex;gap:4px}
+.air-strip-buttons button{width:36px;height:36px;border-radius:10px;border:1px solid var(--ef-control-border,#ffffff24);background:var(--ef-panel,#ffffff0a);color:var(--ef-text,inherit);font:600 12px/1 inherit;cursor:pointer;transition:transform .15s cubic-bezier(.2,.8,.2,1),background .2s}
+.air-strip-buttons button:active{transform:scale(.94)}
+.air-strip-buttons button[aria-pressed="true"]{background:var(--track);border-color:var(--track);color:#0b0d10}
+
+/* The turntable: Earth as the record */
+.air-turntable{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 12px 14px;min-width:0}
+.air-globe{position:relative;width:min(100%,260px);aspect-ratio:1;border-radius:50%}
+.air-globe-2d{position:absolute;inset:6%;border-radius:50%;background-size:200% 100%;background-repeat:repeat-x;box-shadow:inset -18px -10px 40px #000c,inset 8px 6px 24px #ffffff1a,0 0 40px #7fb2ff2e;transition:opacity .4s}
+.air-globe-3d{position:absolute;inset:-14%}
+.air-globe-3d canvas{display:block}
+.air-needle-tag{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font-size:11px;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px 6px #000}
+.air-globe-caption{margin:0;font-size:12px;color:#a6b3bd;text-align:center;text-wrap:balance}
+.air-globe-toggle{min-height:32px;padding:4px 12px;border-radius:999px;border:1px solid #ffffff26;background:#ffffff0b;color:inherit;font:inherit;font-size:11px;cursor:pointer}
+.air-turntable.is-playing .air-globe-2d{animation:air-breathe 2.4s ease-in-out infinite}
+@keyframes air-breathe{50%{box-shadow:inset -18px -10px 40px #000c,inset 8px 6px 24px #ffffff1a,0 0 56px #c19adc55}}
+
+/* Liner notes */
+.air-voice-list,.air-story-list{padding-left:0;list-style:none;display:grid;gap:6px}
+.air-voice-list li{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.air-voice-list i{width:10px;height:10px;border-radius:50%;background:var(--track)}
+.air-story-list em{color:var(--ef-muted)}
+
+@media(max-width:640px){
+  .air-strip{grid-template-columns:10px minmax(0,1fr) minmax(40px,.7fr) auto;gap:8px}
+  .air-strip-note{display:none}
+  .air-globe{width:min(100%,200px)}
+  .air-stories,.air-tempo{padding-left:16px;padding-right:16px}
+  .air-mixer{margin-left:12px;margin-right:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .air-needle{transition:none!important}
+  .air-turntable.is-playing .air-globe-2d{animation:none}
+  .air-stories button,.air-strip-buttons button{transition:none}
+}
+.air-performance{padding-bottom:6px}

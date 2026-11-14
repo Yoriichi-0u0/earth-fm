@@ -10,11 +10,12 @@ TerraJuke is a jukebox. Each NASA Earth visualization is a **record**: choose it
 | --- | --- | --- |
 | 01 | Climate Spiral | NASA SVS 5190 (Side A) and GISTEMP v4 January anomalies (Side B), with the Three.js Climate Coil |
 | 02 | Night Lights | NASA SVS 5313, EIC Version: change map and NASA's twelve annual frames, cross-checked against SVS 5276 |
-| 03 | Moving Earth | EIC exhibit animation from an attributed earth.gov mirror ([provenance](docs/FRAMES.md)) |
-| 04 | Arctic September | Project-derived means of NSIDC September extent, not an EIC visual |
-| 05 | Temperature Through Time | The Side B GISTEMP measurements on their own |
+| 03 | The Air We Share | NASA SVS 5669, GEOS Aerosols: four aerosols become four instruments on a mixing desk while a Three.js Earth turns under the needle; Side B plays NASA's six stories ([details](docs/AIR.md)) |
+| 04 | Moving Earth | EIC exhibit animation from an attributed earth.gov mirror ([provenance](docs/FRAMES.md)) |
+| 05 | Arctic September | Project-derived means of NSIDC September extent, not an EIC visual |
+| 06 | Temperature Through Time | The Side B GISTEMP measurements on their own |
 
-Around the shelf: a Three.js jukebox stage, Grooveprint, Scratch and Earth Looper, Your Record (a personal image that stays on the device), Mystery Record, Mystery Place (hear a region's decade of night lights, guess where it is, then see it on NASA's map), Light and Dark appearance, and English or Simplified Chinese. See [the TerraJuke 3 decisions](docs/TERRAJUKE-3-DECISIONS.md), [Night Lights](docs/NIGHT-LIGHTS.md) and [the design notes](docs/TERRAJUKE-DESIGN.md).
+Every NASA record ends with its journey, *from orbit to your ears*: the instrument, the NASA team, the visualizers and finally you, in your own time zone. Around the shelf: a Three.js jukebox stage, Grooveprint, Scratch and Earth Looper, Your Record (a personal image that stays on the device), Mystery Record, Mystery Place (hear a region's decade of night lights, guess where it is, then see it on NASA's map), and an Auto / Light / Dark appearance switch. The interface is English only. See [the TerraJuke 3 decisions](docs/TERRAJUKE-3-DECISIONS.md), [Night Lights](docs/NIGHT-LIGHTS.md) and [the design notes](docs/TERRAJUKE-DESIGN.md).
 
 The pages are Home (`/`, the jukebox), Listen (`/listen`), Create (`/create`), Explore Data (`/data`) and About (`/about`). `/listen?station=arctic` and `/listen?station=all` open the curated [Earth Stations](docs/EARTH_STATIONS.md). `/?legacy=1` still opens the original Earth FM app for old bookmarks; old climate/visual anchors and shared-mix query parameters remain compatible. See [the submission draft](docs/SUBMISSION.md) and [the actual-user pilot protocol](docs/USER_TEST_PROTOCOL.md).
 

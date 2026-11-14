@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -9,7 +10,7 @@ const loop=(page:Page)=>page.getByRole('region',{name:'Earth Looper',exact:true}
 
 for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refinement comparison`,async({page})=>{
   const layouts:unknown[]=[];
-  await page.goto('/');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await page.goto('/');await chooseAppearance(page,theme);
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();await page.locator('.jb-groove-key>details>summary').click();
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
     await page.setViewportSize(viewport);
@@ -51,7 +52,7 @@ async function setup(page:Page){
 }
 
 for(const theme of ['light','dark'] as const)test(`${theme} Climate vinyl visual comparison on desktop and phone`,async({page})=>{
-  await page.goto('/');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await page.goto('/');await chooseAppearance(page,theme);
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
     await page.setViewportSize(viewport);
@@ -139,28 +140,28 @@ test('an unavailable image has no invented grooves while Side B keeps real obser
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await expect(print(page)).toHaveAttribute('data-groove-count','12');
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves remain bilingual, keyboard usable and accessible at six viewports`,async({page})=>{
-  test.setTimeout(60_000);await setup(page);await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves remain keyboard usable and accessible at six viewports`,async({page})=>{
+  test.setTimeout(60_000);await setup(page);await chooseAppearance(page,theme);
   await page.locator('.jb-groove-key>details>summary').focus();await page.keyboard.press('Enter');await expect(page.locator('.jb-groove-key>details')).toHaveAttribute('open','');
   await page.getByRole('slider',{name:'Inspect sector (silent)',exact:true}).press('End');
   const imageValues=await page.locator('.jb-groove-selected dl dd').allTextContents();
   const paths=await print(page).locator('.gg-mark').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('d'))),reads=await page.evaluate(()=>window.grooveAudit.reads);
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme==='light'?'dark':'light');
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(page.locator('.jb-groove-key')).toContainText('0–100%');
-  await expect(page.getByRole('slider',{name:'静音查看扇区',exact:true})).toHaveValue('48');
+  await chooseAppearance(page,theme==='light'?'dark':'light');
+  
+  await expect(page.getByRole('slider',{name:'Inspect sector (silent)',exact:true})).toHaveValue('48');
   expect(await page.locator('.jb-groove-selected dl dd').allTextContents()).toEqual(imageValues);
   expect(await print(page).locator('.gg-mark').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('d')))).toEqual(paths);expect(await page.evaluate(()=>window.grooveAudit.reads)).toBe(reads);
-  await page.getByRole('button',{name:'翻到 B 面：聆听科学测量',exact:true}).press('Enter');await expect(print(page)).toHaveAttribute('data-groove-count','12');
-  await expect(page.locator('.jb-groove-key')).toContainText('相等角度并不代表相等的年份间隔');
-  await page.getByRole('slider',{name:'静音查看扇区',exact:true}).press('End');
+  await page.getByRole('button',{name:'Flip to Side B: hear the measurements',exact:true}).press('Enter');await expect(print(page)).toHaveAttribute('data-groove-count','12');
+  await expect(page.locator('.jb-groove-key')).toContainText('Equal angles do not represent elapsed years');
+  await page.getByRole('slider',{name:'Inspect sector (silent)',exact:true}).press('End');
   await expect(page.locator('.jb-groove-selected dl dd').first()).toHaveText('2025');
   expect(await page.evaluate(()=>window.grooveAudit.contexts.length)).toBe(0);
   for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}]){
     await page.setViewportSize(viewport);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     const box=(await page.locator('.jb-groove-detail').boundingBox())!;expect(box.width).toBeGreaterThanOrEqual(160);expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(viewport.width);
-    const control=(await page.getByRole('slider',{name:'静音查看扇区',exact:true}).boundingBox())!;expect(control.height).toBeGreaterThanOrEqual(44);
+    const control=(await page.getByRole('slider',{name:'Inspect sector (silent)',exact:true}).boundingBox())!;expect(control.height).toBeGreaterThanOrEqual(44);
   }
-  await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await chooseAppearance(page,theme);
   const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
   expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
   await test.info().attach(`grooveprint-axe-${theme}`,{body:JSON.stringify({violations:scan.violations,contrastIncomplete:scan.incomplete.filter(v=>v.id==='color-contrast').map(v=>v.nodes.map(n=>n.target))}),contentType:'application/json'});
@@ -251,7 +252,7 @@ test('both CSS-flipped faces keep clockwise screen order and the same selected s
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} mapping disclosure preserves selected values, science context and active playback`,async({page})=>{
-  await setup(page);await page.setViewportSize({width:390,height:844});await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await setup(page);await page.setViewportSize({width:390,height:844});await chooseAppearance(page,theme);
   await page.locator('.jb-groove-key>details>summary').press('Enter');await inspect(page).fill('13');
   const values=await selectedValues(page),reads=await page.evaluate(()=>window.grooveAudit.reads);
   await expect(page.locator('.jb-groove-context')).toBeVisible();await expect(page.locator('.jb-groove-context')).toContainText('Image brightness, not temperature');
@@ -259,12 +260,12 @@ for(const theme of ['light','dark'] as const)test(`${theme} mapping disclosure p
   await expect(detail).not.toHaveAttribute('open','');await expect(detail.locator('p').first()).not.toBeVisible();
   await summary.press('Enter');await expect(detail.locator('p').first()).toBeVisible();await expect(detail).toContainText('without rescaling this image');
   expect(await selectedValues(page)).toEqual(values);expect(await page.evaluate(()=>window.grooveAudit.reads)).toBe(reads);
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(detail).toHaveAttribute('open','');await expect(summary).toHaveText('映射细节与局限');
+  await expect(detail).toHaveAttribute('open','');await expect(summary).toHaveText('Mapping details and limitations');
   expect(await selectedValues(page)).toEqual(values);await summary.press('Enter');
-  await page.getByRole('button',{name:'翻到 B 面：聆听科学测量',exact:true}).press('Enter');
-  await expect(page.locator('.jb-groove-context')).toBeVisible();await expect(page.locator('.jb-groove-context')).toContainText('不代表年份间隔');
-  await page.getByRole('slider',{name:'静音查看扇区',exact:true}).press('End');await expect(page.locator('.jb-groove-selected dl dd').first()).toHaveText('2025');
-  await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');
+  await page.getByRole('button',{name:'Flip to Side B: hear the measurements',exact:true}).press('Enter');
+  await expect(page.locator('.jb-groove-context')).toBeVisible();await expect(page.locator('.jb-groove-context')).toContainText('not elapsed years');
+  await page.getByRole('slider',{name:'Inspect sector (silent)',exact:true}).press('End');await expect(page.locator('.jb-groove-selected dl dd').first()).toHaveText('2025');
+  
   for(const expanded of [false,true]){
     if(expanded)await summary.press('Enter');
     const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);

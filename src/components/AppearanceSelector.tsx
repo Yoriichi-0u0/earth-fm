@@ -1,14 +1,21 @@
+// Appearance: a three-way segmented control (Auto, Light, Dark). One press, no menu.
+import {Monitor,Moon,Sun} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import {useAppearance} from '../lib/AppearanceProvider';
-import {parseAppearancePreference} from '../lib/appearance';
-import {useStudioLanguage} from '../lib/studioLanguage';
+import type {AppearancePreference} from '../lib/appearance';
 import './AppearanceSelector.css';
 
-export default function AppearanceSelector() {
-  const {preference, setPreference} = useAppearance();
-  const {t} = useStudioLanguage();
-  return <label className="appearance-selector"><span>{t('Appearance')}</span>
-    <select aria-label={t('Appearance')} value={preference} onChange={event => setPreference(parseAppearancePreference(event.target.value))}>
-      <option value="auto">{t('Auto')}</option><option value="light">{t('Light')}</option><option value="dark">{t('Dark')}</option>
-    </select>
-  </label>;
+const OPTIONS:readonly {value:AppearancePreference;label:string;Icon:LucideIcon}[]=[
+  {value:'auto',label:'Auto',Icon:Monitor},
+  {value:'light',label:'Light',Icon:Sun},
+  {value:'dark',label:'Dark',Icon:Moon},
+];
+
+export default function AppearanceSelector(){
+  const {preference,setPreference}=useAppearance();
+  return <div className="appearance-switch" role="group" aria-label="Appearance">
+    {OPTIONS.map(({value,label,Icon})=><button key={value} type="button" aria-pressed={preference===value} aria-label={`${label} appearance`} title={`${label} appearance`} onClick={()=>setPreference(value)}>
+      <Icon size={15} strokeWidth={1.75} aria-hidden="true"/><span aria-hidden="true">{label}</span>
+    </button>)}
+  </div>;
 }

@@ -413,7 +413,7 @@ test('five real pages keep the homepage simple, support history and direct reloa
   await page.goto('/');
   await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Your planet. On the record.');
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
-  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(5);
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(6);
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
   await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','data');
   await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');
@@ -555,32 +555,32 @@ test('Data explains exact NASA mapping, auditions fixed frequencies, and exports
   await guide.getByRole('link',{name:'Full science & NASA credits ↓',exact:true}).click();await expect(page).toHaveURL(/\/about#sources$/);await expect(page.locator('#sources')).toBeInViewport();
 });
 
-test('language choice persists across the pages, keeps English clean and preserves selected tones',async({page})=>{
+test('the chosen tone persists across the pages, and the interface is English only',async({page})=>{
   await page.goto('/create');await expect(page.locator('html')).toHaveAttribute('lang','en');
   expect(await page.locator('main').textContent()).not.toMatch(/[\u3400-\u9fff]/);
   await page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:'Soft Pluck',exact:true}).click();
-  await page.getByRole('button',{name:/Play my mix/}).click();await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await expect(page.locator('html')).toHaveAttribute('lang','zh-Hans');await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toBeVisible();
-  await expect(page.getByRole('heading',{level:1})).toHaveText('创作你的地球旋律。');
-  await expect(page.getByRole('group',{name:'主旋律音色'}).getByRole('button',{name:'柔和拨音',exact:true})).toHaveAttribute('aria-pressed','true');
-  await page.getByRole('navigation').getByRole('link',{name:'探索数据',exact:true}).click();
-  await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:/Play my mix/}).click();
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{level:1})).toHaveText('Make the music yours.');
+  await expect(page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:'Soft Pluck',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();
+  await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toHaveCount(0);
   await expect(page.locator('.sp-data-summary')).toContainText('+1.37°C');
-  await page.getByRole('navigation').getByRole('link',{name:'创作',exact:true}).click();
-  await expect(page.getByRole('group',{name:'主旋律音色'}).getByRole('button',{name:'柔和拨音',exact:true})).toHaveAttribute('aria-pressed','true');
-  await page.reload();await expect(page.getByLabel('语言',{exact:true})).toHaveValue('zh');
-  await page.getByLabel('语言',{exact:true}).selectOption('en');await expect(page.getByRole('heading',{name:'Make the music yours.'})).toBeVisible();
+  await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();
+  await expect(page.getByRole('group',{name:'Melody tone'}).getByRole('button',{name:'Soft Pluck',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.reload();await expect(page.getByRole('combobox',{name:'Language'})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Make the music yours.'})).toBeVisible();
 });
 
-test('five pages and expanded data are accessible and fit English and Chinese mobile screens',async({page})=>{
+test('five pages and expanded data are accessible and fit mobile screens',async({page})=>{
   test.setTimeout(90000);
-  for(const language of ['en','zh']){
+  for(const language of ['en']){
     for(const path of ['/','/listen','/create','/data','/about']){
       await page.setViewportSize({width:390,height:844});await page.goto(path);await page.locator('h1').waitFor();
-      await page.locator('.sp-language select').selectOption(language);
+      
       if(path==='/data'){
-        await page.getByLabel(language==='en'?'Choose a year':'选择年份',{exact:true}).selectOption('2026');
-        await page.getByLabel(language==='en'?'Month':'月份',{exact:true}).selectOption('10');
+        await page.getByLabel('Choose a year',{exact:true}).selectOption('2026');
+        await page.getByLabel('Month',{exact:true}).selectOption('10');
         await page.locator('.sp-page-data > details').nth(0).locator('summary').first().click();
       }
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -590,19 +590,19 @@ test('five pages and expanded data are accessible and fit English and Chinese mo
   }
 });
 
-test('Chinese Listen is simple and sound controls recover with blocked preference storage',async({page})=>{
+test('Listen is simple and sound controls recover with blocked preference storage',async({page})=>{
   await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked');};Storage.prototype.setItem=()=>{throw Error('blocked');};});
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/');await page.getByLabel('Language',{exact:true}).selectOption('zh');
-  await page.getByRole('link',{name:'了解这段故事',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'先听听这幅画面。'})).toBeVisible();
-  await page.getByRole('button',{name:/继续聆听真实数据/}).click();
-  await page.getByRole('button',{name:/播放数据旋律/}).click();
-  await expect(page.getByRole('status')).toContainText('1880 年 1 月');
-  await page.getByRole('navigation').getByRole('link',{name:'创作',exact:true}).click();
-  await page.getByRole('button',{name:/播放我的混音/}).click();await expect(page.getByRole('button',{name:'■ 停止',exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'■ 停止',exact:true}).click();
-  await expect(page.getByRole('status')).toHaveText('已停止。');expect(errors).toEqual([]);
+  await page.goto('/');
+  await page.getByRole('link',{name:'Discover the story',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'First, hear the picture.'})).toBeVisible();
+  await page.getByRole('button',{name:/Continue to the real data/}).click();
+  await page.getByRole('button',{name:/Play the data melody/}).click();
+  await expect(page.getByRole('status')).toContainText('January 1880');
+  await page.getByRole('navigation').getByRole('link',{name:'Create',exact:true}).click();
+  await page.getByRole('button',{name:/Play my mix/}).click();await expect(page.getByRole('button',{name:'■ Stop',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'■ Stop',exact:true}).click();
+  await expect(page.getByRole('status')).toHaveText('Stopped.');expect(errors).toEqual([]);
 });
 
 test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation', async ({page})=>{
@@ -787,12 +787,12 @@ test('moving Earth sound samples video during playback and obeys still-frame and
  await page.getByRole('button',{name:'Continue to the real data →',exact:true}).click();await expect(page.getByRole('button',{name:'Stop visual sound',exact:true})).toHaveCount(0);await expect(page.getByRole('heading',{name:'Now, hear the measurements.'})).toBeVisible();
 });
 
-test('new stations and live proof remain bilingual, accessible and usable on mobile',async({page})=>{
+test('new stations and live proof remain accessible and usable on mobile',async({page})=>{
  test.setTimeout(90000);await page.setViewportSize({width:390,height:844});
- for(const language of ['en','zh'])for(const route of ['/listen?station=all','/listen?station=arctic','/data?station=arctic','/create?station=arctic','/listen?visual=motion']){
-  await page.goto(route);await page.locator('h1').waitFor();await page.locator('.sp-language select').selectOption(language);
+ for(const language of ['en'])for(const route of ['/listen?station=all','/listen?station=arctic','/data?station=arctic','/create?station=arctic','/listen?visual=motion']){
+  await page.goto(route);await page.locator('h1').waitFor();
   if(route==='/data?station=arctic'){await page.locator('details').first().locator('summary').first().click();}
-  if(route==='/listen?visual=motion'){await page.locator('.st-live-proof summary').click();await expect(page.getByLabel(language==='en'?'Follow the animation':'跟随动画',{exact:true})).toBeDisabled();}
+  if(route==='/listen?visual=motion'){await page.locator('.st-live-proof summary').click();await expect(page.getByLabel('Follow the animation',{exact:true})).toBeDisabled();}
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({route,language,id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
  }
@@ -860,13 +860,13 @@ test('Earth Looper enforces the note limit and finishes an empty recording at th
 test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:700},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
-    await page.goto('http://127.0.0.1:5173/');const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const playBounds=await play.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await play.tap();await page.getByRole('button',{name:'Stop',exact:true}).tap();
+    await page.goto(new URL('/',test.info().project.use.baseURL).href);const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const playBounds=await play.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await play.tap();await page.getByRole('button',{name:'Stop',exact:true}).tap();
     await page.getByRole('button',{name:'Play with Earth',exact:true}).tap();const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!;const cdp=await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.2,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.75,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await expect(page.getByRole('slider',{name:'Image scan position',exact:true})).toHaveValue('37');
     const scrolled=await page.evaluate(()=>scrollY);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5-110,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(scrolled);await expect.poll(()=>page.locator('.jb-deck').getAttribute('data-note-serial')).toBe('0');
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(390);await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');await expect(page.getByRole('region',{name:'地球旋律录制',exact:true})).toBeVisible();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(390);await expect(page.getByRole('region',{name:'Earth Looper',exact:true})).toBeVisible();
     const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);
   }finally{await context.close();}
 });

@@ -5,7 +5,7 @@ import type {MonthlyObservation} from '../lib/climateMapping';
 import {useStudioLanguage} from '../lib/studioLanguage';
 
 export default function ClimateSpiralView({ current, playing }: { current: MonthlyObservation; playing: boolean }) {
-  const {t,language} = useStudioLanguage();
+  const {t} = useStudioLanguage();
   const [tilt, setTilt] = useState(30), [rotation, setRotation] = useState(0), [flat, setFlat] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
   function project(anomaly: number, month: number, year: number) {
     const angle = (month - 1) * Math.PI / 6 + rotation * Math.PI / 180;
@@ -27,7 +27,7 @@ export default function ClimateSpiralView({ current, playing }: { current: Month
       <circle cx="300" cy="280" r="265" fill="url(#ss-halo)"/>
       {[-1,0,1,1.5].map(value => <g key={value}><path d={Array.from({length:73},(_,i) => { const [x,y] = project(value,1+i/6,1953); return `${i ? 'L':'M'}${x},${y}`; }).join(' ')} fill="none" stroke="#66828c" strokeOpacity=".35" strokeDasharray="3 5"/></g>)}
       {paths.map(row => <path key={row.year} d={row.path} fill="none" stroke={row.year === current.year ? '#f8eed8' : `hsl(${205-(row.year-1880)/146*195} 85% 65%)`} strokeWidth={row.year === current.year ? 2.8 : .7} opacity={row.year === current.year ? 1 : .36}/>) }
-      {MONTHS.map((name,i) => { const [x,y] = project(1.9,i+1,1953); return <text key={name} x={x} y={y} textAnchor="middle" fill="#b7cbd5" fontSize="11">{language==='zh' ? t(name) : name.slice(0,3).toUpperCase()}</text>; })}
+      {MONTHS.map((name,i) => { const [x,y] = project(1.9,i+1,1953); return <text key={name} x={x} y={y} textAnchor="middle" fill="#b7cbd5" fontSize="11">{name.slice(0,3).toUpperCase()}</text>; })}
       {selected && <g className="ss-data-marker"><circle className="ss-melody-halo" cx={selected[0]} cy={selected[1]} r={playing ? 16 : 10} fill="#7efce1" opacity=".13"/><circle cx={selected[0]} cy={selected[1]} r="5" fill="#7efce1" stroke="#fff"/></g>}
     </svg>
     <figcaption>{t("Each line is a year; warmer colours indicate later years.")}<br/>{t("1880 → 2026 · radius = anomaly · angle = month")}{!flat && t(' · height = year')}<br/>{t("Reference rings: −1 / 0 / +1 / +1.5°C. White: selected year. Cyan: selected measurement. Halo: decoration only.")}</figcaption>

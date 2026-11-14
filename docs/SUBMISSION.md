@@ -1,61 +1,63 @@
-# TerraJuke — submission draft for the five-page revision
-
-Status: five-page and NASA observatory release, 2026-11-02. The user approved publishing this revision through the existing main-to-production workflow after local review. This is submission material, not evidence that the team has submitted it or that any user study has been completed.
-
-**Project:** TerraJuke — Hear Earth’s changing climate.
+# TerraJuke: The Earth Information Jukebox, submission draft
 
 **Challenge:** The Earth Information Jukebox, NASA Space Apps 2026.
+**Team:** BoboMimi. Chia Yuen Kai (leader, `Chia_0u0`) and Jacy Chiong Yet Suu (`jacychiongys`).
+**Live:** https://terrajuke.vercel.app · **Code:** https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox
 
-**Team:** BoboMimi. Leader: Chia Yuen Kai (`Chia_0u0`). Member: Jacy Chiong Yet Suu (`jacychiongys`).
+Status: draft for the team's own submission form, updated 14 November 2026. It describes the app as deployed; it is not evidence of a submission or of any user study.
 
-## One-sentence pitch
+## One-line pitch
 
-TerraJuke helps first-time learners explore one climate story through a NASA visual, live-generated sound and traceable measurements, then check what they understood.
+TerraJuke turns NASA's pictures of Earth into music you can play like a jukebox: choose a record, press Play, and hear the planet, then see exactly how each sound was made and where the data came from.
 
-## Problem, audience and contribution
+## The problem
 
-Earth visualizations can be engaging but difficult for a first-time learner to interpret. Our initial audience is students and curious members of the public who are new to climate graphs and sonification. This is a design focus, not a claim that every learner benefits.
+NASA's Earth Information Center shows the planet on giant screens, but a picture only reaches people who can see it, and a beautiful picture rarely explains itself. The challenge asks for EIC visual frames paired with sound generated in real time, accessible to blind and low-vision visitors, musical rather than noisy, and able to tell the story.
 
-Our contribution is an explainable learning path that distinguishes two ways of listening: image patterns become sound through live pixel sampling; scientific anomalies become melody through a fixed published mapping. Users can hear the difference, inspect the source values and check common misconceptions. The sound is synthesized in the browser and is not a recording of Earth or an authentic traditional instrument.
+## What TerraJuke does
 
-## What the prototype does
+Every NASA visualization is a **record**. Side A turns the picture's pixels into sound live in the browser; Side B, where one exists, plays the measurements or the story behind it. Six records:
 
-1. **Hear a NASA visual.** The guided story begins with NASA SVS 5190, the Climate Spiral, identified in NASA's EIC-related Climate Vital Signs Dashboard. A 48-strip left-to-right scan turns visible brightness into pitch, RGB into timbre and position into stereo pan. Sound is generated during playback. Labels and backgrounds also affect the scan; this is explicitly not a physical thermometer.
-2. **Hear real observations.** Twelve selected January GISTEMP v4 anomalies from 1880–2025 play on the same fixed ten-band pitch scale. The first comparison uses a warm synthesized tone with no accompaniment. Dates, values and target frequencies are synchronized; the chart uses actual year spacing. Equal note duration does not encode elapsed time or warming rate. The selection illustrates differences and is not the full record or proof of a trend by itself.
-3. **Discover and optionally check understanding.** Four questions address period comparison, the distinction between image brightness and temperature, the role of data in pitch and the baseline. Feedback explains each answer. A user may download their own local practice record with first and later attempts preserved. This is not aggregate research evidence and is not uploaded to a backend.
-4. **Explore and create.** Create offers five synthesized tones, three accompaniment styles, data-only listening and audio export. Explore Data has year/month selection, exact values, sequential year A/B, CSV traces and an optional 2D/3D spiral. About explains the mapping and sources. Advanced controls are collapsed. The preserved Original experience has multiple attributed visual assets, animation sampling and local image/video input.
+| # | Record | NASA source | What you hear |
+|---|---|---|---|
+| 01 | Climate Spiral | SVS 5190 (Climate Vital Signs, EIC) + GISTEMP v4 | A: brightness → pitch across 48 strips. B: twelve Januaries, 1880–2025, on a fixed temperature scale |
+| 02 | Night Lights | SVS 5313, EIC Version (Black Marble, VIIRS) | A: purple rises, orange falls, read on NASA's own legend. B: NASA's twelve yearly frames as a melody; Mystery Place guessing game |
+| 03 | **The Air We Share** | SVS 5669, GEOS Aerosols | Four aerosols become four instruments on a mixing desk while a Three.js Earth turns under the needle; Side B plays NASA's six stories |
+| 04 | Moving Earth | EIC exhibit animation | Video pixels resampled on every note |
+| 05 | Arctic September | NSIDC Sea Ice Index | September extent → pitch (measurements) |
+| 06 | Temperature Through Time | NASA GISS GISTEMP v4 | The Side B measurements on their own |
 
-Home offers one primary Start the experience action; Listen presents Look → Listen → Discover as separate steps. Create, Explore Data and About have independent page URLs. The reviewed Studio is the default local route. Original 1.0 is retained behind `?legacy=1`; old anchors and shared-mix parameters remain compatible. English is default, with persistent Simplified Chinese. Keyboard controls, reduced-motion defaults, motion control and mobile layouts are included. These features do not constitute accessibility certification or proof of suitability for all disabilities.
+**The Air We Share** is the headline. NASA describes this resource as suited to *multi-track experimentation*, so TerraJuke reads NASA's colour bar from NASA's own image and gives each aerosol an instrument: smoky brass (fire smoke), desert strings (dust), an ocean bed (sea salt) and glass bells (sulfate). Earth is literally the record. Each slice of longitude that turns under the needle is one step of the groove: how much of each aerosol sets loudness, where it sits north or south sets pitch, and where there is none the instrument rests. Over Africa all four play at once. Mute or solo any track to pick out the Saharan dust river or the smoke from southern Africa. Side B tells NASA's own six stories, from Hurricane Erin's sea-salt spirals to Kilauea's sulfate stream.
+
+Around the shelf: the **Record Journey**, an animated "from orbit to your ears" strip naming the satellite or model, the NASA team, the visualizers, the Earth Information Center and finally the listener, in their own time zone (computed in the browser, nothing sent). Also a 3D record rack, a Grooveprint picture of each groove, Scratch and Earth Looper for performing, Your Record for a personal image that never leaves the device, and Mystery Record.
 
 ## Challenge alignment
 
-The official summary calls for EIC visual frames paired with dynamic real-time sonification, with accessible, engaging, multisensory exploration. The guided NASA Climate Spiral scan directly demonstrates visual/sound pairing; the numeric sequence is a complementary scientific explanation rather than a replacement. Both stay within one climate story.
+| The challenge asks for | TerraJuke |
+|---|---|
+| EIC visual frames + sonification generated in real time | Every visual record is analysed and synthesized live in the browser from pinned NASA files; no recordings |
+| Select or experience a specific visualization with its soundscape | A jukebox shelf and 3D rack: one press to choose, one press to play |
+| Map colour, brightness, shape or pixel density to sound | Brightness → pitch; RGB → timbre; NASA legend position → pitch; aerosol colour → instrument; colour strength → loudness; density → rhythm (rests where there is nothing) |
+| Balance data with musicality | Fixed scales from the data; shared pentatonic scales so layers harmonise; tempo, tone and mixer are musical choices that never change a note |
+| Accessibility for blind and low-vision users | Every map is a keyboard instrument with spoken descriptions; captions and screen-reader announcements on every note; Android vibration patterns; reduced motion; 2D fallbacks for all 3D; automated WCAG checks in light and dark |
+| Tell the story | NASA's own stories on Side B, liner notes with the method and limits, and the Record Journey from instrument to listener |
+| Use the Resources | EIC Content Database (SVS 5190, SVS 5313 EIC Version) and the listed GEOS Aerosols (SVS 5669); the Caldwell 73 sonification informed the scanning design |
 
-Detailed challenge requirements and the complete 2026 central judging guide have not been independently obtained. The prototype does not claim compliance with unknown scoring weights or requirements. EIC relationship, mirror provenance for older assets, snapshot revisions and source credits are documented.
+## Validity
 
-## Proposed 90-second pitch and demo
+Every NASA file is pinned with its source URL and SHA-256. Every mapping is a fixed rule with unit tests: 119 unit tests and 145 browser tests at this checkpoint. For The Air We Share, tests check that each of NASA's six stories is dominated by the aerosol NASA names, at least twice the next one, and that grey land and Antarctica stay silent. Night Lights is cross-checked against NASA's separately published SVS 5276 series (r = 0.999 for the world).
 
-- **0:00–0:10 — Purpose.** “A graph can show change. Can sound help a new learner notice and understand it? We are BoboMimi, and this is TerraJuke.” Open the canonical Studio homepage and start the guided story.
-- **0:10–0:30 — Respond to the challenge.** Play the NASA Climate Spiral scan. “The browser creates this sound from the visible image in real time. Brightness becomes pitch. This is a visual pattern—not a temperature measurement.” Identify the NASA source.
-- **0:30–0:58 — Explain the scientific difference.** Move to the twelve selected Januaries and play the data-only comparison. “Now the measurements set the notes. We keep the same month, tone and pitch scale across years.” Point to a date, original anomaly and frequency. Mention gaps and equal-duration notes.
-- **0:58–1:12 — Demonstrate transparency.** Contrast 1880 January at −0.19°C/G3 with 2025 January at +1.37°C/A4. “Different values within a band can still share a note, so the exact numbers remain visible.”
-- **1:12–1:23 — Learning and inclusion.** Show the understanding check, optional Chinese, and data-only controls. “We have a working prototype and a real-user test protocol. We have not yet established learning effectiveness.”
-- **1:23–1:30 — Close.** “See it, hear it, then explain what changed. TerraJuke makes the mapping visible so the music can become a path into Earth science.”
+Each record states its limits: pixels are not measurements; GEOS is a model analysis; colour strength is not optical depth; one aerosol moment, not a live feed; equal note lengths do not encode elapsed time. No user study has been run, and TerraJuke claims no learning gains.
 
-This is a proposed demo length, not a verified 2026 video-length rule. The team should confirm its actual event's submission requirements before recording final materials.
+## 90-second demo
 
-## Evidence, sources and limits
+- **0:00–0:10.** Home. "NASA watches the whole planet. TerraJuke lets you hear it." Choose **The Air We Share**.
+- **0:10–0:35.** Press **Play the world**. The globe turns under the needle; the meters jump. "Each slice of longitude is a step in the groove. Dust plays strings, smoke plays brass, sea salt plays the ocean bed, sulfate rings like glass." Solo **Dust** over Africa and the Atlantic: "that's the Sahara crossing an ocean."
+- **0:35–0:50.** Side B: **Hurricane Erin**. The caption and screen reader read NASA's story; the sea-salt track swells.
+- **0:50–1:05.** Close your eyes: focus the map, press → a few times. "Every slice is described out loud. The same music works without the picture."
+- **1:05–1:20.** Flip to **Climate Spiral** Side B: twelve Januaries rise from G3 to A4. "Here the notes are the measurements."
+- **1:20–1:30.** Scroll to the Record Journey ending at "You". "From a satellite, through NASA, to your ears, wherever you are. TerraJuke."
 
-- Repository: https://github.com/Yoriichi-0u0/TerraJuke-The-Earth-Information-Jukebox/tree/main
-- Canonical public entry: https://terrajuke.vercel.app/
-- Direct Studio alias: https://terrajuke.vercel.app/?studio=1
-- Official challenge summary on the official site: https://www.spaceappschallenge.org/2026/find-a-team/proteas/
-- NASA visual: https://svs.gsfc.nasa.gov/5190/
-- EIC-related gallery: https://svs.gsfc.nasa.gov/gallery/climate-vital-signs-dashboard/
-- NASA data: https://data.giss.nasa.gov/gistemp/
-- [Science, sound and source records](EARTH_SYMPHONY_STUDIO.md)
-- [Real-user pilot protocol and reporting limits](USER_TEST_PROTOCOL.md)
+## Credits
 
-GISTEMP snapshot retrieved 2026-10-18 covers January 1880–September 2026. Baseline is 1951–1980 for each corresponding month. Global anomalies are not local weather or absolute temperatures. The original visual's exact data revision is not confirmed to match the snapshot, and no pixel-to-exact-value inference is made. Uncertainty is not encoded in sound.
-
-Automated tests verify software behavior and source integrity. They do not establish learning gains, participant satisfaction or public impact. No participant findings, teacher endorsements, accessibility partnerships or user counts have been collected or invented. Human musical review, physical Safari/iPhone checks and actual novice-user testing remain necessary.
+NASA Scientific Visualization Studio; NASA Global Modeling and Assimilation Office; NASA GISS; NASA/NOAA Suomi NPP VIIRS and Black Marble; NSIDC. Visualizers and scientists are credited in each record's liner notes and in `public/nasa/*/provenance.json`. TerraJuke is an independent project and does not imply NASA endorsement. Built with React, Three.js (react-three-fiber), Anime.js and the Web Audio API; developed with AI assistance (Claude Code).

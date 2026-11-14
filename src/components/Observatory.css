@@ -189,5 +189,4 @@
  .ss-observatory .sp-guided-player .visual-spectrum {margin-top: 17px;}
  .obs-measurement-label {font-size: 8px;letter-spacing: .5px;flex-wrap: wrap;gap: 5px;}
  .obs-measurement-label>span:last-child {font-size: 7px;}
- .ss-observatory:lang(zh-Hans) .ss-welcome h1 {font-size: 43px;letter-spacing: 0;line-height: 1.2;}
 }

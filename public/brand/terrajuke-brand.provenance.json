@@ -1,0 +1,15 @@
+{
+  "title": "TerraJuke icon and artwork",
+  "createdOn": "2026-11-14",
+  "createdBy": "Chia Yuen Kai (BoboMimi), using ChatGPT image generation",
+  "concept": "Earth as a vinyl record on a turntable, with an orbit ring carrying sound waves: Earth is the record, turning under the needle.",
+  "files": {
+    "terrajuke-art-1200.jpg": "Full artwork (Earth-record with tonearm and stylus, space background). Used as the link-preview image. Resampled from the 1254 × 1254 original with macOS sips.",
+    "terrajuke-touch-180.png": "Home-screen icon (apple-touch-icon) from the full artwork.",
+    "terrajuke-mark-512.png": "Simplified flat mark (Earth-disc and orbit ring, transparent background) for small sizes. Cropped to the artwork, centred on a square and stray alpha-1 pixels cleared.",
+    "terrajuke.png": "128 px version of the flat mark: header and browser tab."
+  },
+  "revisions": "An earlier draft placed a blue double music note at the centre; it was replaced by a tonearm and stylus because it resembled an existing music-app icon.",
+  "meaning": "Original AI-generated brand artwork. The Earth shown is illustrative: it is not NASA imagery, a scientific map or a sonification input, and no NASA logo is used.",
+  "replaces": "The 13 Nov 2026 blue-tile record mark (terrajuke.svg)."
+}

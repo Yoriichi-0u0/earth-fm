@@ -18,7 +18,7 @@
 | Create (style mixer, 25 s WAV) | Musicality, engagement | **Keep** | Temperature still drives pitch; style is labelled as musical choice |
 | Your Record (image upload) | Creativity, engagement | **Keep** | Clearly labelled as personal, not NASA data |
 | Mystery Record | Discovery | **Keep** | Draws from the shelf; no invented records |
-| Appearance, English / Chinese | Accessibility, reach | **Keep** | New strings get English first; Chinese where feasible |
+| Appearance, English / Chinese | Accessibility, reach | **Keep** (revised 14 Nov: Chinese removed; Appearance became a segmented button control) | English-only interface; the TerraJuke 4 plan records the change |
 | "Moving Earth" record | Decorative EIC exhibit animation from a **third-party GitHub mirror** of earth.gov; no data meaning | **Keep for now, renumbered 03** (revised) | The earth.gov originals now return 404, so it cannot be re-sourced; its provenance (mirror URL, SHA-256) is documented in docs/FRAMES.md and the record already says it is an archived visual, not data. It is also Mystery Record's only animated record. Revisit when the Listen page is reworked |
 | "Temperature Through Time" record | Same GISTEMP data as Climate Spiral Side B | **Keep for now, 05** (revised) | Mystery Record's measurement round depends on it; remove together with the Mystery rework |
 | "Arctic September" record | NSIDC project-derived means, **not an EIC visualization** | **Keep for now, 04** (revised) | As above; labelled as project-derived means, not an EIC frame |

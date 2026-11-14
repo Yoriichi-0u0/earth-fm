@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import {resolve} from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
@@ -66,7 +67,7 @@ test('normal → mystery → personal → mystery → original keeps exactly one
   await closed(page);await noLateNotes(page);
   await expect(page.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
-  await expect(page.locator('.jb-record')).toHaveCount(5);
+  await expect(page.locator('.jb-record')).toHaveCount(6);
   await page.getByRole('button',{name:'Your Record',exact:true}).click();
   await expect(page.locator('.jb-media img')).toHaveAttribute('src',url!);
   await expect(page.locator('.jb-deck')).not.toHaveClass(/is-playing/);
@@ -118,27 +119,27 @@ for(const mode of ['playback','replay'])test(`Remove during personal ${mode} can
   await openMystery(page);await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
 });
 
-test('appearance and language preserve a personal take, then preserve the active mystery and its guess',async({page})=>{
+test('appearance changes preserve a personal take, then preserve the active mystery and its guess',async({page})=>{
   await setup(page);await upload(page);await page.getByRole('button',{name:'Scratch your image',exact:true}).click();
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();await page.getByRole('slider',{name:'Image scan position',exact:true}).fill('31');
   await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
-  await expect(page.getByRole('region',{name:'地球旋律录制',exact:true})).toHaveAttribute('data-loop-count','1');
-  await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');
+  await chooseAppearance(page,'light');
+  
+  await expect(page.getByRole('region',{name:'Earth Looper',exact:true})).toHaveAttribute('data-loop-count','1');
+  
   await openMystery(page);await closed(page);
   await mystery(page).getByRole('radio',{name:'Moving Earth',exact:true}).check();await mystery(page).getByRole('button',{name:'Play mystery',exact:true}).click();
   const contexts=await page.evaluate(()=>window.integrationAudit.contexts.length);
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
-  const zh=page.getByRole('region',{name:'神秘唱片',exact:true});await expect(zh.getByRole('button',{name:'停止神秘唱片',exact:true})).toBeVisible();
-  await expect(zh.getByRole('radio',{name:'流动的地球',exact:true})).toBeChecked();
+  await chooseAppearance(page,'dark');
+  
+  const zh=page.getByRole('region',{name:'Mystery Record',exact:true});await expect(zh.getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();
+  await expect(zh.getByRole('radio',{name:'Moving Earth',exact:true})).toBeChecked();
   expect(await page.evaluate(()=>window.integrationAudit.contexts.length)).toBe(contexts);
-  await page.getByRole('button',{name:'你的唱片',exact:true}).click();await closed(page);await noLateNotes(page);
-  await expect(page.getByRole('heading',{name:'你的唱片',exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'划动图片演奏',exact:true}).click();
-  // Leaving a deck clears its take; changing theme/language within it does not.
-  await expect(page.getByRole('region',{name:'地球旋律录制',exact:true})).toHaveAttribute('data-loop-count','0');
+  await page.getByRole('button',{name:'Your Record',exact:true}).click();await closed(page);await noLateNotes(page);
+  await expect(page.getByRole('heading',{name:'Your Record',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Scratch your image',exact:true}).click();
+  // Leaving a deck clears its take; changing the theme within it does not.
+  await expect(page.getByRole('region',{name:'Earth Looper',exact:true})).toHaveAttribute('data-loop-count','0');
 });
 
 for(const owner of ['personal','mystery'])test(`leaving Home during ${owner} playback closes audio and forgets personal data`,async({page})=>{
@@ -167,18 +168,18 @@ for(const [draw,second] of [[.6,'September 1990'],[.9,'January 1900']] as const)
   await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();
   await expect(mystery(page).locator('.mr-observation-label')).toHaveText('Last heard observation');
   await expect(mystery(page).locator('.jb-data-value>span')).toHaveText(second);
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
-  await expect(page.locator('.mr-observation-label')).toHaveText('最后听到的观测');
+  
+  await expect(page.locator('.mr-observation-label')).toHaveText('Last heard observation');
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} integrated Home keeps both optional entries usable in English and Chinese at six viewports`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} integrated Home keeps both optional entries usable at six viewports`,async({page})=>{
   test.setTimeout(60_000);await setup(page);
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);
+  await chooseAppearance(page,theme);
   for(const mode of ['curated','mystery','personal']){
     if(mode==='mystery')await openMystery(page);
     if(mode==='personal')await upload(page);
-    for(const language of ['en','zh']){
-      await page.getByRole('combobox',{name:'Language',exact:true}).selectOption(language);
+    for(const language of ['en']){
+      
       for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}]){
         await page.setViewportSize(viewport);
         expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -191,7 +192,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} integrated Home keep
           await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path,fullPage:true});await test.info().attach(`integrated-${mode}-${viewport.width}-${theme}`,{path,contentType:'image/png'});
         }
       }
-      if(language==='zh')await page.getByRole('combobox',{name:'语言',exact:true}).selectOption('en');
+      
     }
     const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
     expect(scan.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))).toEqual([]);

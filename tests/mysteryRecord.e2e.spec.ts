@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 const recordTitles=['Climate Spiral','Moving Earth','Arctic September','Temperature Through Time'];
@@ -76,13 +77,13 @@ for(const draw of [0,.6])test(`pending ${draw===0?'visual':'measurement'} startu
   await page.evaluate(()=>{window.mysteryAudit.hold=true;});await play(page).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.resumes.length)).toBe(1);await page.getByRole('navigation').getByRole('link',{name:'Explore Data',exact:true}).click();await page.evaluate(()=>window.mysteryAudit.resumes.splice(0).forEach(resolve=>resolve()));await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.contexts.every(c=>c.state==='closed'))).toBe(true);expect(await page.evaluate(()=>window.mysteryAudit.notes)).toEqual([]);
 });
 
-test('a hidden tab stops sound without resuming; appearance/language preserve the current round and active owner',async({page})=>{
+test('a hidden tab stops sound without resuming; appearance changes preserve the current round and active owner',async({page})=>{
   await setup(page,.6);await open(page);await mystery(page).getByRole('radio',{name:'Climate Spiral',exact:true}).check();await play(page).click();
   const contexts=await page.evaluate(()=>window.mysteryAudit.contexts.length);
-  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');await expect(mystery(page).getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();expect(await page.evaluate(()=>window.mysteryAudit.contexts.length)).toBe(contexts);
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');const zh=page.getByRole('region',{name:'神秘唱片',exact:true});await expect(zh.getByRole('button',{name:'停止神秘唱片',exact:true})).toBeVisible();await expect(zh.getByRole('radio',{name:'气候螺旋',exact:true})).toBeChecked();
-  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});await expect(zh.getByRole('button',{name:'重播',exact:true})).toBeVisible();const count=await page.evaluate(()=>window.mysteryAudit.notes.length);
-  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(600);expect(await page.evaluate(()=>window.mysteryAudit.notes.length)).toBe(count);await zh.getByRole('button',{name:'揭晓来源',exact:true}).click();await expect(zh).toContainText('NSIDC');
+  await chooseAppearance(page,'light');await chooseAppearance(page,'dark');await expect(mystery(page).getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();expect(await page.evaluate(()=>window.mysteryAudit.contexts.length)).toBe(contexts);
+  const zh=page.getByRole('region',{name:'Mystery Record',exact:true});await expect(zh.getByRole('button',{name:'Stop mystery',exact:true})).toBeVisible();await expect(zh.getByRole('radio',{name:'Climate Spiral',exact:true})).toBeChecked();
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});await expect(zh.getByRole('button',{name:'Replay',exact:true})).toBeVisible();const count=await page.evaluate(()=>window.mysteryAudit.notes.length);
+  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(600);expect(await page.evaluate(()=>window.mysteryAudit.notes.length)).toBe(count);await zh.getByRole('button',{name:'Reveal source',exact:true}).click();await expect(zh).toContainText('NSIDC');
 });
 
 test('audio initialization and missing imagery fail neutrally and keep Reveal available',async({page})=>{
@@ -106,7 +107,7 @@ test('guesses, rerolls and reveals stay in session memory without score or netwo
 });
 
 for(const theme of ['light','dark'] as const)test(`${theme} mystery is accessible, keyboard usable and responsive before and after reveal`,async({page})=>{
-  test.setTimeout(60_000);await setup(page,.6);await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption(theme);await open(page);
+  test.setTimeout(60_000);await setup(page,.6);await chooseAppearance(page,theme);await open(page);
   for(const phase of ['concealed','revealed']){
     if(phase==='revealed')await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();
     for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1024,height:768},{width:1440,height:900},{width:844,height:390}]){
