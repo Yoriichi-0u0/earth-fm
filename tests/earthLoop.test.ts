@@ -42,7 +42,18 @@ test('stopping a replay while a note is pending prevents later notes and stale c
 test('a stalled replay ends without bursting overdue notes; audio failure also clears the schedule',async()=>{
   const time=new Clock(),heard:number[]=[],ended:ReplayEnd[]=[];
   const replay=new ScanReplay(async event=>{heard.push(event.strip);return true;},reason=>ended.push(reason),time.clock);
-  replay.start(take);await time.advance(400);assert.deepEqual(heard,[]);assert.deepEqual(ended,['late']);assert.equal(time.tasks.size,0);
+  replay.start(take);await time.advance(1200);assert.deepEqual(heard,[]);assert.deepEqual(ended,['late']);assert.equal(time.tasks.size,0);
   const failed=new ScanReplay(async()=>{throw new Error('device unavailable');},reason=>ended.push(reason),time.clock);
-  failed.start({...take,events:[{strip:1,atMs:0}]});await time.advance(400);assert.deepEqual(ended,['late','audio']);assert.equal(time.tasks.size,0);
+  failed.start({...take,events:[{strip:1,atMs:0}]});await time.advance(1200);assert.deepEqual(ended,['late','audio']);assert.equal(time.tasks.size,0);
+});
+
+test('a short hiccup on a busy phone plays on, and later notes land back on schedule',async()=>{
+  const time=new Clock(),heard:{strip:number;at:number}[]=[],ended:ReplayEnd[]=[];
+  const replay=new ScanReplay(async event=>{heard.push({strip:event.strip,at:time.now});return true;},reason=>ended.push(reason),time.clock);
+  replay.start(take);
+  await time.advance(450); // the first note, due at 200 ms, runs 250 ms late
+  assert.deepEqual(heard,[{strip:11,at:450}]);assert.deepEqual(ended,[]);
+  await time.advance(500);await time.advance(900);await time.advance(1200);
+  assert.deepEqual(heard,[{strip:11,at:450},{strip:30,at:500},{strip:6,at:900}],'anchored schedule: later notes are on time');
+  assert.deepEqual(ended,['complete']);
 });

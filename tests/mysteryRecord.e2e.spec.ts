@@ -30,7 +30,7 @@ async function noPrematureIdentity(page:Page){
   await expect(scene.getByRole('radio')).toHaveCount(4);await expect(scene.getByRole('radio',{checked:true})).toHaveCount(0);
 }
 
-for(const [index,title] of recordTitles.entries())test(`${title} stays concealed, uses the original audio and reveals the exact source`,async({page})=>{
+for(const [index,title] of recordTitles.entries())test(`${title} stays concealed, uses the original audio and reveals the exact source`,{tag:'@dev'},async({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   const chunks:string[]=[];page.on('request',r=>{if(r.url().includes('/MysteryRecord'))chunks.push(r.url());});
   await setup(page,(index+.1)/4);await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();expect(chunks).toEqual([]);
@@ -95,7 +95,7 @@ test('a stalled initialization is bounded by the 30-second guard and late resolu
   await setup(page);await open(page);await page.clock.install();await page.evaluate(()=>{window.mysteryAudit.hold=true;});await play(page).click();await expect.poll(()=>page.evaluate(()=>window.mysteryAudit.resumes.length)).toBe(1);await page.clock.runFor(30_050);await expect(mystery(page).getByRole('status')).toContainText('Excerpt stopped');await page.evaluate(()=>{window.mysteryAudit.hold=false;window.mysteryAudit.resumes.splice(0).forEach(resolve=>resolve());});expect(await page.evaluate(()=>window.mysteryAudit.notes)).toEqual([]);
 });
 
-test('the generated measurement performance ends naturally and can be replayed',async({page})=>{
+test('the generated measurement performance ends naturally and can be replayed',{tag:'@full'},async({page})=>{
   test.setTimeout(35_000);await setup(page,.9);await open(page);await play(page).click();await expect(mystery(page).getByRole('status')).toContainText('Ready to replay',{timeout:27_000});await expect(mystery(page).getByRole('button',{name:'Replay',exact:true})).toBeEnabled();
   await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await expect(mystery(page).locator('.mr-observation-label')).toHaveText('Last heard observation');await expect(mystery(page).locator('.jb-data-value>span')).toHaveText('January 2025');
 });
@@ -106,7 +106,7 @@ test('guesses, rerolls and reveals stay in session memory without score or netwo
   await mystery(page).getByRole('radio',{name:'Moving Earth',exact:true}).check();await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();await mystery(page).getByRole('button',{name:'Try another mystery',exact:true}).click();expect(await storage()).toEqual(before);expect(posts).toEqual([]);await expect(mystery(page).getByRole('radio',{checked:true})).toHaveCount(0);
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} mystery is accessible, keyboard usable and responsive before and after reveal`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} mystery is accessible, keyboard usable and responsive before and after reveal`,{tag:'@full'},async({page})=>{
   test.setTimeout(60_000);await setup(page,.6);await chooseAppearance(page,theme);await open(page);
   for(const phase of ['concealed','revealed']){
     if(phase==='revealed')await mystery(page).getByRole('button',{name:'Reveal source',exact:true}).click();

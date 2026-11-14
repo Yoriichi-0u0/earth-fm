@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {warmInstrument} from './instrumentWarmup';
 import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import {resolve} from 'node:path';
@@ -99,12 +100,12 @@ test('replacement during audio initialization and pending startup in both direct
   expect(await page.evaluate(()=>window.integrationAudit.notes)).toBe(0);
 });
 
-for(const mode of ['playback','replay'])test(`Remove during personal ${mode} cancels sound and releases the image before Mystery`,async({page})=>{
+for(const mode of ['playback','replay'])test(`Remove during personal ${mode} cancels sound and releases the image before Mystery`,{tag:'@timing'},async({page})=>{
   await setup(page);await upload(page);
   if(mode==='playback')await page.getByRole('button',{name:'Play record',exact:true}).click();
   else{
     await page.getByRole('button',{name:'Scratch your image',exact:true}).click();
-    await loop(page).getByRole('button',{name:'Record',exact:true}).click();
+    await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();
     for(const [i,position] of ['12','31','7'].entries()){
       await page.getByRole('slider',{name:'Image scan position',exact:true}).fill(position);
       await expect(loop(page)).toHaveAttribute('data-loop-count',String(i+1));await page.waitForTimeout(180);
@@ -119,7 +120,7 @@ for(const mode of ['playback','replay'])test(`Remove during personal ${mode} can
   await openMystery(page);await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);
 });
 
-test('appearance changes preserve a personal take, then preserve the active mystery and its guess',async({page})=>{
+test('appearance changes preserve a personal take, then preserve the active mystery and its guess',{tag:'@timing'},async({page})=>{
   await setup(page);await upload(page);await page.getByRole('button',{name:'Scratch your image',exact:true}).click();
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();await page.getByRole('slider',{name:'Image scan position',exact:true}).fill('31');
   await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
@@ -172,7 +173,7 @@ for(const [draw,second] of [[.6,'September 1990'],[.9,'January 1900']] as const)
   await expect(page.locator('.mr-observation-label')).toHaveText('Last heard observation');
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} integrated Home keeps both optional entries usable at six viewports`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} integrated Home keeps both optional entries usable at six viewports`,{tag:'@full'},async({page})=>{
   test.setTimeout(60_000);await setup(page);
   await chooseAppearance(page,theme);
   for(const mode of ['curated','mystery','personal']){

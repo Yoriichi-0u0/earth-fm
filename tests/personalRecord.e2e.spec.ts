@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {warmInstrument} from './instrumentWarmup';
 import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -82,14 +83,15 @@ test('a first-image error has a direct retry; empty MIME is sniffed and the new 
   await expect(page.getByRole('link',{name:'Browse Earth stories',exact:true})).toHaveAttribute('href','/listen?station=all');
 });
 
-test('a failed replacement preserves the image but deliberately clears the old take',async({page})=>{
-  await page.goto('/');await upload(page);const source=await page.locator('.jb-media img').getAttribute('src');await scratch(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('20');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
+test('a failed replacement preserves the image but deliberately clears the old take',{tag:'@timing'},async({page})=>{
+  await page.goto('/');await upload(page);const source=await page.locator('.jb-media img').getAttribute('src');await scratch(page);await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('20');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
   await input(page).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('broken')});await expect(page.getByRole('alert')).toContainText('Its take has been cleared.');await expect(page.locator('.jb-media img')).toHaveAttribute('src',source!);
   await scratch(page);await expect(loop(page)).toHaveAttribute('data-loop-count','0');await expect(loop(page).getByRole('button',{name:'Replay take',exact:true})).toBeDisabled();
 });
 
-test('record and replay use the same notes; replacing even the same file cancels the take and closes the old audio',async({page})=>{
+test('record and replay use the same notes; replacing even the same file cancels the take and closes the old audio',{tag:'@timing'},async({page})=>{
   await audit(page);await page.goto('/');await upload(page);await scratch(page);
+  await warmInstrument(page);await page.evaluate(()=>window.personalAudit.notes.splice(0));
   await loop(page).getByRole('button',{name:'Record',exact:true}).click();
   for(const [i,position] of ['12','31','7'].entries()){await slider(page).fill(position);await expect(loop(page)).toHaveAttribute('data-loop-count',String(i+1));await page.waitForTimeout(160);}
   await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
@@ -127,9 +129,9 @@ test('a decode timeout releases its URL and choosing a curated record cancels pe
   await expect(page.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();await expect.poll(()=>page.evaluate(()=>window.personalAudit.created.every(url=>window.personalAudit.revoked.includes(url)))).toBe(true);
 });
 
-test('pending audio startup and pending replay are cancelled when the personal source changes',async({page})=>{
+test('pending audio startup and pending replay are cancelled when the personal source changes',{tag:'@timing'},async({page})=>{
   await audit(page);await page.goto('/');await upload(page);await scratch(page);
-  await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('12');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
+  await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();await slider(page).fill('12');await expect(loop(page)).toHaveAttribute('data-loop-count','1');await loop(page).getByRole('button',{name:'Finish recording',exact:true}).click();
   await page.evaluate(()=>{window.personalAudit.delayAudio=true;for(const context of window.personalAudit.contexts)if(context.state==='running')void context.suspend();});
   await loop(page).getByRole('button',{name:'Replay take',exact:true}).click();await expect(loop(page)).toHaveAttribute('data-loop-phase','preparing');
   await upload(page,fixture('jpg'));await page.evaluate(()=>{window.personalAudit.delayAudio=false;window.personalAudit.resume.splice(0).forEach(resolve=>resolve());});await expect(page.locator('.jb-deck')).toHaveAttribute('data-note-serial','0');
@@ -138,7 +140,7 @@ test('pending audio startup and pending replay are cancelled when the personal s
   await expect.poll(()=>page.evaluate(()=>window.personalAudit.contexts.every(context=>context.state==='closed'))).toBe(true);
 });
 
-test('the image, filename and take stay out of storage and outbound requests; navigation and reload forget them',async({page})=>{
+test('the image, filename and take stay out of storage and outbound requests; navigation and reload forget them',{tag:'@timing'},async({page})=>{
   await audit(page);const requests:{url:string;method:string;body:string|null}[]=[];
   page.on('request',request=>{if(!request.url().startsWith('blob:'))requests.push({url:request.url(),method:request.method(),body:request.postData()});});
   await page.goto('/');await expect(page.getByRole('button',{name:'Choose image',exact:true})).toBeVisible();
@@ -153,7 +155,7 @@ test('the image, filename and take stay out of storage and outbound requests; na
   await upload(page);await page.reload();await expect(page.getByRole('button',{name:'Your Record',exact:true})).toHaveCount(0);expect(await storage()).toEqual(before);
 });
 
-test('personal touch dragging scans the visible image while vertical gestures scroll and cancel audio',async({browser})=>{
+test('personal touch dragging scans the visible image while vertical gestures scroll and cancel audio',{tag:'@timing'},async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
     await page.goto(new URL('/',test.info().project.use.baseURL).href);await upload(page);await scratch(page);
@@ -170,7 +172,7 @@ test('personal touch dragging scans the visible image while vertical gestures sc
   }finally{await context.close();}
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} personal record fits phone and tablet, and preserves a take through appearance changes`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} personal record fits phone and tablet, and preserves a take through appearance changes`,{tag:['@full','@timing']},async({page})=>{
   test.setTimeout(60_000);await audit(page);await page.goto('/');await chooseAppearance(page,theme);await upload(page);
   await page.getByRole('button',{name:'Play record',exact:true}).click();await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);
   const count=await page.evaluate(()=>window.personalAudit.contexts.length);await chooseAppearance(page,theme==='light'?'dark':'light');await expect(page.locator('.jb-deck')).toHaveClass(/is-playing/);expect(await page.evaluate(()=>window.personalAudit.contexts.length)).toBe(count);await page.getByRole('button',{name:'Stop',exact:true}).click();await scratch(page);

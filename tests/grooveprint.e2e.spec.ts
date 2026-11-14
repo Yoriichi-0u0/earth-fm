@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {warmInstrument} from './instrumentWarmup';
 import {appearanceButton,appearanceGroup,chooseAppearance} from './appearanceControl';
 import type {Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -8,7 +9,7 @@ declare global{interface Window{grooveAudit:GrooveAudit}}
 const print=(page:Page)=>page.locator('.jb-vinyl-fallback>.jb-grooveprint');
 const loop=(page:Page)=>page.getByRole('region',{name:'Earth Looper',exact:true});
 
-for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refinement comparison`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} selected-panel refinement comparison`,{tag:'@full'},async({page})=>{
   const layouts:unknown[]=[];
   await page.goto('/');await chooseAppearance(page,theme);
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();await page.locator('.jb-groove-key>details>summary').click();
@@ -51,7 +52,7 @@ async function setup(page:Page){
   await page.goto('/');await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
 }
 
-for(const theme of ['light','dark'] as const)test(`${theme} Climate vinyl visual comparison on desktop and phone`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} Climate vinyl visual comparison on desktop and phone`,{tag:'@full'},async({page})=>{
   await page.goto('/');await chooseAppearance(page,theme);
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
@@ -70,7 +71,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} Climate vinyl visual
   }
 });
 
-test('both patterns reuse the source values and fixed sound mapping without extra image reads',async({page})=>{
+test('both patterns reuse the source values and fixed sound mapping without extra image reads',{tag:'@dev'},async({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await setup(page);await expect(print(page)).toHaveAttribute('data-groove-count','48');
   const data=await print(page).locator('[data-groove-sector]').evaluateAll(nodes=>nodes.map(n=>Number(n.getAttribute('data-groove-value'))));
@@ -98,10 +99,10 @@ test('both patterns reuse the source values and fixed sound mapping without extr
   await page.getByRole('button',{name:'Stop',exact:true}).click();await expect(print(page)).toHaveAttribute('data-groove-index','0');
 });
 
-test('Scratch and Looper move the same sector; switching sources removes the old pattern and take',async({page})=>{
+test('Scratch and Looper move the same sector; switching sources removes the old pattern and take',{tag:'@timing'},async({page})=>{
   await setup(page);const initial=await print(page).locator('.gg-mark').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('d')));
   await page.getByRole('button',{name:'Play with Earth',exact:true}).click();
-  await loop(page).getByRole('button',{name:'Record',exact:true}).click();
+  await warmInstrument(page);await loop(page).getByRole('button',{name:'Record',exact:true}).click();
   for(const [i,position] of [12,37,5].entries()){
     await page.getByRole('slider',{name:'Image scan position',exact:true}).fill(String(position));
     await expect(loop(page)).toHaveAttribute('data-loop-count',String(i+1));await expect(print(page)).toHaveAttribute('data-groove-index',String(position-1));await page.waitForTimeout(180);
@@ -140,7 +141,7 @@ test('an unavailable image has no invented grooves while Side B keeps real obser
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();await expect(print(page)).toHaveAttribute('data-groove-count','12');
 });
 
-for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves remain keyboard usable and accessible at six viewports`,async({page})=>{
+for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves remain keyboard usable and accessible at six viewports`,{tag:'@full'},async({page})=>{
   test.setTimeout(60_000);await setup(page);await chooseAppearance(page,theme);
   await page.locator('.jb-groove-key>details>summary').focus();await page.keyboard.press('Enter');await expect(page.locator('.jb-groove-key>details')).toHaveAttribute('open','');
   await page.getByRole('slider',{name:'Inspect sector (silent)',exact:true}).press('End');
@@ -170,7 +171,7 @@ for(const theme of ['light','dark'] as const)test(`${theme} expanded grooves rem
   const path=test.info().outputPath(`${theme}-390-expanded.png`);await page.screenshot({path,fullPage:true});await test.info().attach(`${theme}-390-expanded`,{path,contentType:'image/png'});
 });
 
-test('read-only groove geometry stays small and does not create another audio context',async({page})=>{
+test('read-only groove geometry stays small and does not create another audio context',{tag:'@dev'},async({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await setup(page);
   const result=await page.evaluate(async()=>{
@@ -186,7 +187,7 @@ test('read-only groove geometry stays small and does not create another audio co
 const inspect=(page:Page)=>page.getByRole('slider',{name:'Inspect sector (silent)',exact:true});
 const selectedValues=(page:Page)=>page.locator('.jb-groove-selected dl dd').allTextContents();
 
-test('silent inspection keeps every image/January input and mapped note consistent without starting audio',async({page})=>{
+test('silent inspection keeps every image/January input and mapped note consistent without starting audio',{tag:'@dev'},async({page})=>{
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   test.setTimeout(45_000);await setup(page);await page.locator('.jb-groove-key>details>summary').click();
   const brightness=await print(page).locator('[data-groove-sector]').evaluateAll(nodes=>nodes.map(n=>Number(n.getAttribute('data-groove-value'))));
