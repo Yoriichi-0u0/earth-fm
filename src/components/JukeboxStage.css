@@ -1,0 +1,6 @@
+/* The 3D jukebox cabinet above the record shelf (decorative; the shelf buttons are the controls). */
+.jb-record-shelf{min-width:0}
+.jb-stage{position:relative;width:100%;min-width:0;height:230px;margin:0 0 12px;border-radius:16px;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#1b2236 0%,#070a10 70%);border:1px solid #ffffff17}
+.jb-stage>div{position:absolute!important;inset:0}
+.jb-stage canvas{display:block;width:100%!important;height:100%!important}
+@media(max-width:760px){.jb-stage{height:180px}}

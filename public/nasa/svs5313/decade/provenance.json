@@ -1,0 +1,150 @@
+{
+  "title": "Annual night-light averages 2012–2023, from NASA SVS 5313 (EIC Version)",
+  "svsId": 5313,
+  "page": "https://svs.gsfc.nasa.gov/5313",
+  "sourceMovie": {
+    "originalFilename": "nightlights_flat_series_and_change_wZooms_13_EIC_2160p30_h265.mp4",
+    "originalUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a005300/a005313/nightlights_flat_series_and_change_wZooms_13_EIC_2160p30_h265.mp4",
+    "retrievedAt": "2026-11-14T10:05:00+08:00",
+    "bytes": 34306797,
+    "sha256": "fa770691e32961d6670ef22689a63210fd732228fabf4946a8117e96b2bcffd9",
+    "codec": "HEVC (H.265)",
+    "width": 7680,
+    "height": 2160,
+    "fps": 30,
+    "frames": 1300,
+    "seconds": 43.333
+  },
+  "method": "Each year is held for about 18 frames at the start of the movie, labelled with its year. For each year, the 5 frames centred on the hold (sourceFrames, 0-based, inclusive) are averaged per channel, scaled from 7680 x 2160 to 1024 x 288 with area averaging (the grid of the change-map still), and saved as JPEG (ffmpeg -q:v 2). Reproduce with scripts/extract-decade.sh; the output is byte-identical.",
+  "yearLabel": {
+    "note": "NASA prints the year near the middle of the map; TerraJuke masks it.",
+    "rect1024": {
+      "x0": 531,
+      "y0": 144,
+      "x1": 553,
+      "y1": 151
+    }
+  },
+  "frames": {
+    "2012": {
+      "file": "2012.jpg",
+      "bytes": 29956,
+      "sha256": "17a8c7e517e85f9ca4ded99e00a732cad648609ac9cf00be3cf2903137aa1300",
+      "sourceFrames": [
+        4,
+        8
+      ]
+    },
+    "2013": {
+      "file": "2013.jpg",
+      "bytes": 30209,
+      "sha256": "13f94497a0df12befe0b00d5259e82af985ec7d7d46e3a5a69aa2e7faad927ea",
+      "sourceFrames": [
+        20,
+        24
+      ]
+    },
+    "2014": {
+      "file": "2014.jpg",
+      "bytes": 30493,
+      "sha256": "17fe72ef5773fcad7ac975719a9e5d5d9f7fc105ed5a556096f44b00d7039032",
+      "sourceFrames": [
+        37,
+        41
+      ]
+    },
+    "2015": {
+      "file": "2015.jpg",
+      "bytes": 30374,
+      "sha256": "04fb62a1ca443b53e2f12037ab8aad559b30aa06c42123e6d9f54355b4354fae",
+      "sourceFrames": [
+        55,
+        59
+      ]
+    },
+    "2016": {
+      "file": "2016.jpg",
+      "bytes": 30596,
+      "sha256": "cd4d91ea8e7f1db7f63aa927ca970b140e0bc039a82c7ae121d7faf87ad7c14a",
+      "sourceFrames": [
+        74,
+        78
+      ]
+    },
+    "2017": {
+      "file": "2017.jpg",
+      "bytes": 30895,
+      "sha256": "c151e6f9a85af5732e276e8d9ea5bf270b3b4168dac4a1b61242c502a2eb8ecb",
+      "sourceFrames": [
+        92,
+        96
+      ]
+    },
+    "2018": {
+      "file": "2018.jpg",
+      "bytes": 31065,
+      "sha256": "93321537cf34e6679b219c4fadb6824b250562b926f2b5f357eaeb1abcb3f6c4",
+      "sourceFrames": [
+        110,
+        114
+      ]
+    },
+    "2019": {
+      "file": "2019.jpg",
+      "bytes": 31291,
+      "sha256": "c57bbfe9c572f2839f32b597b4b0f32fbc243a40d4eaa0a08b65a8b277978456",
+      "sourceFrames": [
+        128,
+        132
+      ]
+    },
+    "2020": {
+      "file": "2020.jpg",
+      "bytes": 31055,
+      "sha256": "16455a94d80009c75855c9f31008099e70833b0a07376815e29669031e39bfa6",
+      "sourceFrames": [
+        146,
+        150
+      ]
+    },
+    "2021": {
+      "file": "2021.jpg",
+      "bytes": 31403,
+      "sha256": "e750f3aa585e74e298ba0e6ee92b4712d038a532e582fe3e93d1e18f4e0a49aa",
+      "sourceFrames": [
+        164,
+        168
+      ]
+    },
+    "2022": {
+      "file": "2022.jpg",
+      "bytes": 32155,
+      "sha256": "3d181763bf8fc793230353f453a0e3db8e9e0d0dc9af62f8c025a17d15e4b898",
+      "sourceFrames": [
+        182,
+        186
+      ]
+    },
+    "2023": {
+      "file": "2023.jpg",
+      "bytes": 32713,
+      "sha256": "75b5f2783b77e91b57e54f1552c5a9b90cf94553bb64fc3f308db06f2b194da8",
+      "sourceFrames": [
+        220,
+        224
+      ]
+    }
+  },
+  "credits": {
+    "producer": "NASA's Scientific Visualization Studio",
+    "visualizer": "Kel Elkins (USRA)",
+    "scientists": [
+      "Zhuosen Wang (UMD)",
+      "Miguel Román (Leidos)",
+      "Ranjay Shrestha (SSAI)",
+      "Srija Chakraborty (USRA)",
+      "Virginia Kalb (NASA)"
+    ],
+    "dataset": "Black Marble (Next Generation), Suomi NPP VIIRS, NASA/NOAA"
+  }
+}

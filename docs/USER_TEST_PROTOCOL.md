@@ -1,5 +1,7 @@
 # Earth FM — first-time learner pilot protocol
 
+Historical guided-lesson protocol. For the current jukebox-first Home, Flip, Scratch/Looper, Your Record, Mystery and silent Grooveprint review, use [EXPERIENCE-VALIDATION.md](EXPERIENCE-VALIDATION.md). The lesson-specific protocol below is preserved for its original scope.
+
 Status: study plan, not results. Target recruitment: 6–10 volunteers, not yet recruited. No user contact, recruitment or research collection is automated by the application.
 
 ## Purpose

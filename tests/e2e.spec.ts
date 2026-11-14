@@ -319,7 +319,8 @@ test('Climate Explore selects real monthly values and schedules the mapped elect
   await expect(measurement).toContainText('−0.19°C'.replace('−', '-'));
   await expect(scene.locator('.climate-band-readout')).toContainText('BAND 2 OF 5');
   await expect.poll(() => page.evaluate(() => Math.abs((window as any).climateAudioEvidence.frequencies.at(-2) - 293.664768))).toBeLessThan(0.001);
-  expect(requests.every(url => url.startsWith('http://127.0.0.1:5173/') || url.startsWith('data:'))).toBeTruthy();
+  const origin = new URL(page.url()).origin; // local dev server or the deployed site under test
+  expect(requests.every(url => url.startsWith(origin + '/') || url.startsWith('data:'))).toBeTruthy();
   await scene.locator('summary').click();
   await expect(scene.getByRole('link', { name: 'Fixed source CSV' })).toHaveAttribute('href', '/data/sources/gistemp-global-monthly-2026-10-18.csv');
 });
@@ -412,7 +413,7 @@ test('five real pages keep the homepage simple, support history and direct reloa
   await page.goto('/');
   await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Your planet. On the record.');
   await expect(page.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
-  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(4);
+  await expect(page.getByRole('button',{name:/Select record:/})).toHaveCount(5);
   await page.getByRole('button',{name:'Side B: hear the measurements',exact:true}).click();
   await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-kind','data');
   await expect(page.locator('.jb-deck')).toHaveAttribute('data-record-side','b');
@@ -438,7 +439,9 @@ test('five real pages keep the homepage simple, support history and direct reloa
   await page.getByRole('link',{name:'About & sources',exact:true}).click();
   await expect(page).toHaveURL(/\/about$/);
   await expect(page.getByRole('heading',{level:1})).toBeVisible();
-  await page.getByRole('link',{name:/Original experience/}).click();
+  // The legacy Earth FM view is no longer a front-door link; old bookmarks still open it.
+  await expect(page.getByRole('link',{name:/Original experience/})).toHaveCount(0);
+  await page.goto('/?legacy=1');
   await expect(page.getByRole('heading',{name:/A moment in time/})).toBeVisible();
   await page.goto('/#climate-spiral');await expect(page.locator('#climate-spiral .climate-measurement')).toContainText('+1.37°C');
 });
@@ -603,6 +606,7 @@ test('Chinese Listen is simple and sound controls recover with blocked preferenc
 });
 
 test('all five melody tones retain mapped fundamentals, deterministic data-only output, and rhythmic style isolation', async ({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await page.goto('/create');
   await expect(page.getByRole('group',{name:'Melody tone'})).toBeVisible();
   const result=await page.evaluate(async()=>{
@@ -856,7 +860,7 @@ test('Earth Looper enforces the note limit and finishes an empty recording at th
 test('short mobile viewports expose Play and touch scanning keeps vertical scrolling available',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:700},isMobile:true,hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();
   try{
-    await page.goto('http://127.0.0.1:5173/');const compact=page.getByRole('button',{name:'Play selected record',exact:true});await expect(compact).toBeVisible();const playBounds=await compact.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await compact.tap();await page.getByRole('button',{name:'Stop selected record',exact:true}).tap();
+    await page.goto('http://127.0.0.1:5173/');const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const playBounds=await play.boundingBox();expect(playBounds!.y+playBounds!.height).toBeLessThan(700);await play.tap();await page.getByRole('button',{name:'Stop',exact:true}).tap();
     await page.getByRole('button',{name:'Play with Earth',exact:true}).tap();const surface=page.locator('.jb-scratch-surface');await surface.scrollIntoViewIfNeeded();const bounds=(await surface.boundingBox())!;const cdp=await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.2,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*.75,y:bounds.y+bounds.height*.5,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await expect(page.getByRole('slider',{name:'Image scan position',exact:true})).toHaveValue('37');

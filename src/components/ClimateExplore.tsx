@@ -79,7 +79,7 @@ export default function ClimateExplore({ active, onStart }: Props) {
 
   return <section id="climate-spiral" className="climate-explore content-width" aria-labelledby="climate-title">
     <div className="climate-intro">
-      <div><span className="eyebrow"><span className="live-dot"/> EARTH FM · CLIMATE SPIRAL</span><h2 id="climate-title">A moment in time.<br/><span>A note of change.</span></h2></div>
+      <div><span className="eyebrow"><span className="live-dot"/> TerraJuke · CLIMATE SPIRAL</span><h2 id="climate-title">A moment in time.<br/><span>A note of change.</span></h2></div>
       <p>Explore NASA’s global temperature record, one month at a time. Choose a moment, hear its anomaly, and discover what the note means.</p>
     </div>
     <div className="climate-layout">

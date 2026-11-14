@@ -65,6 +65,7 @@ test('invalid or unavailable preference storage leaves the appearance controls u
 });
 
 test('theme changes preserve active audio, source pixels, mapped strip values and the saved take',async({page})=>{
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL),'Imports /src modules that only the Vite dev server serves.');
   await page.addInitScript(()=>{
     const audit={contexts:[] as AudioContext[]};(window as unknown as {appearanceAudio:typeof audit}).appearanceAudio=audit;
     const Original=AudioContext;window.AudioContext=class extends Original{constructor(){super();audit.contexts.push(this);}};
@@ -158,11 +159,13 @@ for(const viewport of [{width:320,height:568},{width:390,height:844},{width:768,
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${theme} ${route}: no document overflow`).toBe(true);
       if(route==='/'){
         const disc=await page.locator('.jb-vinyl-fallback').boundingBox(),toggle=await page.getByRole('button',{name:'Try 3D record',exact:true}).boundingBox();
-        expect(disc!.y+disc!.height,'vinyl must not cover its 3D action').toBeLessThanOrEqual(toggle!.y);
+        // Phones place the record beside its 3D action; any layout must keep them from overlapping.
+        const separate=disc!.x+disc!.width<=toggle!.x||toggle!.x+toggle!.width<=disc!.x||disc!.y+disc!.height<=toggle!.y||toggle!.y+toggle!.height<=disc!.y;
+        expect(separate,'vinyl must not cover its 3D action').toBe(true);
       }
       const bounds=await appearance(page).boundingBox();expect(bounds!.x).toBeGreaterThanOrEqual(0);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(viewport.width);
       if(route==='/'&&[320,390,768].includes(viewport.width)){
-        const play=page.getByRole('button',{name:'Play selected record',exact:true});await expect(play).toBeVisible();const box=await play.boundingBox();expect(box!.y+box!.height).toBeLessThanOrEqual(viewport.height);
+        const play=page.getByRole('button',{name:'Play record',exact:true});await expect(play).toBeVisible();const box=await play.boundingBox();expect(box!.y+box!.height).toBeLessThanOrEqual(viewport.height);
       }
       if(route==='/create'){
         const play=page.getByRole('button',{name:/Play my mix/});await expect(play).toHaveCount(1);await expect(page.locator('.sp-create-transport')).toBeVisible();
@@ -192,4 +195,34 @@ test('Chinese appearance names, reduced motion and enlarged-text stress preserve
   await page.getByRole('button',{name:'Mellow Reed',exact:true}).focus();await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:'Soft Glass',exact:true})).toBeFocused();
   const tone=await page.getByRole('button',{name:'Soft Glass',exact:true}).boundingBox(),dock=await page.locator('.sp-create-transport').boundingBox();expect(tone!.y).toBeGreaterThanOrEqual(dock!.y+dock!.height);expect(tone!.y+tone!.height).toBeLessThanOrEqual(1024);
   await test.info().attach('enlarged-text-Chromium-fixture',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
+});
+
+test('provisional identity and the primary Play action work at phone width', async({page})=>{
+  await page.setViewportSize({width:320,height:568});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await expect(page).toHaveTitle('TerraJuke — The Earth Information Jukebox');
+  const brand=page.getByRole('link',{name:'TerraJuke home',exact:true});
+  await expect(brand).toBeVisible();
+  await expect.poll(()=>brand.locator('img').evaluate(img=>(img as HTMLImageElement).naturalWidth)).toBe(128);
+
+  const player=page.getByRole('region',{name:'Record player',exact:true});
+  const play=page.getByRole('button',{name:'Play record',exact:true});
+  await expect(play).toHaveCount(1);
+  await expect(play).toBeEnabled();
+  const playBounds=await play.boundingBox();
+  expect(playBounds!.y+playBounds!.height).toBeLessThanOrEqual(568);
+  await page.getByRole('link',{name:'Browse records',exact:true}).press('Enter');
+  await page.getByRole('button',{name:'Select record: Arctic September',exact:true}).press('Enter');
+  await expect(player).toBeFocused();
+  await expect(player.getByRole('heading',{name:'Arctic September',exact:true})).toBeVisible();
+  await expect(player.getByRole('button',{name:'Play record',exact:true})).toBeEnabled();
+
+  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('zh');
+  await expect(page).toHaveTitle('TerraJuke — 地球信息点唱机');
+  await page.getByRole('navigation').getByRole('link',{name:'关于',exact:true}).press('Enter');
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.getByRole('link',{name:'关于',exact:true})).toHaveAttribute('aria-current','page');
+  await page.goto('/?legacy=1');
+  await expect(page.getByRole('link',{name:'TerraJuke home',exact:true})).toBeVisible();
 });

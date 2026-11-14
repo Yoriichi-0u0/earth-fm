@@ -1,0 +1,70 @@
+/* Night Lights record (NASA SVS 5313). The map keeps NASA's 32:9 shape at every width. */
+.jb-media.nl-media{height:auto;padding:34px 0 30px;background:#05070c}
+.nl-map{position:relative;line-height:0;cursor:crosshair;touch-action:manipulation;outline:none;margin:0 14px}
+.nl-map:focus-visible{box-shadow:0 0 0 2px var(--record-accent,#b48cff);border-radius:4px}
+.nl-map img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;border-radius:4px}
+.nl-map img.nl-year-frame{position:absolute;inset:0;width:100%;height:100%}
+.nl-year-badge{position:absolute;left:1.2%;top:4%;line-height:1.15;padding:3px 9px;border-radius:7px;background:#0a0812d9;border:1px solid #ffffff2b;color:#f4f1fb;font-weight:700;font-size:clamp(13px,2vw,22px);font-variant-numeric:tabular-nums;pointer-events:none}
+.nl-focus,.nl-place-box{position:absolute;pointer-events:none;border-radius:2px}
+.nl-focus{border:2px solid #64d2ff}
+.nl-place-box{border:1.5px dashed #ffe08a}
+.nl-ring{position:absolute;pointer-events:none;border-radius:50%;border:3px solid #f4f1fb;color:#f4f1fb;box-shadow:0 0 14px currentColor;animation:nl-ring .55s ease-out both}
+.nl-ring.nl-more{border-color:#b48cff;color:#b48cff}
+.nl-ring.nl-less{border-color:#f0a35e;color:#f0a35e}
+.nl-ring.nl-area{border-radius:6px;animation-name:nl-flash}
+.nl-ring.nl-static{animation:none;border-style:double;border-width:4px}
+@keyframes nl-ring{0%{transform:scale(.55);opacity:1}100%{transform:scale(1.15);opacity:0}}
+@keyframes nl-flash{0%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.nl-ring{animation:none!important;border-style:double;border-width:4px}}
+.nl-caption{margin:10px 16px 0;min-height:2.6em;line-height:1.35;font-size:13px;font-weight:600;color:#f4f1fb;overflow-wrap:anywhere}
+.nl-places{display:flex;flex-wrap:wrap;gap:6px;padding:12px 23px 0}
+.nl-places button{min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid #ffffff2b;background:#ffffff0d;color:inherit;font:inherit;font-size:12px;cursor:pointer}
+.nl-places button[aria-pressed="true"]{border-color:var(--record-accent,#b48cff);background:#b48cff26}
+.nl-places button:disabled{opacity:.45;cursor:not-allowed}
+.nl-year{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 23px 0}
+.nl-year label{font-size:12px;font-weight:600}
+.nl-year input{flex:1 1 200px;min-height:36px;accent-color:#b48cff}
+.nl-year output{min-width:8ch;font-variant-numeric:tabular-nums;font-size:12px}
+.nl-vibrate{display:flex;align-items:center;gap:8px;padding:10px 23px 0;font-size:12px;min-height:36px}
+.nl-notes{margin:12px 23px 0;padding:10px 0 4px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent);font-size:13px;line-height:1.5}
+.nl-notes summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
+.nl-notes h3{font-size:13px;margin:14px 0 6px}
+.nl-notes ul{padding-left:18px;margin:6px 0}
+.nl-table-scroll{overflow-x:auto;max-width:100%;margin:8px 0}
+.nl-compare{border-collapse:collapse;min-width:640px;font-size:12px}
+.nl-compare caption{text-align:left;font-weight:600;margin-bottom:6px}
+.nl-compare th,.nl-compare td,.nl-mapping td{text-align:left;padding:6px 8px;border-bottom:1px solid color-mix(in srgb,currentColor 14%,transparent);vertical-align:top}
+.nl-compare thead th{color:inherit;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.nl-mapping{border-collapse:collapse;font-size:12px;width:100%}
+.nl-credit{color:inherit;font-size:12px}
+@media(max-width:760px){.jb-media.nl-media{padding:28px 0 26px}.nl-map{margin:0 8px}.nl-places,.nl-year,.nl-vibrate{padding-left:16px;padding-right:16px}.nl-notes{margin:12px 16px 0}.nl-caption{font-size:12px;margin:8px 10px 0}}
+/* Rhythm: tempo, beats per bar, click and a visual beat (a musical choice; never data). */
+.nl-rhythm{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 23px 0;font-size:12px}
+.nl-tempo{display:flex;align-items:center;gap:8px;flex:1 1 240px}
+.nl-tempo label{font-weight:600}
+.nl-tempo input{flex:1;min-height:36px;accent-color:#b48cff}
+.nl-tempo output{min-width:7ch;font-variant-numeric:tabular-nums}
+.nl-meter{display:flex;align-items:center;gap:6px}
+.nl-meter span{font-weight:600;margin-right:2px}
+.nl-meter button{min-width:36px;min-height:36px;border-radius:9px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
+.nl-meter button[aria-pressed="true"]{border-color:#b48cff;background:#b48cff2e}
+.nl-click{display:flex;align-items:center;gap:6px;min-height:36px}
+.nl-beats{display:flex;align-items:center;gap:7px;min-height:36px}
+.nl-beats i{width:10px;height:10px;border-radius:50%;background:color-mix(in srgb,currentColor 22%,transparent);transition:transform .08s,background .08s}
+.nl-beats i.is-down{width:14px;height:14px}
+.nl-beats i.is-on{background:#b48cff;transform:scale(1.25)}
+@media(prefers-reduced-motion:reduce){.nl-beats i{transition:none}.nl-beats i.is-on{transform:none;outline:2px solid #b48cff}}
+@media(max-width:760px){.nl-rhythm{padding-left:16px;padding-right:16px}}
+/* Mystery Place: guess the place from its decade. */
+.nl-mystery{margin:12px 23px 0;padding:12px 14px;border-radius:12px;border:1px solid color-mix(in srgb,#b48cff 45%,transparent);background:color-mix(in srgb,#b48cff 8%,transparent);font-size:13px}
+.nl-mystery-head h3{margin:0;font-size:14px}
+.nl-mystery-head p{margin:4px 0 8px;line-height:1.4}
+.nl-mystery button{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 30%,transparent);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer}
+.nl-mystery button.nl-mystery-play{border-color:#b48cff;background:#b48cff33}
+.nl-mystery button:disabled{opacity:.5;cursor:not-allowed}
+.nl-mystery-guess{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 16px}
+.nl-mystery-guess legend{font-weight:600;margin-bottom:6px;padding:0}
+.nl-mystery-guess label{display:flex;align-items:center;gap:6px;min-height:36px}
+.nl-mystery-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.nl-mystery-answer{margin:10px 0 0;font-weight:600;line-height:1.45}
+@media(max-width:760px){.nl-mystery{margin:12px 16px 0}}

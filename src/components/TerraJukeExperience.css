@@ -1,0 +1,116 @@
+/* TerraJuke Experience 2.0 — layout refinements over the shared identity. Scientific media keeps its own surfaces. */
+
+/* The deck still clips its rounded corners, but `clip` (unlike `hidden`) lets the transport stick while scrolling. */
+.ss.ss-pages .jb-home .jb-deck { overflow: clip; }
+
+/* A/B: one segmented control, side identity carried by the letter. */
+.ss.ss-pages .jb-home .jb-side-selector button { transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
+.ss.ss-pages .jb-home .jb-side-selector button[aria-pressed='true'] { box-shadow: 0 1px 2px #0000001a, 0 0 0 3px color-mix(in srgb, var(--ef-accent) 18%, transparent); }
+
+/* Coil: a hint of depth and a clear focus of attention. */
+.ss.ss-pages .jb-coil { box-shadow: inset 0 0 0 1px #ffffff12; }
+
+@media (max-width: 640px) {
+  /* Header: one row for brand + preferences, one single-line row for navigation. */
+  .ss.ss-pages .sp-header { padding-block: 8px 4px; row-gap: 6px; }
+  .ss.ss-pages .sp-preferences :is(.sp-language, .appearance-selector) > span {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .ss.ss-pages .sp-preferences { align-items: center; }
+  :root[data-theme] .ss.ss-pages .sp-header .sp-nav { display: flex; justify-content: space-between; gap: 2px; }
+  :root[data-theme] .ss.ss-pages .sp-header .sp-nav a { white-space: nowrap; overflow-wrap: normal; padding-inline: .5em; font-size: .8rem; }
+  .ss.ss-pages .jb-home .jb-side-selector button { padding-inline: 10px; }
+
+  /* Transport stays reachable while the visual, readouts and grooves scroll beneath it. */
+  .ss.ss-pages .jb-home .jb-transport {
+    position: sticky; top: 0; z-index: 4; padding-block: 8px;
+    box-shadow: 0 1px 0 var(--ef-border);
+  }
+
+  /* The science visual takes the full width; the record object becomes a compact row below it. */
+  .ss.ss-pages .jb-home .jb-artwork-paired { display: flex; flex-direction: column; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-science-window { order: 0; border-left: 0; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-media { height: clamp(250px, 80vw, 340px); }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-art { height: auto; min-height: 0; padding: 38px 12px 30px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-art > svg { height: 150px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 220px; margin: 2px 0 4px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired :is(.jb-art-label, .jb-art-footer) { font-size: 10px; letter-spacing: .4px; left: 12px; right: 12px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-caption { flex-direction: row; align-items: center; font-size: 10.5px; padding: 0; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-caption small { font-size: 10.5px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-value { padding: 0 2px; gap: 0 12px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-value > span { font-size: 12px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-value > strong { font-size: 26px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil-key { display: flex; left: 8px; right: auto; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil-axis span:nth-child(2) { display: inline; }
+
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-earth-record {
+    order: 1; height: auto; min-height: 0;
+    display: grid; grid-template-columns: 120px minmax(0, 1fr); grid-template-rows: auto auto; align-content: center;
+    column-gap: 14px; padding: 12px 16px 14px; text-align: left; border-top: 1px solid #ffffff14;
+  }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-vinyl-button { grid-row: 1 / span 2; height: 136px; min-height: 136px; }
+  /* Flat disc in the compact row: the 3D tilt suits the wide deck, not a 100 px record. The label still shows A or B. */
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-vinyl-fallback { position: relative; display: block; width: 100px; inset: auto; margin: 2px auto 0; translate: none; transform: none; transition: none; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-vinyl-fallback.side-b { transform: rotateY(180deg); }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-vinyl-button::after { bottom: 16px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-flip-hint { font-size: 12px; bottom: 0; gap: 5px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-flip-hint svg { width: 14px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-3d-toggle { justify-self: start; align-self: end; font-size: 13px; padding: 10px 0 6px; min-height: 44px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-record-art-caption { align-self: start; font-size: 11px; letter-spacing: 0; margin: 0; }
+
+  /* Side buttons: one line each; the long sublabel is redundant with the science cue below. */
+  .ss.ss-pages .jb-home .jb-side-selector button small { display: none; }
+  .ss.ss-pages .jb-home .jb-side-selector button > span { font-size: 13px; line-height: 1.25; }
+}
+
+/* Phones held sideways: the visual sits beside a slim record column again, but stays legible. */
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 641px) {
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 150px; }
+}
+
+@media (max-width: 360px) {
+  :root[data-theme] .ss.ss-pages .sp-header .sp-nav { gap: 0; }
+  :root[data-theme] .ss.ss-pages .sp-header .sp-nav a { padding-inline: .3em; font-size: .74rem; }
+}
+
+/* Wider screens: give the coil room to explore; the data panel may grow taller than the vinyl column. */
+@media (min-width: 641px) {
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-data-art.has-coil { height: auto; min-height: 280px; padding-bottom: 30px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 205px; flex: none; }
+}
+@media (min-width: 641px) and (max-width: 1050px) {
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil { height: 185px; }
+}
+
+/* Safe areas: index.html uses viewport-fit=cover, so keep content clear of a landscape notch or Dynamic Island.
+ * Each max() keeps the existing gutter (24 / 20 / 16 px) wherever the inset is smaller. */
+.ss.ss-pages { padding-left: max(24px, calc((100vw - 1240px) / 2), env(safe-area-inset-left, 0px)); padding-right: max(24px, calc((100vw - 1240px) / 2), env(safe-area-inset-right, 0px)); }
+@media (max-width: 650px) { .ss.ss-pages { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); } }
+@media (max-width: 360px) { .ss.ss-pages { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); } }
+@media (max-width: 640px) {
+  /* Sticky Play clears a status bar when the site runs full-screen from the Home Screen. */
+  .ss.ss-pages .jb-home .jb-transport { top: env(safe-area-inset-top, 0px); }
+}
+
+/* 44 pt touch target for the 3D/2D switch on any touch screen, phones and tablets alike. */
+@media (pointer: coarse) { .ss.ss-pages .jb-home .jb-coil-toggle { min-height: 44px; padding-inline: 14px; } }
+
+/* Narrowest phones (≤360 px): wrap side labels between words, never inside one, and keep the coil key on one line. */
+@media (max-width: 360px) {
+  .ss.ss-pages .jb-home .jb-side-selector button > span { overflow-wrap: normal; word-break: normal; hyphens: manual; font-size: 12.5px; }
+  .ss.ss-pages .jb-home .jb-artwork-paired .jb-coil-key { gap: 7px; padding: 3px 7px; font-size: 9.5px; }
+}
+.ss.ss-pages .jb-coil-key li { white-space: nowrap; }
+
+/* The note halo lives inside the disc, so it shares the disc's centre, size and tilt on every layout. */
+.ss.ss-pages .jb-vinyl-fallback > .jb-note-halo { top: -6%; left: -6%; width: 112%; border-color: color-mix(in srgb, var(--ef-accent) 60%, transparent); }
+
+/* Retire the last lime accents on the modern pages (Legacy keeps its own preserved palette). */
+.ss.ss-pages .jb-state .is-on { background: var(--ef-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ef-accent) 25%, transparent); }
+.ss.ss-pages .jb-scan { background: #64d2ff; box-shadow: 0 0 0 1px #00000066, 0 0 14px #64d2ff99; }
+.ss.ss-pages .jb-scan::before { background: linear-gradient(90deg, transparent, #64d2ff17); }
+.ss.ss-pages .jb-scan > span { color: #64d2ff; }
+.ss.ss-pages .jb-grooveprint { --gg-selected: #bfe6ff; }
+.ss.ss-pages .live-dot { background: var(--ef-accent); }
+/* Play/Stop keeps white text on hover and focus in both themes (a generic dark hover rule turned it black). */
+:root[data-theme] .ss.ss-pages .jb-home .jb-deck .jb-play:is(:hover, :focus-visible):not(:disabled) { color: var(--tj-on-action); background: color-mix(in srgb, var(--tj-action), #000 14%); }

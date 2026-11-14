@@ -1,0 +1,21 @@
+.jb-data-art.has-coil{display:flex;flex-direction:column}
+.jb-coil{position:relative;display:flex;flex-direction:column;height:clamp(210px,26vw,280px);margin:2px -6px 4px;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b2433 0,#0b0d12 72%);touch-action:pan-y;cursor:grab}
+.jb-coil-stage{position:relative;flex:1 1 auto;min-height:0}
+.jb-coil:active{cursor:grabbing}
+.jb-coil canvas{display:block}
+.jb-coil-axis{flex:none;display:flex;justify-content:space-between;gap:8px;padding:2px 12px 7px;font-size:11px;color:#c7c7cc;pointer-events:none;font-variant-numeric:tabular-nums}
+.jb-coil-axis span:nth-child(2){color:#8e8e93}
+.jb-coil-tip{position:absolute;left:10px;bottom:28px;margin:0;padding:4px 9px;border-radius:8px;background:#000c;color:#f5f5f7;font-size:12px;pointer-events:none;font-variant-numeric:tabular-nums}
+.jb-coil-tip b{font-weight:600;margin-right:4px}
+.jb-coil-key{position:absolute;top:8px;right:10px;display:flex;gap:10px;margin:0;padding:4px 8px;list-style:none;font-size:10.5px;color:#e5e5ea;background:#0009;border-radius:999px;pointer-events:none}
+.jb-coil-key li{display:flex;align-items:center;gap:5px}
+.jb-coil-key i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.jb-coil-key .is-cool{background:#2f7bff}.jb-coil-key .is-warm{background:linear-gradient(90deg,#ff3b30,#ffd60a)}.jb-coil-key .is-bead{background:#fff;box-shadow:0 0 0 2px #2997ff}
+.jb-data-caption{flex-wrap:wrap}
+.jb-coil-toggle{display:inline-flex;align-items:center;gap:5px;min-height:32px;margin-left:auto;padding:4px 11px;border-radius:999px;border:1px solid #ffffff40;background:#ffffff14;color:#f5f5f7;font-size:12px;cursor:pointer}
+.jb-coil-toggle:hover{background:#ffffff26}
+@media(max-width:520px){.jb-coil-key{left:8px;right:auto;font-size:10px;gap:7px}.jb-coil{height:200px}}
+.jb-artwork-paired .jb-coil-toggle{min-height:26px;padding:2px 9px;font-size:11px}
+/* Paired-deck coil heights live in TerraJukeExperience.css. Between 641 and 760 px the narrow panel drops the key and hint. */
+.jb-artwork-paired .jb-coil{margin:0}
+@media(max-width:760px){.jb-artwork-paired .jb-coil-key,.jb-artwork-paired .jb-coil-axis span:nth-child(2){display:none}}

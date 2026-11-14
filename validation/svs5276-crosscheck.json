@@ -1,0 +1,341 @@
+{
+  "title": "Independent cross-check: NASA SVS 5276 annual night-light stills, 2012–2023",
+  "page": "https://svs.gsfc.nasa.gov/5276",
+  "method": "Each 12-frame series is scaled with area averaging, NASA's printed year is masked (detected per frame), and src/decade.ts analyzeYear() sums every pixel's luma above its 7 × 7 median (pixels darker than 0.06 skipped; excess at or below 0.01 treated as noise), exactly as for the EIC frames.",
+  "years": [
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+  ],
+  "yearOrder": {
+    "stills": [
+      {
+        "file": "nightlights_flat_series_stills_8k_compare.02012.jpg",
+        "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005200/a005276/nightlights_flat_series_stills_8k_compare.02012.jpg",
+        "bytes": 2466015,
+        "sha256": "31deb9a5a5c2f06a4d661fb02dee59d07a04db331fec3566f228241c07daa03b"
+      },
+      {
+        "file": "nightlights_flat_series_stills_8k_compare.02023.jpg",
+        "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005200/a005276/nightlights_flat_series_stills_8k_compare.02023.jpg",
+        "bytes": 2606413,
+        "sha256": "2f9b2e2a39a87e9b2627a04a77cb32d17fe235929ec0d45d582e7b638ba658b9"
+      }
+    ],
+    "frame0vs2012": 1.463,
+    "frame0vs2023": 1.711,
+    "frame11vs2012": 1.549,
+    "frame11vs2023": 1.391
+  },
+  "series": {
+    "world": {
+      "source": {
+        "file": "nightlights_flat_series_stills_8k_4320p3_h265.mp4",
+        "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005200/a005276/nightlights_flat_series_stills_8k_4320p3_h265.mp4",
+        "bytes": 5135333,
+        "sha256": "06be3603e1bb6accbade50c8517b0d1da9c180e5df3632037622cabe78ce2d8f"
+      },
+      "scale": [
+        720,
+        405
+      ],
+      "yearLabels": [
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 349,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 349,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 349,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 349,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 349,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        },
+        {
+          "x0": 269,
+          "y0": 245,
+          "x1": 348,
+          "y1": 262
+        }
+      ],
+      "light": [
+        771.404,
+        787.384,
+        793.894,
+        799.684,
+        804.071,
+        813.897,
+        827.438,
+        837.36,
+        826.861,
+        850.36,
+        883.469,
+        908.348
+      ]
+    },
+    "india": {
+      "source": {
+        "file": "nightlights_flat_series_stills_india_2160p3_h265.mp4",
+        "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005200/a005276/nightlights_flat_series_stills_india_2160p3_h265.mp4",
+        "bytes": 2975321,
+        "sha256": "ca64042691cfcb7e6309c37ad6b858555348e95efa1afa974ef94d8c9c657004"
+      },
+      "scale": [
+        960,
+        540
+      ],
+      "yearLabels": [
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 352,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 352,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 352,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        },
+        {
+          "x0": 306,
+          "y0": 351,
+          "x1": 351,
+          "y1": 370
+        }
+      ],
+      "light": [
+        2914.412,
+        3032.393,
+        3155.112,
+        3260.627,
+        3369.345,
+        3475.264,
+        3611.666,
+        3628.107,
+        3619.624,
+        3816.912,
+        4146.625,
+        4407.42
+      ]
+    },
+    "ukraine": {
+      "source": {
+        "file": "nightlights_flat_series_stills_ukraine_2160p3_h265.mp4",
+        "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005200/a005276/nightlights_flat_series_stills_ukraine_2160p3_h265.mp4",
+        "bytes": 3524605,
+        "sha256": "7e4dc1f16690dbf80e9ae83d77d9c2375de6207b119ae3796d52fbbe0bbc6b18"
+      },
+      "scale": [
+        960,
+        540
+      ],
+      "yearLabels": [
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 515,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 515,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 514,
+          "y1": 494
+        },
+        {
+          "x0": 463,
+          "y0": 473,
+          "x1": 559,
+          "y1": 494
+        }
+      ],
+      "light": [
+        5298.736,
+        5439.344,
+        5532.105,
+        5490.996,
+        5516.054,
+        5613.583,
+        5747.59,
+        5960.674,
+        5723.08,
+        6079.243,
+        5800.444,
+        5869.479
+      ]
+    }
+  }
+}

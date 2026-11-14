@@ -3,6 +3,8 @@ import type {ErrorInfo,ReactNode} from 'react';
 import {Rotate3D} from 'lucide-react';
 import {useStudioLanguage} from '../lib/studioLanguage';
 import type {RecordSide,RecordSignal} from '../lib/recordSignal';
+import type {GrooveSegment} from '../lib/grooveprint';
+import Grooveprint from './Grooveprint';
 
 const Scene=lazy(()=>import('./RecordScene'));
 class SceneBoundary extends Component<{children:ReactNode;onUnavailable:()=>void},{failed:boolean}>{
@@ -12,8 +14,8 @@ class SceneBoundary extends Component<{children:ReactNode;onUnavailable:()=>void
   render(){return this.state.failed?null:this.props.children;}
 }
 
-type Props={side:RecordSide;signal:RecordSignal;motion:boolean;onFlip:()=>void};
-export default function EarthRecord({side,signal,motion,onFlip}:Props){
+type Props={side:RecordSide;signal:RecordSignal;motion:boolean;onFlip:()=>void;grooves:readonly GrooveSegment[];position:number;descriptionId:string};
+export default function EarthRecord({side,signal,motion,onFlip,grooves,position,descriptionId}:Props){
   const {t}=useStudioLanguage();
   const [three,setThree]=useState(false),[ready,setReady]=useState(false),[failed,setFailed]=useState(false),[visible,setVisible]=useState(true),[pageVisible,setPageVisible]=useState(!document.hidden);
   const root=useRef<HTMLDivElement>(null),pointer=useRef({x:0,y:0}),requestRender=useRef(()=>{});
@@ -31,16 +33,15 @@ export default function EarthRecord({side,signal,motion,onFlip}:Props){
   const rendering=three&&visible&&pageVisible;
   useEffect(()=>{if(!rendering){setReady(false);requestRender.current=()=>{};}},[rendering]);
   return <div ref={root} className={`jb-earth-record ${motion?'has-motion':'motion-off'}${signal.playing&&motion?' is-spinning':''}${ready&&rendering?' is-three':''}`} data-record-renderer={ready&&rendering?'three':'2d'} data-record-in-view={visible} data-record-page-visible={pageVisible} data-note-serial={signal.event?.serial??0}>
-    {signal.playing&&signal.event&&motion&&<span key={signal.event.serial} className="jb-note-halo" aria-hidden="true"/>}
-    <button type="button" className="jb-vinyl-button" aria-label={t(side==='a'?'Flip to Side B: hear the measurements':'Flip to Side A: hear the picture')} onClick={onFlip}
+    <button type="button" className="jb-vinyl-button" aria-describedby={descriptionId} aria-label={t(side==='a'?'Flip to Side B: hear the measurements':'Flip to Side A: hear the picture')} onClick={onFlip}
       onPointerMove={e=>{if(!motion||e.pointerType==='touch')return;const bounds=e.currentTarget.getBoundingClientRect();pointer.current={x:(e.clientX-bounds.left)/bounds.width*2-1,y:(e.clientY-bounds.top)/bounds.height*2-1};if(rendering)requestRender.current();}}
       onPointerLeave={()=>{pointer.current={x:0,y:0};if(rendering)requestRender.current();}}>
-      <span className={`jb-vinyl-fallback side-${side}`} aria-hidden="true"><span className="jb-vinyl-disc"><span className="jb-vinyl-label"><small>EARTH FM</small><i>◉</i><b>{side.toUpperCase()}</b></span><span className="jb-spindle"/></span></span>
+      <span className={`jb-vinyl-fallback side-${side}`} aria-hidden="true">{signal.playing&&signal.event&&motion&&<span key={signal.event.serial} className="jb-note-halo" aria-hidden="true"/>}<span className="jb-vinyl-disc"><span className="jb-vinyl-label"><small>TerraJuke</small><i>◉</i><b>{side.toUpperCase()}</b></span><span className="jb-spindle"/></span><Grooveprint segments={grooves} index={position} side={side}/></span>
       {rendering&&<span className="jb-three-canvas" aria-hidden="true"><SceneBoundary onUnavailable={unavailable}><Suspense fallback={null}><Scene side={side} signal={signal} motion={motion} pointer={pointer} onReady={sceneReady} onUnavailable={unavailable}/></Suspense></SceneBoundary></span>}
       <span className="jb-flip-hint"><Rotate3D size={13}/>{t('Flip the record')}</span>
     </button>
     <button type="button" className="jb-3d-toggle" aria-pressed={three} onClick={()=>{setReady(false);setFailed(false);setThree(v=>!v);}}>{t(three?'Use 2D record':'Try 3D record')}<span aria-hidden="true">{three?' ↙':' ↗'}</span></button>
-    <p className="jb-record-art-caption">{t(failed?'2D active · 3D unavailable':'AI artwork · note activity')}</p>
+    <p className="jb-record-art-caption">{t(failed?'2D active · 3D unavailable':ready&&rendering?'AI artwork · note activity':grooves.length?'AI artwork · data-derived grooves':'AI artwork · no decoded grooves')}</p>
     <span className="sr-only" role="status">{failed?t('3D is unavailable. The 2D record and all audio controls still work.'):three&&!ready?t('Loading the 3D record. Audio is ready independently.'):''}</span>
   </div>;
 }
