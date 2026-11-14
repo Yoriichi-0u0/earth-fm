@@ -25,7 +25,9 @@ import EarthLooper from './EarthLooper';
 import {usePersonalImage} from '../lib/usePersonalImage';
 import type {PersonalImage} from '../lib/personalImage';
 import {observatoryImagery} from '../data/observatory';
+import {ShowContext} from '../lib/showMode';
 import './JukeboxHome.css';
+import './JukeboxShow.css';
 import './TerraJukeExperience.css';
 
 const noop=()=>{};
@@ -34,6 +36,8 @@ const MysteryRecord=lazy(()=>import('./MysteryRecord'));
 const NightLightsDeck=lazy(()=>import('./NightLightsDeck'));
 const AirDeck=lazy(()=>import('./AirDeck'));
 const RecordJourney=lazy(()=>import('./RecordJourney'));
+const ShowCard=lazy(()=>import('./ShowCard'));
+type Show={index:number;phase:'intro'|'playing';cue:number|null};
 const JukeboxStage=lazy(()=>import('./JukeboxStage'));
 function useVisualRecord(record:VisualRecord,motion:boolean,volume:number){
   const {t}=useStudioLanguage();const [animate,setAnimate]=useState(true),[requestAt,setRequestAt]=useState(0);
@@ -157,6 +161,24 @@ export default function JukeboxHome({motion}:{motion:boolean}){
   const [selected,setSelected]=useState<JukeboxRecordId|'personal'|'mystery'>('spiral'),[volume,setVolume]=useState(.55),[earthOpen,setEarthOpen]=useState(false),[earthReady,setEarthReady]=useState(false);
   const personal=usePersonalImage(),fileInput=useRef<HTMLInputElement>(null),player=useRef<HTMLDivElement>(null);
   const shelf=useRef<HTMLDivElement>(null),[edges,setEdges]=useState({left:false,right:false});
+  // ---- Jukebox Show: every NASA record in turn --------------------------------------------
+  const [show,setShow]=useState<Show|null>(null),[deckEpoch,setDeckEpoch]=useState(0),[showMessage,setShowMessage]=useState('');
+  const showNow=useRef<Show|null>(null),cueSerial=useRef(0);showNow.current=show;
+  const announce=(index:number)=>{const r=jukeboxRecords[index];setShowMessage(`${t('Now playing record')} ${index+1} ${t('of')} ${jukeboxRecords.length}: ${t(r.title)}, ${t(r.source)}.`);};
+  function startShow(){
+    personal.cancel();setSelected(jukeboxRecords[0].id);setDeckEpoch(e=>e+1);setShow({index:0,phase:'intro',cue:null});announce(0);
+    player.current?.scrollIntoView({block:'start',behavior:motion?'smooth':'instant'});
+  }
+  function stopShow(say=true){if(!showNow.current)return;setShow(null);setDeckEpoch(e=>e+1);if(say)setShowMessage(t('Show stopped.'));}
+  const introDone=()=>setShow(s=>s&&s.phase==='intro'?{...s,phase:'playing',cue:++cueSerial.current}:s);
+  const onEnded=(cue:number)=>{
+    const s=showNow.current;if(!s||s.cue!==cue)return;
+    const next=s.index+1;
+    if(next>=jukeboxRecords.length){setShow(null);setShowMessage(t('That was the whole jukebox: six records from NASA’s view of Earth.'));return;}
+    setSelected(jukeboxRecords[next].id);setShow({index:next,phase:'intro',cue:null});announce(next);
+  };
+  const onStopped=(cue:number)=>{const s=showNow.current;if(s&&s.cue===cue){setShow(null);setShowMessage(t('Show stopped.'));}};
+  useEffect(()=>{if(!show)return;const key=(e:KeyboardEvent)=>{if(e.key==='Escape')stopShow();};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[show!==null]);
   useEffect(()=>{
     const element=shelf.current;if(!element)return;
     const update=()=>{const left=element.scrollLeft>2,right=element.scrollLeft+element.clientWidth<element.scrollWidth-2;setEdges(previous=>previous.left===left&&previous.right===right?previous:{left,right});};
@@ -167,6 +189,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
   const optional=selected==='personal'||selected==='mystery';
   const stageRecords=useMemo(()=>jukeboxRecords.map(r=>({id:r.id,title:r.title,number:r.number,accent:r.accent,image:r.frame?.imageUrl??r.posterUrl,focus:r.id==='nightlights'?[.855,.72] as [number,number]:undefined})),[]);
   function selectRecord(id:JukeboxRecordId|'mystery'){
+    stopShow(false);
     personal.cancel();
     setSelected(id);
     player.current?.focus({preventScroll:true});
@@ -174,16 +197,19 @@ export default function JukeboxHome({motion}:{motion:boolean}){
       player.current.scrollIntoView({block:'start',behavior:'instant'});
     }
   }
-  function selectPersonal(){setSelected('personal');player.current?.scrollIntoView({block:'start',behavior:motion?'smooth':'instant'});}
+  function selectPersonal(){stopShow(false);setSelected('personal');player.current?.scrollIntoView({block:'start',behavior:motion?'smooth':'instant'});}
   function chooseImage(file:File){selectPersonal();void personal.choose(file);}
   function moveShelf(direction:number){const element=shelf.current;if(element)element.scrollBy({left:direction*element.clientWidth*.8,behavior:motion?'smooth':'instant'});}
   return <div className="jb-home" style={{'--record-accent':record.accent} as CSSProperties}>
-    <header className="jb-intro"><div><p className="jb-eyebrow"><Disc3 size={15}/>{t('THE EARTH INFORMATION JUKEBOX')}</p><h1 tabIndex={-1}>{t('Your planet.')} <em>{t('On the record.')}</em></h1></div><p>{t('Choose an Earth story. Press Play.')}<span>{t('Sound made from NASA visuals and Earth observations.')}</span><a className="jb-shelf-link" href="#record-shelf">{t('Browse records')} <ArrowDown aria-hidden="true" size={14}/></a></p></header>
+    <header className="jb-intro"><div><p className="jb-eyebrow"><Disc3 size={15}/>{t('THE EARTH INFORMATION JUKEBOX')}</p><h1 tabIndex={-1}>{t('Your planet.')} <em>{t('On the record.')}</em></h1></div><p>{t('Choose an Earth story. Press Play.')}<span>{t('Sound made from NASA visuals and Earth observations.')}</span><a className="jb-shelf-link" href="#record-shelf">{t('Browse records')} <ArrowDown aria-hidden="true" size={14}/></a><button type="button" className="jb-show-start" aria-pressed={show!==null} onClick={()=>show?stopShow():startShow()}>{show?<><Square size={14} fill="currentColor"/>{t('Stop the show')}</>:<><Play size={15} fill="currentColor"/>{t('Play the whole jukebox')}</>}</button></p></header>
     <div className="jb-layout">
       <div className="jb-player" ref={player} role="region" aria-label={t('Record player')} tabIndex={-1}>
+        <ShowContext.Provider value={{cue:show?.phase==='playing'?show.cue:null,onEnded,onStopped}}>
+        {show?.phase==='intro'&&<Suspense fallback={null}><ShowCard key={show.index} record={jukeboxRecords[show.index]} index={show.index} total={jukeboxRecords.length} motion={motion} onDone={introDone}/></Suspense>}
         {selected==='personal'&&personal.error&&<p className="jb-personal-error" role="alert">{t(personal.error)}{personal.image&&<> {t('Your previous image is still available. Its take has been cleared.')}</>}</p>}
-        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='nightlights'?<Suspense fallback={<p role="status">{t('Loading Night Lights…')}</p>}><NightLightsDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.id==='air'?<Suspense fallback={<p role="status">{t('Loading The Air We Share…')}</p>}><AirDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.kind==='visual'?<VisualDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={record.id} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
+        {selected==='mystery'?<Suspense fallback={<p role="status">{t('Loading Mystery Record…')}</p>}><MysteryRecord motion={motion} volume={volume} onVolume={setVolume} onOpen={selectRecord}/></Suspense>:selected==='personal'?personal.loading||!personal.image?<section className="jb-personal-loading" aria-labelledby="jb-personal-loading-title"><ImagePlus size={32}/><h2 id="jb-personal-loading-title">{t('Your Record')}</h2><p role="status">{t(personal.loading?'Opening your image…':'Choose an image to make your record.')}</p><p>{t('The previous performance has been cleared.')}</p>{!personal.loading&&<button type="button" onClick={()=>fileInput.current?.click()}>{t('Choose another image')}</button>}</section>:<PersonalDeck key={personal.image.id} image={personal.image} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='spiral'?<ClimateDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:record.id==='nightlights'?<Suspense fallback={<p role="status">{t('Loading Night Lights…')}</p>}><NightLightsDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.id==='air'?<Suspense fallback={<p role="status">{t('Loading The Air We Share…')}</p>}><AirDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/></Suspense>:record.kind==='visual'?<VisualDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>:<DataDeck key={`${record.id}:${deckEpoch}`} record={record} motion={motion} volume={volume} onVolume={setVolume}/>}
         {!optional&&<Suspense fallback={null}><RecordJourney key={record.id} recordId={record.id} motion={motion}/></Suspense>}
+        </ShowContext.Provider>
       </div>
       <div className="jb-record-shelf">
         <Suspense fallback={null}><JukeboxStage records={stageRecords} selected={selected} motion={motion} onSelect={id=>selectRecord(id as JukeboxRecordId)}/></Suspense>
@@ -214,5 +240,7 @@ export default function JukeboxHome({motion}:{motion:boolean}){
     </div>
     <div className="jb-deeper"><span>{t(optional?'Explore more of TerraJuke.':'Curiosity has a B-side.')} <ArrowDown size={14}/></span><a href={pageUrl('listen',optional?'all':station,record.id==='motion'?'motion':undefined)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('listen',optional?'all':station,record.id==='motion'?'motion':undefined);}}>{t(optional?'Browse Earth stories':'Discover the story')} <ArrowUpRight size={15}/></a><a href={pageUrl('data',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('data',station);}}>{t(optional?'Inspect Earth data':'Inspect the data')} <ArrowUpRight size={15}/></a><a href={pageUrl('create',station)} onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();goToPage('create',station);}}>{t('Open the music studio')} <ArrowUpRight size={15}/></a></div>
     <details className="jb-earth-extra" onToggle={e=>{setEarthOpen(e.currentTarget.open);if(!e.currentTarget.open)setEarthReady(false);}}><summary>{t('A closer look at home')} <span>{t('The Earth Observatory view')} ↗</span></summary>{earthOpen&&<div><Suspense fallback={<p role="status">{t('Loading the Earth view…')}</p>}><EarthGlobe locations={[]} selectedId="" onSelect={noop} playing={false} autoRotate={motion} photographic onSurfaceReady={setEarthReady}/></Suspense><p>{t(earthReady?'July 2004 composite. Lighting and rotation are illustrative, not live weather.':'Interactive illustration with Natural Earth boundaries. Lighting and rotation are illustrative.')} <a href={earthReady?observatoryImagery.sourcePage:'https://www.naturalearthdata.com/'} target="_blank" rel="noreferrer">{t(earthReady?'NASA Earth Observatory · Blue Marble ↗':'Interactive Earth illustration ↗')}</a></p></div>}</details>
+    {show&&<div className="jb-show-bar" role="group" aria-label={t('Jukebox show')}><i aria-hidden="true"/><span>{t('Jukebox show')} · <b>{String(show.index+1).padStart(2,'0')} / {String(jukeboxRecords.length).padStart(2,'0')}</b> · {t(jukeboxRecords[show.index].title)}</span><button type="button" onClick={()=>stopShow()}>{t('Stop')}</button></div>}
+    <p className="sr-only" aria-live="polite" data-testid="show-announcer">{showMessage}</p>
   </div>;
 }

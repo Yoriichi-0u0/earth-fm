@@ -1,8 +1,9 @@
 // The record player's console: title, transport, progress, artwork, readouts and source.
 // Shared by every record on the jukebox (moved out of JukeboxHome.tsx unchanged).
-import {useEffect} from 'react';
+import {useEffect,useRef} from 'react';
 import type {ReactNode} from 'react';
 import {announceDeck} from '../lib/deckEvents';
+import {useShowCue} from '../lib/showMode';
 import {ArrowUpRight,Play,Square,Volume2} from 'lucide-react';
 import type {JukeboxRecord,JukeboxRecordId} from '../data/jukeboxRecords';
 import {useStudioLanguage} from '../lib/studioLanguage';
@@ -17,6 +18,18 @@ export default function DeckConsole({labels,record,artwork,playing,starting,read
   const {t}=useStudioLanguage();const active=playing||starting;
   useEffect(()=>{announceDeck(active);},[active]);
   useEffect(()=>()=>announceDeck(false),[]);
+  // Jukebox Show: press Play once per cue when ready; report a natural finish or an early stop.
+  const show=useShowCue(),showNow=useRef(show),startedFor=useRef<number|null>(null),wasActive=useRef(false),completedNow=useRef(completed),onPlayNow=useRef(onPlay);
+  showNow.current=show;completedNow.current=completed;onPlayNow.current=onPlay;
+  useEffect(()=>{if(show.cue!==null&&ready&&!active&&startedFor.current!==show.cue){startedFor.current=show.cue;onPlayNow.current();}},[show.cue,ready,active]);
+  useEffect(()=>{
+    const cue=show.cue;if(cue===null||startedFor.current!==cue)return;
+    if(active){wasActive.current=true;return;}
+    if(!wasActive.current)return;
+    wasActive.current=false;
+    // Read the result a moment later: some decks set "completed" just after they stop.
+    window.setTimeout(()=>{if(showNow.current.cue===cue)(completedNow.current?showNow.current.onEnded:showNow.current.onStopped)(cue);},60);
+  },[active,show.cue]);
   return <article className={`jb-deck ${active?'is-playing':''}${side?' jb-two-sided':''}${manual?' jb-manual':''}`} aria-labelledby="jb-record-title" data-record-kind={record.kind} data-record-side={side} data-play-mode={manual?'manual':'automatic'} data-note-serial={signal.event?.serial??0} data-note-at={signal.event?.at??0} data-play-request-at={requestAt} data-frequency={signal.frequency??''}>
     <header className="jb-deck-header">
       <div className="jb-record-heading"><h2 id="jb-record-title" tabIndex={-1}>{t(record.title)}</h2></div>

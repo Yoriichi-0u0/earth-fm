@@ -72,3 +72,11 @@
   .air-stories button,.air-strip-buttons button{transition:none}
 }
 .air-performance{padding-bottom:6px}
+
+/* Meet the instruments */
+.air-meet{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 23px 0}
+:is(.ss,html) .air-meet button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--record-accent,#c19adc);background:color-mix(in srgb,var(--record-accent,#c19adc) 16%,transparent);color:var(--ef-text,inherit);font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+:is(.ss,html) .air-meet button:active{transform:scale(.97)}
+:is(.ss,html) .air-meet button[aria-pressed="true"]{background:var(--record-accent,#c19adc);color:#0b0d10}
+.air-meet span{font-size:12px;color:var(--ef-muted,#a6b3bd);text-wrap:pretty}
+@media(max-width:640px){.air-meet{padding-left:16px;padding-right:16px}}

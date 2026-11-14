@@ -76,6 +76,8 @@ React 19 + Vite + TypeScript, no backend. Everything (sound synthesis via Web Au
 
 **Motion.** Anime.js (`animejs` 4.5) drives the mixer meters and the Record Journey (`RecordJourney.tsx`, data in `src/data/journeys.ts`); Three.js via react-three-fiber drives the jukebox stage, the vinyl, the Climate Coil and the aerosol globe. Every animation is off under reduced motion, and 3D always has a 2D fallback.
 
+**Jukebox Show.** `JukeboxHome` owns the running order and wraps the player in `ShowContext` (`src/lib/showMode.tsx`). `DeckConsole` presses its own Play once per cue when the deck is ready and reports a natural finish (`completed`) or an early stop; stopping a show remounts the deck (`deckEpoch` in its key) so each deck's own cleanup silences it. New decks get show mode for free if they report `ready`, `playing` and `completed` accurately.
+
 **Presentation never drives audio.** The audio clock is the source of truth. Players expose a read-only `RecordSignal`/`NoteEvent` (`src/lib/recordSignal.ts`) that visuals (Grooveprint, the vinyl, the Three.js coil and stage) follow; `announceDeck()` in `src/lib/deckEvents.ts` broadcasts play/stop to the 3D jukebox via a window event. Keep that direction: rendering must not schedule or alter sound.
 
 **Language and appearance.** The interface is English only (Simplified Chinese was removed on 14 Nov 2026). UI text still goes through `t()` from `useStudioLanguage()`, which returns the English text, so keep using it for visible copy. Appearance (Auto/Light/Dark) is a segmented button control (`AppearanceSelector`); it is resolved before paint by the inline script in `index.html` and then by `AppearanceProvider`; both must use the same storage keys.

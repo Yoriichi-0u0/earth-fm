@@ -70,3 +70,19 @@ export const MAPPING_TABLE: readonly (readonly [string, string])[] = [
   ['Longitude of the slice (64 slices of 5.625°)', 'Time and stereo position: west to east'],
   ['Tempo, mute and solo', 'Your musical choice; they never change a note'],
 ];
+
+/** "Meet the instruments": each aerosol alone, south → equator → north, so the mapping is learned by ear. */
+export const MEET_LATITUDES = [-40, 10, 60] as const;
+export const MEET_LOUDNESS = 0.8;
+export type MeetStep = Chord & { aerosol: Aerosol | null; lat: number | null };
+export function meetScore(): MeetStep[] {
+  const steps: MeetStep[] = [];
+  AEROSOLS.forEach((aerosol, k) => {
+    for (const lat of MEET_LATITUDES) {
+      const midi = midiFor(VOICES[aerosol], lat);
+      steps.push({ index: steps.length, lon: 0, pan: 0, aerosol, lat, notes: [{ aerosol, midi, hz: midiToHz(midi), name: midiName(midi), loudness: MEET_LOUDNESS, amount: FULL_AMOUNT, lat }] });
+    }
+    if (k < AEROSOLS.length - 1) steps.push({ index: steps.length, lon: 0, pan: 0, aerosol: null, lat: null, notes: [] });
+  });
+  return steps;
+}

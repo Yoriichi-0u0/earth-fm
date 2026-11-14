@@ -103,3 +103,18 @@ test('captions use fixed words on the same scale as the sound', () => {
   assert.match(sahara, /^strong dust near \d+°N/);
   assert.equal(mixSentence(mixIn(field, boxFor(-180, -90, 180, -80))), 'clear air, silence');
 });
+
+test('Meet the instruments: each aerosol alone, rising from south to north, with a rest between voices', async () => {
+  const { meetScore, MEET_LATITUDES } = await import('../src/lib/air/sonify.ts');
+  const score = meetScore();
+  assert.equal(score.length, AEROSOLS.length * MEET_LATITUDES.length + AEROSOLS.length - 1);
+  for (const aerosol of AEROSOLS) {
+    const steps = score.filter((s) => s.aerosol === aerosol);
+    assert.equal(steps.length, 3);
+    assert.ok(steps.every((s) => s.notes.length === 1 && s.notes[0].aerosol === aerosol));
+    assert.ok(steps[0].notes[0].midi < steps[1].notes[0].midi && steps[1].notes[0].midi < steps[2].notes[0].midi, `${aerosol} rises with latitude`);
+    assert.deepEqual(steps.map((s) => s.notes[0].midi), MEET_LATITUDES.map((lat) => midiFor(VOICES[aerosol], lat)), 'same pitch rule as the map');
+  }
+  assert.equal(score.filter((s) => s.aerosol === null && s.notes.length === 0).length, AEROSOLS.length - 1);
+  assert.deepEqual(score.map((s) => s.index), score.map((_, i) => i));
+});

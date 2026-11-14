@@ -37,6 +37,12 @@ Simplified Chinese is removed: the interface is English only, the dictionary and
 
 Unit and e2e tests for every new behaviour, docs (`docs/AIR.md`, SUBMISSION, README), merge, deploy and verify live.
 
+## TerraJuke 5: Showtime (14 Nov, evening)
+
+- **Play the whole jukebox**: every record in turn with an Anime.js title card, a spoken announcement and a floating show bar; Stop, Escape or choosing a record ends it.
+- **Meet the four instruments** on The Air We Share: each aerosol alone, rising from south to north.
+- Checked in emulated iPhone WebKit: the Air and Night Lights specs pass (21/21).
+
 ## Not claimed
 
 GEOS is a model analysis that assimilates satellite and ground observations. It is not a direct measurement, and the colour bar carries no numeric scale, so TerraJuke reports rendered colour strength, never optical depth or concentrations. The still is one moment (19 Aug 2025, 20:00 UTC). Shares are of map pixels on an equirectangular map, not of area.
