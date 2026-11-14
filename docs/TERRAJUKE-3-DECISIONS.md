@@ -4,7 +4,7 @@
 
 **Organising idea.** TerraJuke is a jukebox. Each NASA visualization is a **record**: you choose it, put it on, hear it, flip it, explore it. Three.js makes the machine itself the visual centrepiece. Every feature must serve that metaphor and the challenge, or it goes.
 
-**Baseline.** This repository (`codex/terrajuke-experience-2`, production `05e8af5` at terrajuke.vercel.app). The hackathon repository (`TerraJuke-SpaceApps-2026`) remains the project submitted for judging under the Local Lead's ruling; work flows from it into this one (the team's own new work), never the reverse.
+**Baseline.** This repository (`codex/terrajuke-experience-2`, production `05e8af5` at terrajuke.vercel.app). This repository is the team's Space Apps submission. The Night Lights science was written in the team's in-event repository (`TerraJuke-SpaceApps-2026`) and ported here. *(Corrected 14 Nov 2026: an earlier version of this line wrongly called the in-event repository the judged submission and restricted work to flow one way.)*
 
 ## Audit and decisions
 
@@ -31,7 +31,7 @@
 ## Build order
 
 1. Night Lights science into `src/lib/nightLights/` with its unit tests, NASA files, provenance and the SVS 5276 validation (ported from the hackathon repository at `4a1abc4`, the team's own work from 14 Nov).
-2. Night Lights record in the jukebox (replaces Moving Earth on the shelf), with the synchronized feedback channels.
+2. Night Lights record in the jukebox (record 02; Moving Earth moves to 03), with the synchronized feedback channels.
 3. Three.js jukebox stage for choosing and playing records.
-4. Shelf clean-up (remove Moving Earth, the duplicate records and the legacy entry), docs, tests.
+4. Shelf clean-up (shelf numbering and the legacy footer link removed; Moving Earth, Arctic September and Temperature Through Time kept for now, per the audit table), docs, tests.
 5. Full check, draft PR, production deploy, live verification.
